@@ -139,10 +139,6 @@ HTML_TEMPLATE = """
     .hidden {
       display: none !important;
     }
-    /* Always show sources body when panel is visible */
-    #sources-body {
-      display: block !important;
-    }
     /* Styles for mode buttons */
     .mode-button {
       transition: all 0.3s ease;
@@ -222,18 +218,6 @@ HTML_TEMPLATE = """
         </div>
       </div>
       <!-- Messages will be added here dynamically -->
-    </div>
-
-    <div id="sources-container" class="hidden">
-      <div id="sources-header" class="flex items-center justify-between cursor-pointer px-4 py-2 border-t">
-        <h2 class="text-sm font-semibold text-gray-700">Sources</h2>
-        <svg id="sources-chevron" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-      <div id="sources-body" class="px-4 pb-4 hidden">
-        <div id="sources" class="space-y-1"></div>
-      </div>
     </div>
     
     <!-- Chat Input Area -->
@@ -391,7 +375,7 @@ HTML_TEMPLATE = """
       // Convert citation references [n] to clickable links
       message = message.replace(
         /\[(\d+)\]/g,
-        '<a href="#source-$1" class="citation-link text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
+        '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
       );
       return message;
     }
@@ -451,7 +435,7 @@ HTML_TEMPLATE = """
           <div class="text-sm font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
              ${formatMessage(message)}
           </div>
-          <span class="text-xs font-normal text-gray-500 dark:text-gray-400 float-right">Was this helpful?</span>
+          <span class="text-xs font-normal text-gray-500 dark:text-gray-400 text-right pt-1">Was this helpful?</span>
         </div>
       `;
       
@@ -528,101 +512,7 @@ HTML_TEMPLATE = """
           if (data.sources && data.sources.length > 0) {
             // Store last sources for citation click handling
             window.lastSources = data.sources;
-            const sourcesContainer = document.getElementById('sources-container');
-            const sourcesDiv = document.getElementById('sources');
-            
-            if (sourcesContainer && sourcesDiv) {
-              sourcesDiv.innerHTML = '';
-              data.sources.forEach((source, index) => {
-                const sourceItem = document.createElement('div');
-                sourceItem.className = 'source-item mb-1 p-1 bg-gray-50 rounded text-sm';
-                sourceItem.id = `source-${index + 1}`;
-                
-                // Handle different source formats
-                let sourceTitle = '';
-                let sourceContent = '';
-                
-                if (typeof source === 'string') {
-                  // For string sources, use the first 100 chars as title and the rest as content
-                  if (source.length > 100) {
-                    sourceTitle = source.substring(0, 100) + '...';
-                    sourceContent = source;
-                  } else {
-                    sourceTitle = source;
-                    sourceContent = '';
-                  }
-                } else if (typeof source === 'object') {
-                  // Extract title and content from source object
-                  sourceTitle = source.title || source.id || `Source ${index + 1}`;
-                  sourceContent = source.content || '';
-                }
-                
-                // Truncate content if it's too long (more than 150 chars)
-                const isLongContent = sourceContent.length > 150;
-                const truncatedContent = isLongContent ? 
-                  sourceContent.substring(0, 150) + '...' : 
-                  sourceContent;
-                
-                // Create HTML with collapsible content
-                sourceItem.innerHTML = `
-                  <div>
-                   <h2 data-toc="true" id="source-${index + 1}"><a name="source-${index + 1}" class="text-sm text-black font-bold">[${index + 1}] ${sourceTitle}</a></h2>
-                    <div class="source-content">${truncatedContent}</div>
-                    ${isLongContent ? 
-                      `<div class="source-full-content hidden">${sourceContent}</div>
-                       <button class="toggle-source-btn text-blue-600 text-xs mt-1 hover:underline">Show more</button>` 
-                      : ''}
-                  </div>
-                `;
-                
-                // Add event listener for toggle button
-                if (isLongContent) {
-                  setTimeout(() => {
-                    const toggleBtn = sourceItem.querySelector('.toggle-source-btn');
-                    if (toggleBtn) {
-                      toggleBtn.addEventListener('click', function() {
-                        const truncatedEl = this.parentNode.querySelector('.source-content');
-                        const fullEl = this.parentNode.querySelector('.source-full-content');
-                        
-                        if (truncatedEl.classList.contains('hidden')) {
-                          // Show truncated, hide full
-                          truncatedEl.classList.remove('hidden');
-                          fullEl.classList.add('hidden');
-                          this.textContent = 'Show more';
-                        } else {
-                          // Show full, hide truncated
-                          truncatedEl.classList.add('hidden');
-                          fullEl.classList.remove('hidden');
-                          this.textContent = 'Show less';
-                        }
-                      });
-                    }
-                  }, 100);
-                }
-                sourcesDiv.appendChild(sourceItem);
-              });
-              
-              
-              // Position sources panel below the latest visible bot response
-              if (sourcesContainer && sourcesDiv) {
-                const botMsgs = chatMessages.querySelectorAll('.bot-message');
-                const visibleBotMsgs = Array.from(botMsgs).filter(msg => !msg.classList.contains('hidden'));
-                const lastMsg = visibleBotMsgs[visibleBotMsgs.length - 1];
-                if (lastMsg) {
-                  lastMsg.insertAdjacentElement('afterend', sourcesContainer);
-                }
-                sourcesContainer.classList.remove('hidden');
-                const sourcesHeader = document.getElementById('sources-header');
-                const sourcesBody = document.getElementById('sources-body');
-                const sourcesChevron = document.getElementById('sources-chevron');
-                if (sourcesHeader) {
-                  sourcesHeader.addEventListener('click', function() {
-                    sourcesBody.classList.toggle('hidden');
-                    sourcesChevron.classList.toggle('rotate-180');
-                  });
-                }
-              }
-            }
+            // Old sources panel display logic removed. dynamic-container.js will handle it.
           }
         }
       })
@@ -708,57 +598,19 @@ HTML_TEMPLATE = """
     window.formatMessage = formatMessage;
     window.openDrawer = openDrawer;
     window.logsContainer = consoleLogsContent;
-    // Move sources panel into chat messages for alignment
-    document.addEventListener('DOMContentLoaded', () => {
-      const msgs = document.getElementById('chat-messages');
-      const sources = document.getElementById('sources-container');
-      if (msgs && sources) {
-        msgs.appendChild(sources);
-      }
-
-    });
+    // Old DOMContentLoaded listener for sources panel removed.
   </script>
 
   <!-- Load the unified developer evaluation module -->
   
 <script src="/static/js/unifiedEval.js"></script>
-<script src="/static/js/custom.js"></script>
+<script src="/static/js/custom.js"></script> <!-- This file is empty/deprecated -->
 <script src="/static/js/debug-logger.js"></script>
 <script src="/static/js/dynamic-container.js"></script>
-<script src="/static/js/citation-toggle.js"></script>
+<!-- <script src="/static/js/citation-toggle.js"></script> --> <!-- Removed -->
 <script src="/static/js/feedback-integration.js"></script>
 <script src="/static/js/feedback_thumbs.js"></script>
-<script>
-    // Define a placeholder citation click handler that will be overridden by citation-toggle.js
-    window.handleCitationClick = function(e) {
-      const link = e.target.closest('.citation-link');
-      if (!link) return;
-      e.stopPropagation();
-      
-      const sourceId = link.getAttribute('data-source-id');
-      
-      // Default implementation (will be overridden)
-      const sourcesDiv = document.getElementById('sources');
-      const sourcesBody = document.getElementById('sources-body');
-      const sourcesContainer = document.getElementById('sources-container');
-      const sourcesChevron = document.getElementById('sources-chevron');
-      
-      if (sourcesContainer) sourcesContainer.classList.remove('hidden');
-      if (sourcesBody) sourcesBody.classList.remove('hidden');
-      
-      const target = document.getElementById(`source-${sourceId}`);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        target.classList.add('bg-yellow-100');
-        setTimeout(() => target.classList.remove('bg-yellow-100'), 2000);
-      }
-    };
-    
-    // Add the event listener that will use the handler
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('chat-messages').addEventListener('click', window.handleCitationClick);
-    });
-</script>
+<!-- Placeholder citation click handler and its listener removed -->
   </body>
 </html>
 

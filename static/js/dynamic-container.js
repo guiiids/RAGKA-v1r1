@@ -149,21 +149,6 @@ class DynamicContainer {
         color: #1d4ed8;
       }
       
-      /* Citation highlight styles */
-      .citation-highlight {
-        background-color: #fef08a;
-        transition: background-color 0.3s ease;
-        padding: 0.25rem;
-        border-radius: 0.25rem;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        animation: pulse-highlight 1s ease-in-out;
-      }
-      
-      @keyframes pulse-highlight {
-        0% { background-color: #fef08a; }
-        50% { background-color: #fde047; }
-        100% { background-color: #fef08a; }
-      }
     `;
     
     document.head.appendChild(style);
@@ -288,12 +273,11 @@ class DynamicContainer {
     this.show(content, title);
   }
 
+  removeAllHighlights() {
+    document.querySelectorAll('.bg-yellow-100').forEach(el => el.classList.remove('bg-yellow-100'));
+  }
+
   handleCitationClick(citationLink) {
-    // Check if dynamic citations are enabled
-    if (window.useDynamicCitations === false) {
-      return; // Let the classic implementation handle it
-    }
-    
     const sourceId = citationLink.getAttribute('data-source-id');
     
     // Log the citation click if debug logger is available
@@ -351,45 +335,7 @@ class DynamicContainer {
         
         // Show the container with the source content
         this.show(content, title);
-        
-        // Highlight the citation title in the sources panel
-        this.highlightCitationTitle(sourceId);
       }
-    }
-  }
-  
-  highlightCitationTitle(sourceId) {
-    // Find the citation title element
-    const citationTitle = document.querySelector(`#source-${sourceId}`);
-    if (citationTitle) {
-      // Add highlight class
-      citationTitle.classList.add('citation-highlight');
-      
-      // Scroll the element into view if needed
-      citationTitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Log the highlight action if debug logger is available
-      if (window.debugLogger) {
-        window.debugLogger.log('Citation title highlighted', 'ui-state', {
-          sourceId: sourceId,
-          element: `#source-${sourceId}`
-        });
-      }
-    }
-  }
-  
-  removeAllHighlights() {
-    // Remove highlight class from all citation titles
-    const highlightedElements = document.querySelectorAll('.citation-highlight');
-    highlightedElements.forEach(element => {
-      element.classList.remove('citation-highlight');
-    });
-    
-    // Log the highlight removal if debug logger is available
-    if (window.debugLogger && highlightedElements.length > 0) {
-      window.debugLogger.log('Removed all citation highlights', 'ui-state', {
-        count: highlightedElements.length
-      });
     }
   }
 
@@ -440,9 +386,6 @@ class DynamicContainer {
     
     // Restore the chat container
     this.chatContainer.classList.remove('compressed');
-    
-    // Remove any citation highlights
-    this.removeAllHighlights();
     
     setTimeout(() => {
       this.container.classList.add('hidden');

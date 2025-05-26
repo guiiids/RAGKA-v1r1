@@ -37,7 +37,7 @@
         return `
             <div class="feedback-container flex flex-wrap" data-message-id="${messageId}"
                  style="display: flex; flex-direction: column; align-items: flex-end; margin-left: 8px; font-size:14px;">
-                <div class="feedback-icons inline-flex" style="margin-bottom: 5px;">
+                <div class="feedback-icons inline-flex mb-5 pt-1">
                     <i class="fas fa-thumbs-up feedback-thumb" data-type="up"
                        style="color: #6b7280; cursor: pointer; margin-right: 8px; font-size: 16px; transition: color 0.2s;"
                        title="Helpful"></i>
