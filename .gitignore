@@ -1,0 +1,70 @@
+# Environment variables and secrets
+.env
+*.env
+set_azure_env.sh
+delete_azure_env.sh
+
+# Logs
+*.log
+app.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Data dumps and temporary files
+dump_*.md
+dump_*.txt
+*.dump
+
+# User data
+feedback_data/
+.ignore_files/
+
+# Cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker volumes
+docker-volumes/
+
+# Local development files
+local_settings.py
+
+# venv
+.venv/
+chat_neo.html
+memory-bank/
+
+.ignore/
+.ignore_files
+stag.py
+app.zip
+package_dir/
+
+.env_export.json
+.env_transformed.json
+.env.json
+kson.json

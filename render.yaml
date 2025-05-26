@@ -1,0 +1,28 @@
+services:
+  # Web service
+  - type: web
+    name: azure-search-rag-assistant
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: OPENAI_ENDPOINT
+        sync: false
+      - key: OPENAI_KEY
+        sync: false
+      - key: OPENAI_API_VERSION
+        sync: false
+      - key: EMBEDDING_DEPLOYMENT
+        sync: false
+      - key: CHAT_DEPLOYMENT
+        sync: false
+      - key: SEARCH_ENDPOINT
+        sync: false
+      - key: SEARCH_INDEX
+        sync: false
+      - key: SEARCH_KEY
+        sync: false
+      - key: VECTOR_FIELD
+        sync: false
+      - key: PORT
+        value: 10000
