@@ -480,21 +480,117 @@
             break;
         }
         
-        // Make API call
+        // Generate unique request ID for tracking
+        const requestStartTime = Date.now();
+        const requestId = `req_${requestStartTime}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Log comprehensive API request details
+        if (window.debugLogger) {
+          window.debugLogger.log(`🚀 API Request Started`, 'api-request', {
+            requestId: requestId,
+            endpoint: endpoint,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            payload: data,
+            payloadSize: JSON.stringify(data).length,
+            timestamp: new Date().toISOString(),
+            mode: activeMode,
+            userAgent: navigator.userAgent
+          });
+        }
+        
+        // Console logging for detailed debugging
+        console.group(`🚀 [API REQUEST ${requestId}] Starting request to ${endpoint}`);
+        console.log('📤 Request Details:', {
+          endpoint: endpoint,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          timestamp: new Date().toISOString(),
+          mode: activeMode
+        });
+        console.log('📦 Request Payload:', JSON.stringify(data, null, 2));
+        console.log('📏 Payload Size:', JSON.stringify(data).length, 'bytes');
+        console.groupEnd();
+        
+        // Make API call with comprehensive logging
         fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         })
         .then(response => {
+          const requestEndTime = Date.now();
+          const duration = requestEndTime - requestStartTime;
+          
+          // Extract response headers
+          const responseHeaders = {};
+          for (let [key, value] of response.headers.entries()) {
+            responseHeaders[key] = value;
+          }
+          
+          // Log response details
+          if (window.debugLogger) {
+            window.debugLogger.log(`📥 API Response Received`, 'api-response', {
+              requestId: requestId,
+              status: response.status,
+              statusText: response.statusText,
+              headers: responseHeaders,
+              duration: `${duration}ms`,
+              timestamp: new Date().toISOString(),
+              ok: response.ok,
+              redirected: response.redirected,
+              type: response.type,
+              url: response.url
+            });
+          }
+          
+          console.group(`📥 [API RESPONSE ${requestId}] Response received`);
+          console.log('📊 Response Status:', response.status, response.statusText);
+          console.log('⏱️ Duration:', duration + 'ms');
+          console.log('📋 Response Headers:', responseHeaders);
+          console.log('✅ Response OK:', response.ok);
+          console.log('🔄 Redirected:', response.redirected);
+          console.log('📍 Response URL:', response.url);
+          console.groupEnd();
+          
           if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const error = new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+            error.status = response.status;
+            error.statusText = response.statusText;
+            error.headers = responseHeaders;
+            throw error;
           }
           return response.json();
         })
         .then(result => {
-          // Log the full response for debugging
-          console.log('API Response:', result);
+          const parseEndTime = Date.now();
+          const totalDuration = parseEndTime - requestStartTime;
+          
+          // Log the complete response body
+          if (window.debugLogger) {
+            window.debugLogger.log(`📄 API Response Body Parsed`, 'api-response', {
+              requestId: requestId,
+              responseBody: result,
+              responseSize: JSON.stringify(result).length,
+              totalDuration: `${totalDuration}ms`,
+              timestamp: new Date().toISOString(),
+              hasError: !!result.error,
+              hasResults: !!(result.result || result.answer || result.results || result.batch1_results),
+              hasSources: !!(result.sources && result.sources.length > 0)
+            });
+          }
+          
+          console.group(`📄 [API RESPONSE ${requestId}] Response body parsed`);
+          console.log('📦 Response Body:', JSON.stringify(result, null, 2));
+          console.log('📏 Response Size:', JSON.stringify(result).length, 'bytes');
+          console.log('⏱️ Total Duration:', totalDuration + 'ms');
+          console.log('❌ Has Error:', !!result.error);
+          console.log('✅ Has Results:', !!(result.result || result.answer || result.results || result.batch1_results));
+          console.log('📚 Has Sources:', !!(result.sources && result.sources.length > 0));
+          if (result.error) {
+            console.error('❌ API Error:', result.error);
+          }
+          console.groupEnd();
           
           // Remove typing indicator
           if (typingIndicator && typingIndicator.remove) {
@@ -751,6 +847,31 @@
           currentStep = 'query';
         })
         .catch(error => {
+          const errorEndTime = Date.now();
+          const errorDuration = errorEndTime - requestStartTime;
+          
+          // Log comprehensive error details
+          if (window.debugLogger) {
+            window.debugLogger.log(`❌ API Request Failed`, 'api-error', {
+              requestId: requestId,
+              error: error.message,
+              status: error.status || 'unknown',
+              statusText: error.statusText || 'unknown',
+              headers: error.headers || {},
+              duration: `${errorDuration}ms`,
+              timestamp: new Date().toISOString(),
+              stack: error.stack
+            });
+          }
+          
+          console.group(`❌ [API ERROR ${requestId}] Request failed`);
+          console.error('💥 Error Message:', error.message);
+          console.error('📊 Error Status:', error.status || 'unknown');
+          console.error('📋 Error Headers:', error.headers || {});
+          console.error('⏱️ Error Duration:', errorDuration + 'ms');
+          console.error('🔍 Error Stack:', error.stack);
+          console.groupEnd();
+          
           // Remove typing indicator
           if (typingIndicator && typingIndicator.remove) {
             typingIndicator.remove();

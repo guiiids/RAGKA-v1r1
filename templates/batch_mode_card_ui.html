@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAGKA - Batch Mode</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .card-transition {
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+    .card-active {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .card-inactive {
+      transform: scale(0.95);
+      opacity: 0.6;
+    }
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center">
+        <img class="h-10 w-auto" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png" alt="Logo">
+        <h1 class="text-2xl font-bold ml-4 text-gray-800">RAGKA - Batch Mode</h1>
+      </div>
+      <button id="back-to-chat" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+        Back to Chat
+      </button>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+      <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 33%"></div>
+    </div>
+
+    <!-- Cards Container -->
+    <div class="flex flex-col lg:flex-row justify-center gap-6 mb-8">
+      <!-- Card 1: Settings -->
+      <div id="card-1" class="bg-gray-800 rounded-3xl p-6 w-full max-w-md flex flex-col card-transition card-active">
+        <h2 class="text-xl font-semibold mb-2 text-white"># Batch Mode</h2>
+        <h3 class="text-2xl font-bold mb-4 text-white">1. Settings</h3>
+
+        <label class="mb-2 block text-sm text-white">Query</label>
+        <textarea id="batch-query" class="w-full h-20 p-2 rounded-md text-black resize-none mb-4" placeholder="Enter your query here..."></textarea>
+
+        <label class="mb-2 block text-sm text-white">Custom Prompt</label>
+        <textarea id="batch-custom-prompt" class="w-full h-28 p-2 rounded-md text-black resize-none mb-4" placeholder="Add custom instructions to the system prompt..."></textarea>
+
+        <label class="block mb-1 text-white">Temperature: <span id="temp-value">0.3</span></label>
+        <input id="batch-temperature" type="range" min="0" max="2" step="0.1" value="0.3" class="w-full mb-4" />
+
+        <label class="block mb-1 text-white">Top P: <span id="top-p-value">1.0</span></label>
+        <input id="batch-top-p" type="range" min="0" max="1" step="0.05" value="1.0" class="w-full mb-4" />
+
+        <label class="block mb-1 text-white">Max. Tokens: <span id="max-tokens-value">1000</span></label>
+        <input id="batch-max-tokens" type="range" min="100" max="4000" step="100" value="1000" class="w-full mb-4" />
+
+        <label class="block mb-1 text-white">No of Runs</label>
+        <input id="batch-runs" type="number" value="4" min="1" max="20" class="w-16 px-2 py-1 rounded text-black mb-4" />
+
+        <button id="next-to-review" class="ml-auto mt-auto bg-black text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700">
+          &gt;
+        </button>
+      </div>
+
+      <!-- Card 2: Review -->
+      <div id="card-2" class="bg-gray-800 rounded-3xl p-6 w-full max-w-md flex flex-col card-transition card-inactive hidden">
+        <h2 class="text-xl font-semibold mb-2 text-white"># Batch Mode</h2>
+        <h3 class="text-2xl font-bold mb-4 text-white">2. Review</h3>
+
+        <div class="text-sm mb-4 text-white">
+          <p><strong>Query</strong><br>
+          <span id="review-query"></span></p>
+        </div>
+
+        <div class="text-sm mb-4 text-white">
+          <p><strong>Custom Prompt</strong><br>
+          <span id="review-prompt"></span></p>
+        </div>
+
+        <div class="text-sm space-y-2 text-white">
+          <p><strong>Temperature:</strong> <span id="review-temperature">0.3</span></p>
+          <p><strong>Top P:</strong> <span id="review-top-p">1.0</span></p>
+          <p><strong>Max. Tokens:</strong> <span id="review-max-tokens">1000</span></p>
+          <p><strong>No of Runs:</strong> <span id="review-runs">4</span></p>
+        </div>
+
+        <div class="flex justify-between mt-auto">
+          <button id="back-to-settings" class="bg-gray-600 text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-500">
+            &lt;
+          </button>
+          <button id="start-batch" class="bg-black text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700">
+            &gt;
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Results -->
+      <div id="card-3" class="bg-gray-800 rounded-3xl p-6 w-full max-w-md flex flex-col card-transition card-inactive hidden">
+        <h2 class="text-xl font-semibold mb-2 text-white"># Batch Mode</h2>
+        <h3 class="text-2xl font-bold mb-4 text-white">3. Results</h3>
+
+        <div id="loading-indicator" class="flex flex-col items-center justify-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          <p class="text-white mt-4">Processing batch runs...</p>
+          <p class="text-white text-sm mt-2">Run <span id="current-run">0</span> of <span id="total-runs">4</span></p>
+        </div>
+
+        <div id="results-content" class="hidden">
+          <div class="text-sm mb-4 text-white">
+            <p><strong>Query</strong><br>
+            <span id="result-query"></span></p>
+          </div>
+
+          <div class="text-sm mb-4 text-white">
+            <p class="font-bold mb-1">Analysis</p>
+            <div id="result-analysis" class="space-y-1">
+              <!-- Analysis content will be inserted here -->
+            </div>
+          </div>
+
+          <div class="text-sm mb-4 font-bold text-white">Suggestions</div>
+          <div id="result-suggestions" class="text-sm mb-4 text-white">
+            <!-- Suggestions content will be inserted here -->
+          </div>
+        </div>
+
+        <div class="mt-auto flex gap-3">
+          <button id="back-to-review" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-2">
+            Back
+          </button>
+          <button id="export-results" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v16h16V4H4zm4 4h8m-4 4v4" />
+            </svg>
+            Export
+          </button>
+          <button id="new-batch" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+            New Batch
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    const batchState = {
+      query: '',
+      customPrompt: '',
+      temperature: 0.3,
+      topP: 1.0,
+      maxTokens: 1000,
+      runs: 4,
+      currentStep: 1,
+      results: null,
+      isProcessing: false
+    };
+
+    // DOM Elements
+    const card1 = document.getElementById('card-1');
+    const card2 = document.getElementById('card-2');
+    const card3 = document.getElementById('card-3');
+    const progressBar = document.getElementById('progress-bar');
+    
+    // Input elements
+    const queryInput = document.getElementById('batch-query');
+    const customPromptInput = document.getElementById('batch-custom-prompt');
+    const temperatureInput = document.getElementById('batch-temperature');
+    const topPInput = document.getElementById('batch-top-p');
+    const maxTokensInput = document.getElementById('batch-max-tokens');
+    const runsInput = document.getElementById('batch-runs');
+    
+    // Display elements
+    const tempValue = document.getElementById('temp-value');
+    const topPValue = document.getElementById('top-p-value');
+    const maxTokensValue = document.getElementById('max-tokens-value');
+    
+    // Review elements
+    const reviewQuery = document.getElementById('review-query');
+    const reviewPrompt = document.getElementById('review-prompt');
+    const reviewTemperature = document.getElementById('review-temperature');
+    const reviewTopP = document.getElementById('review-top-p');
+    const reviewMaxTokens = document.getElementById('review-max-tokens');
+    const reviewRuns = document.getElementById('review-runs');
+    
+    // Results elements
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const resultsContent = document.getElementById('results-content');
+    const resultQuery = document.getElementById('result-query');
+    const resultAnalysis = document.getElementById('result-analysis');
+    const resultSuggestions = document.getElementById('result-suggestions');
+    const currentRunElement = document.getElementById('current-run');
+    const totalRunsElement = document.getElementById('total-runs');
+    
+    // Navigation buttons
+    const nextToReviewBtn = document.getElementById('next-to-review');
+    const backToSettingsBtn = document.getElementById('back-to-settings');
+    const startBatchBtn = document.getElementById('start-batch');
+    const backToReviewBtn = document.getElementById('back-to-review');
+    const exportResultsBtn = document.getElementById('export-results');
+    const newBatchBtn = document.getElementById('new-batch');
+    const backToChatBtn = document.getElementById('back-to-chat');
+
+    // Initialize UI
+    function initUI() {
+      // Set up input change handlers
+      temperatureInput.addEventListener('input', (e) => {
+        batchState.temperature = parseFloat(e.target.value);
+        tempValue.textContent = batchState.temperature;
+      });
+      
+      topPInput.addEventListener('input', (e) => {
+        batchState.topP = parseFloat(e.target.value);
+        topPValue.textContent = batchState.topP;
+      });
+      
+      maxTokensInput.addEventListener('input', (e) => {
+        batchState.maxTokens = parseInt(e.target.value);
+        maxTokensValue.textContent = batchState.maxTokens;
+      });
+      
+      runsInput.addEventListener('input', (e) => {
+        batchState.runs = parseInt(e.target.value);
+      });
+      
+      // Set up navigation handlers
+      nextToReviewBtn.addEventListener('click', goToReview);
+      backToSettingsBtn.addEventListener('click', goToSettings);
+      startBatchBtn.addEventListener('click', startBatchProcess);
+      backToReviewBtn.addEventListener('click', goToReview);
+      newBatchBtn.addEventListener('click', goToSettings);
+      backToChatBtn.addEventListener('click', backToChat);
+      exportResultsBtn.addEventListener('click', exportResults);
+    }
+
+    // Navigation functions
+    function goToSettings() {
+      batchState.currentStep = 1;
+      updateCardVisibility();
+      progressBar.style.width = '33%';
+    }
+    
+    function goToReview() {
+      // Validate query
+      if (!queryInput.value.trim()) {
+        alert('Please enter a query before proceeding.');
+        return;
+      }
+      
+      // Update state
+      batchState.query = queryInput.value.trim();
+      batchState.customPrompt = customPromptInput.value.trim();
+      batchState.currentStep = 2;
+      
+      // Update review card
+      reviewQuery.textContent = batchState.query;
+      reviewPrompt.textContent = batchState.customPrompt || '(Using default prompt)';
+      reviewTemperature.textContent = batchState.temperature;
+      reviewTopP.textContent = batchState.topP;
+      reviewMaxTokens.textContent = batchState.maxTokens;
+      reviewRuns.textContent = batchState.runs;
+      
+      // Update UI
+      updateCardVisibility();
+      progressBar.style.width = '66%';
+    }
+    
+    function goToResults() {
+      batchState.currentStep = 3;
+      updateCardVisibility();
+      progressBar.style.width = '100%';
+      
+      // Show loading initially
+      loadingIndicator.classList.remove('hidden');
+      resultsContent.classList.add('hidden');
+      
+      // Update results display
+      resultQuery.textContent = batchState.query;
+      totalRunsElement.textContent = batchState.runs;
+    }
+    
+    function updateCardVisibility() {
+      // Hide all cards first
+      card1.classList.add('hidden', 'card-inactive');
+      card2.classList.add('hidden', 'card-inactive');
+      card3.classList.add('hidden', 'card-inactive');
+      
+      // Show active card
+      if (batchState.currentStep === 1) {
+        card1.classList.remove('hidden', 'card-inactive');
+      } else if (batchState.currentStep === 2) {
+        card2.classList.remove('hidden', 'card-inactive');
+      } else if (batchState.currentStep === 3) {
+        card3.classList.remove('hidden', 'card-inactive');
+      }
+    }
+    
+    // Batch processing
+    function startBatchProcess() {
+      goToResults();
+      batchState.isProcessing = true;
+      
+      // Simulate API call to backend
+      simulateBatchProcessing();
+    }
+    
+    function simulateBatchProcessing() {
+      let currentRun = 0;
+      
+      // Update the progress indicator
+      function updateProgress() {
+        currentRun++;
+        currentRunElement.textContent = currentRun;
+        
+        if (currentRun >= batchState.runs) {
+          setTimeout(showResults, 1000);
+        } else {
+          setTimeout(updateProgress, 1000);
+        }
+      }
+      
+      // Start the progress updates
+      setTimeout(updateProgress, 1000);
+    }
+    
+    function showResults() {
+      // Hide loading, show results
+      loadingIndicator.classList.add('hidden');
+      resultsContent.classList.remove('hidden');
+      
+      // Generate mock results (in real implementation, this would come from the API)
+      const mockAnalysis = [
+        'Consistent responses across all runs with 87% similarity',
+        'Average response time: 2.3 seconds',
+        'All responses correctly addressed the query context'
+      ];
+      
+      const mockSuggestions = 'Consider lowering the temperature to 0.2 for more consistent results, or increasing to 0.5 for more creative variations.';
+      
+      // Populate results
+      resultAnalysis.innerHTML = mockAnalysis.map(item => `<li class="list-disc list-inside">${item}</li>`).join('');
+      resultSuggestions.textContent = mockSuggestions;
+      
+      batchState.isProcessing = false;
+    }
+    
+    function exportResults() {
+      alert('Results exported! (This would save results to a file in the actual implementation)');
+    }
+    
+    function backToChat() {
+      // In real implementation, this would navigate back to the chat interface
+      alert('This would return to the chat interface in the actual implementation');
+    }
+    
+    // Initialize the UI when the page loads
+    document.addEventListener('DOMContentLoaded', initUI);
+  </script>
+</body>
+</html>

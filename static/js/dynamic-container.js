@@ -120,7 +120,7 @@ class DynamicContainer {
       }
 
       .chat-container.compressed {
-        width: 50% !important;
+        width: 70% !important;
         margin-left: 0 !important;
         margin-right: auto !important;
       }
