@@ -175,7 +175,7 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-        <img class='h-10 w-auto ml-2' src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png" alt="Logo"> 
+        <img class='h-6 w-auto ml-2' src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/ragka_no_logo.png" alt="Logo"> 
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -188,7 +188,7 @@ HTML_TEMPLATE = """
           Analytics
         </a>
         <!-- Mode buttons will be dynamically added here by unifiedDevEval.js -->
-        <div id="mode-buttons-container" class="ml-4 flex space-x-2">
+        <div id="mode-buttons-container" class="ml-4 flex space-x-2" style="display:none;">
           <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400" type="button">
            eVal Mode
           </button>
@@ -201,7 +201,7 @@ HTML_TEMPLATE = """
     <div id="chat-messages" class="chat-messages">
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
-      <img class="h-60 w-auto inline-block object-cover md:h-60" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/This-is-a-to-do-item-This-is-completed-item.png" alt="Logo">
+      <img class="h-70 w-auto inline-block object-cover md:h-80" src="/static/logo-main.gif" alt="Logo">
               </div>
       
       <!-- Bot welcome message (initially hidden) -->
@@ -209,7 +209,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
             <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 dark:text-white">SPARK/<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 dark:text-white">RAGKA/<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-gray-900 dark:text-white">
             Hi there! I'm an AI assistant trained on your knowledge base. What would you like to know?
@@ -230,7 +230,7 @@ HTML_TEMPLATE = """
       </div>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
-      <button id="toggle-console-btn" class="group px-3 py-1 w-full bg-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
+      <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
         Console Logs
         <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4 text-gray-800" viewBox="0 0 20 20" fill="buttoncurrentColor">
           <path fill-rule="evenodd" d="M18 10c0 4.418-3.582 8-8 8-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8zm-9 4a1 1 0 112 0 1 1 0 01-2 0zm.75-7.001a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z" clip-rule="evenodd"/>
@@ -430,7 +430,7 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white">SPARK/<span class="mt-1 text-sm leading-tight font-strong text-indigo-500 hover:underline">AI</span></span>
+            <span class="text-xs font-semibold text-gray-900 dark:text-white">RAGKA/<span class="mt-1 text-sm leading-tight font-strong text-indigo-500 hover:underline">AI</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
              ${formatMessage(message)}
@@ -603,7 +603,7 @@ HTML_TEMPLATE = """
 
   <!-- Load the unified developer evaluation module -->
   
-<script src="/static/js/unifiedEval.js"></script>
+<!-- <script src="/static/js/unifiedEval.js"></script> -->
 <script src="/static/js/custom.js"></script> <!-- This file is empty/deprecated -->
 <script src="/static/js/debug-logger.js"></script>
 <script src="/static/js/dynamic-container.js"></script>
