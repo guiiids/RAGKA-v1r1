@@ -329,7 +329,7 @@ class DynamicContainer {
               ${source.content ? `
                 <div>
                   <h4 class="font-medium text-gray-900 mb-2">Content</h4>
-                  <div class="bg-gray-50 p-3 rounded text-sm text-base/8 overflow-y-auto">
+                  <div class="bg-gray-50 p-3 rounded text-sm leading-8 overflow-y-auto">
                     ${linkifiedContent}
                   </div>
                 </div>
