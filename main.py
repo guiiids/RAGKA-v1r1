@@ -175,7 +175,7 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-        <img class='h-6 w-auto ml-2' src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/ragka_no_logo.png" alt="Logo"> 
+        <img class='h-4 w-auto ml-2' src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-no-logo.png" alt="Logo"> 
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -201,9 +201,23 @@ HTML_TEMPLATE = """
     <div id="chat-messages" class="chat-messages">
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
-      <img class="h-70 w-auto inline-block object-cover md:h-80" src="/static/logo-main.gif" alt="Logo">
-              </div>
-      
+        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo">
+        <h3 class="text-lg font-thin text-gray-900 mt-2">RAG Knowledge Assistant</h3>
+      </div>
+      <script>
+      (function() {
+        const logos = [
+          
+         
+          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-and-text-1.png',
+        ];
+        const chosen = logos[Math.floor(Math.random() * logos.length)];
+        document.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('random-logo').src = chosen;
+        });
+      })();
+      </script>
+
       <!-- Bot welcome message (initially hidden) -->
          <div id="welcome-message" class="flex items-start gap-2.5 mb-4 hidden">
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">

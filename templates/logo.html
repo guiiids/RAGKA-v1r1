@@ -1,2 +1,16 @@
-<img src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/ragka_aI_no_logo.png" width="100%">
-<img src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-cooking.png" width="100%">
+<div id="logo-container">
+  <img id="random-logo" width="100%">
+</div>
+<script>
+(function() {
+  const logos = [
+    'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-cooking.png',
+    'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-no-logo.png',
+    'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-and-text.png'
+  ];
+  const chosen = logos[Math.floor(Math.random() * logos.length)];
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('random-logo').src = chosen;
+  });
+})();
+</script>
