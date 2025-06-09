@@ -44,7 +44,7 @@ class DynamicContainer {
     // Create the container structure
     this.container.innerHTML = `
       <div class="dynamic-container-header">
-        <h2 id="dynamic-container-title" class="text-lg font-semibold text-gray-900">Dynamic Content</h2>
+        <h2 id="dynamic-container-title" class="text-md font-semibold text-gray-900">Dynamic Content</h2>
         <button id="dynamic-container-close" class="close-btn">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -69,7 +69,7 @@ class DynamicContainer {
         position: fixed;
         top: 0;
         right: 0;
-        width: 30%;
+        width: 40%;
         height: 100vh;
         background: white;
         border-left: 2px solid #e5e7eb;
@@ -120,7 +120,7 @@ class DynamicContainer {
       }
 
       .chat-container.compressed {
-        width: 70% !important;
+        width: 60% !important;
         margin-left: 0 !important;
         margin-right: auto !important;
       }
@@ -302,17 +302,22 @@ class DynamicContainer {
         let content = '';
         
         if (typeof source === 'string') {
+          // Auto-link URLs in text-only source content
+          const linkified = source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           content = `
             <div class="space-y-4">
               <div>
                 <h3 class="font-medium text-gray-900 mb-2">Source Content</h3>
                 <div class="bg-gray-50 p-3 rounded text-sm">
-                  ${source}
+                  ${linkified}
                 </div>
               </div>
             </div>
           `;
         } else if (typeof source === 'object') {
+          // Auto-link URLs in source.content
+          const rawContent = source.content || '';
+          const linkifiedContent = rawContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           title = source.title || source.id || `Source [${sourceId}]`;
           content = `
             <div class="space-y-4">
@@ -324,8 +329,8 @@ class DynamicContainer {
               ${source.content ? `
                 <div>
                   <h4 class="font-medium text-gray-900 mb-2">Content</h4>
-                  <div class="bg-gray-50 p-3 rounded text-sm  overflow-y-auto">
-                    ${source.content}
+                  <div class="bg-gray-50 p-3 rounded text-sm leading-8 overflow-y-auto">
+                    ${linkifiedContent}
                   </div>
                 </div>
               ` : ''}
@@ -356,7 +361,11 @@ class DynamicContainer {
     const contentElement = document.getElementById('dynamic-container-content');
     
     if (titleElement) titleElement.textContent = title;
-    if (contentElement) contentElement.innerHTML = content;
+    if (contentElement) {
+      contentElement.innerHTML = content;
+      // Auto-link URLs in rendered HTML
+      contentElement.innerHTML = contentElement.innerHTML.replace(/((http|https):\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
+    }
     
     // Show the container
     this.container.classList.remove('hidden');

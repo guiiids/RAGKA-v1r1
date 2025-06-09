@@ -446,7 +446,7 @@ HTML_TEMPLATE = """
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
             <span class="text-xs font-semibold text-gray-900 dark:text-white">RAGKA/<span class="mt-1 text-sm leading-tight font-strong text-indigo-500 hover:underline">AI</span></span>
           </div>
-          <div class="text-sm font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
+          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
              ${formatMessage(message)}
           </div>
           <span class="text-xs font-normal text-gray-500 dark:text-gray-400 text-right pt-1">Was this helpful?</span>
