@@ -360,15 +360,14 @@ class FlaskRAGAssistant:
                 deployment=self.deployment_name,
             )
 
-            # Add a visible marker to the answer to confirm use of rag_assistant3
-            answer = "[RAG3] " + answer
+            
             return answer, cited_sources, [], evaluation, context
         
 
         except Exception as exc:
             logger.error("RAG generation error: %s", exc)
             return (
-                "[RAG3] I encountered an error while generating the response.",
+                "I encountered an error while generating the response.",
                 [],
                 [],
                 {},
@@ -483,8 +482,7 @@ class FlaskRAGAssistant:
                     collected_answer += content
                     yield content
             
-            # Add the RAG3 marker
-            collected_answer = "[RAG3] " + collected_answer
+            logger.info("DEBUG - Collected answer: %s", collected_answer[:100])
             
             # Filter cited sources
             cited_raw = self._filter_cited(collected_answer, src_map)

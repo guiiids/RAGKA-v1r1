@@ -237,8 +237,8 @@ HTML_TEMPLATE = """
     <!-- Chat Input Area -->
     <div class="chat-input">
       <div class="relative">
-        <input id="query-input" type="text" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-2xl pl-3 pr-20 py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder="Ask me anything about our knowledge base..." />
-        <button id="submit-btn" class="absolute right-1 top-1 rounded bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+        <textarea id="query-input" rows="1" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-2xl pl-3 pr-20 py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow resize-none overflow-hidden" placeholder="Ask me anything about our knowledge base..."></textarea>
+        <button id="submit-btn" class="absolute right-1 bottom-3 rounded-2xl bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
           Send
         </button>
       </div>
@@ -398,6 +398,15 @@ HTML_TEMPLATE = """
     const chatMessages = document.getElementById('chat-messages');
     const queryInput = document.getElementById('query-input');
     const submitBtn = document.getElementById('submit-btn');
+    // Auto-resize textarea up to 6 lines
+    const maxLines = 6;
+    const lineHeight = parseInt(window.getComputedStyle(queryInput).lineHeight);
+    queryInput.addEventListener('input', () => {
+      queryInput.style.height = 'auto';
+      const boundedHeight = Math.min(queryInput.scrollHeight, lineHeight * maxLines);
+      queryInput.style.height = boundedHeight + 'px';
+      queryInput.style.overflowY = queryInput.scrollHeight > lineHeight * maxLines ? 'auto' : 'hidden';
+    });
     
     // --- Chat functionality ---
     // Add user message to chat
