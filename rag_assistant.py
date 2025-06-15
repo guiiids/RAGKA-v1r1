@@ -11,6 +11,7 @@ from azure.core.credentials import AzureKeyCredential
 import re
 import sys
 import os
+import re
 
 # Import config but handle the case where it might import streamlit
 try:
@@ -50,6 +51,17 @@ class FactCheckerStub:
     ) -> Dict[str, Any]:
         return {}
 
+
+
+def format_context_text(text: str) -> str:
+    # Add line breaks after long sentences
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    formatted = "\n\n".join(sentence for sentence in sentences if sentence)
+    
+    # Optional: emphasize headings or keywords
+    formatted = re.sub(r'(?<=\n\n)([A-Z][^\n:]{5,40})(?=\n\n)', r'**\1**', formatted)  # crude title detection
+    
+    return formatted
 
 class FlaskRAGAssistant:
     """Retrieval-Augmented Generation assistant for Azure OpenAI + Search."""
@@ -208,13 +220,17 @@ class FlaskRAGAssistant:
             chunk = res["chunk"].strip()
             if not chunk:
                 continue
-            entries.append(f'<source id="{sid}">{chunk}</source>')
+
+            formatted_chunk = format_context_text(chunk)
+
+            entries.append(f'<source id="{sid}">{formatted_chunk}</source>')
             src_map[str(sid)] = {
                 "title":    res["title"],
-                "content":  chunk
+                "content":  formatted_chunk  # Optional: also store the formatted version
             }
             sid += 1
         return "\n\n".join(entries), src_map
+
 
     def _chat_answer(self, query: str, context: str, src_map: Dict) -> str:
         # Get system prompt from settings if available

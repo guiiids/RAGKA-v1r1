@@ -423,8 +423,8 @@ HTML_TEMPLATE = """
         return '';
       }
       
-      let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">';
-      sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">### Sources Utilized</h4>';
+      let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">≈kk';
+      sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">L----------opp Utilized</h4>';
       sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
       
       sources.forEach((source, index) => {
@@ -676,7 +676,7 @@ HTML_TEMPLATE = """
     function addSourcesUtilizedSection() {
       if (window.lastSources && window.lastSources.length > 0) {
         let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">';
-        sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">### Sources Utilized</h4>';
+        sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">Sources Utilized</h4>';
         sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
         
         window.lastSources.forEach((source, index) => {
