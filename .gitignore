@@ -68,3 +68,4 @@ package_dir/
 .env_transformed.json
 .env.json
 kson.json
+build_and_push.ps1
