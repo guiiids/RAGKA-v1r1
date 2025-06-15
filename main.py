@@ -33,6 +33,11 @@ file_executed = os.path.abspath(__file__)
 logger.info("Flask RAG application starting up")
 
 app = Flask(__name__)
+# Serve static files from the 'assets' folder
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory('assets', filename)
+
 
 # HTML template with Tailwind CSS
 HTML_TEMPLATE = """
@@ -171,6 +176,23 @@ HTML_TEMPLATE = """
   </style>
 </head>
 <body class="bg-white">
+  <!-- Passcode Overlay -->
+  <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
+    <div class="text-center max-w-md mx-auto p-8">
+      
+      
+      <h2 class="text-5xl font-bold mb-8 text-white">Restricted Area</h2>
+      <div class="relative mb-6">
+        <input type="password" id="passcode-input" class="w-full bg-gray-100 rounded-full py-3 px-4 pl-12 pr-20 text-lg" placeholder="Passcode">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-lock text-gray-500"></i>
+        </div>
+        <button id="access-btn" class="absolute inset-y-0 right-0 flex items-center bg-gray-800 text-white rounded-full py-2 px-4 mr-1 text-lg">
+          <i class="fas fa-unlock mr-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="chat-container w-[70%] mx-auto">
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
@@ -209,7 +231,8 @@ HTML_TEMPLATE = """
         const logos = [
           
          
-          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-and-text-1.png',
+          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-gif-3.gif',
+           '/assets/animated_2.gif',
         ];
         const chosen = logos[Math.floor(Math.random() * logos.length)];
         document.addEventListener('DOMContentLoaded', () => {
@@ -394,6 +417,41 @@ HTML_TEMPLATE = """
       return message;
     }
 
+    // Generate sources section HTML
+    function generateSourcesSection(sources) {
+      if (!sources || !Array.isArray(sources) || sources.length === 0) {
+        return '';
+      }
+      
+      let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">';
+      sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">### Sources Utilized</h4>';
+      sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
+      
+      sources.forEach((source, index) => {
+        let sourceTitle = 'Untitled Source';
+        
+        if (typeof source === 'string') {
+          // If source is just a string, use it as the title (truncated)
+          sourceTitle = source.length > 80 ? source.substring(0, 80) + '...' : source;
+        } else if (typeof source === 'object' && source !== null) {
+          // If source is an object, try to get title, otherwise use content or fallback
+          sourceTitle = source.title || 
+                       (source.content ? (source.content.length > 80 ? source.content.substring(0, 80) + '...' : source.content) : 
+                       `Source ${index + 1}`);
+        }
+        
+        // Escape HTML in the title to prevent XSS
+        sourceTitle = escapeHtml(sourceTitle);
+        
+        sourcesHtml += `<li>${index + 1}. ${sourceTitle}</li>`;
+      });
+      
+      sourcesHtml += '</ol>';
+      sourcesHtml += '</div>';
+      
+      return sourcesHtml;
+    }
+
     // --- DOM elements ---
     const chatMessages = document.getElementById('chat-messages');
     const queryInput = document.getElementById('query-input');
@@ -535,7 +593,8 @@ HTML_TEMPLATE = """
           if (data.sources && data.sources.length > 0) {
             // Store last sources for citation click handling
             window.lastSources = data.sources;
-            // Old sources panel display logic removed. dynamic-container.js will handle it.
+            // Add sources utilized section
+            addSourcesUtilizedSection();
           }
         }
       })
@@ -613,6 +672,72 @@ HTML_TEMPLATE = """
       }
     }
     
+    // Add sources utilized section function
+    function addSourcesUtilizedSection() {
+      if (window.lastSources && window.lastSources.length > 0) {
+        let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">';
+        sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">### Sources Utilized</h4>';
+        sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
+        
+        window.lastSources.forEach((source, index) => {
+          let sourceTitle = 'Untitled Source';
+          
+          if (typeof source === 'string') {
+            // If source is just a string, use it as the title (truncated)
+            sourceTitle = source.length > 80 ? source.substring(0, 80) + '...' : source;
+          } else if (typeof source === 'object' && source !== null) {
+            // If source is an object, try to get title, otherwise use content or fallback
+            sourceTitle = source.title || 
+                         (source.content ? (source.content.length > 80 ? source.content.substring(0, 80) + '...' : source.content) : 
+                         `Source ${index + 1}`);
+          }
+          
+          // Escape HTML in the title to prevent XSS
+          sourceTitle = escapeHtml(sourceTitle);
+          
+          // Make the source title clickable with the same functionality as inline citations
+          sourcesHtml += `<li>${index + 1}. <a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
+        });
+        
+        sourcesHtml += '</ol>';
+        sourcesHtml += '</div>';
+        
+        // Append to the last bot message
+        const lastBotMessage = document.querySelector('.bot-message:last-child .message-bubble');
+        if (lastBotMessage) {
+          lastBotMessage.innerHTML += sourcesHtml;
+          
+          // Add click event listeners for the new citation links
+          // This ensures the newly added links work with the existing citation functionality
+          setTimeout(() => {
+            const newCitationLinks = lastBotMessage.querySelectorAll('.citation-link');
+            newCitationLinks.forEach(link => {
+              link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sourceId = this.getAttribute('data-source-id');
+                
+                // Trigger the same behavior as inline citations
+                // This will scroll to and highlight the source in the sidebar
+                if (window.handleCitationClick) {
+                  window.handleCitationClick(sourceId);
+                } else {
+                  // Fallback: try to find and scroll to the source element
+                  const sourceElement = document.getElementById(`source-${sourceId}`);
+                  if (sourceElement) {
+                    sourceElement.scrollIntoView({ behavior: 'smooth' });
+                    sourceElement.classList.add('bg-yellow-100');
+                    setTimeout(() => {
+                      sourceElement.classList.remove('bg-yellow-100');
+                    }, 2000);
+                  }
+                }
+              });
+            });
+          }, 100);
+        }
+      }
+    }
+
     // Make functions available globally for the unified module
     window.addUserMessage = addUserMessage;
     window.addBotMessage = addBotMessage;
@@ -621,6 +746,7 @@ HTML_TEMPLATE = """
     window.formatMessage = formatMessage;
     window.openDrawer = openDrawer;
     window.logsContainer = consoleLogsContent;
+    window.addSourcesUtilizedSection = addSourcesUtilizedSection;
     // Old DOMContentLoaded listener for sources panel removed.
   </script>
 
@@ -634,6 +760,56 @@ HTML_TEMPLATE = """
 <script src="/static/js/feedback-integration.js"></script>
 <script src="/static/js/feedback_thumbs.js"></script>
 <!-- Placeholder citation click handler and its listener removed -->
+
+<!-- Passcode protection for staging environment -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const overlay = document.getElementById('passcode-overlay');
+  const passcodeInput = document.getElementById('passcode-input');
+  const accessBtn = document.getElementById('access-btn');
+  
+  // Check if already authenticated
+  if (localStorage.getItem('stagingAuth') === 'true') {
+    overlay.classList.add('hidden');
+  }
+  
+  // Simple hash function for basic obfuscation
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash;
+  }
+  
+  // The passcode hash (can be changed to any value)
+  const correctPasscodeHash = -1633765023; // This would be the hash of your actual passcode "rosebud"
+  
+  // Validate passcode
+  function validatePasscode() {
+    const enteredPasscode = passcodeInput.value.trim();
+    if (simpleHash(enteredPasscode) === correctPasscodeHash || enteredPasscode === "rosebud") {
+      overlay.classList.add('hidden');
+      localStorage.setItem('stagingAuth', 'true');
+    } else {
+      passcodeInput.classList.add('border-red-500');
+      setTimeout(() => {
+        passcodeInput.classList.remove('border-red-500');
+      }, 1000);
+    }
+  }
+  
+  // Event listeners
+  accessBtn.addEventListener('click', validatePasscode);
+  passcodeInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      validatePasscode();
+    }
+  });
+});
+</script>
   </body>
 </html>
 
@@ -1323,4 +1499,5 @@ def api_dev_eval_compare():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5003))
     logger.info(f"Starting Flask app on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=True)
     app.run(host="0.0.0.0", port=port, debug=True)
