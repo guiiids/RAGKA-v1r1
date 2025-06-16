@@ -4,10 +4,10 @@ import json
 import logging
 import sys
 import os
-
+from dotenv import load_dotenv
+load_dotenv() 
 # Import directly from the current directory
 from rag_assistant import FlaskRAGAssistant
-from llm_summary_compact import summarize_batch_comparison
 
 # Configure logginghttps://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png
 logger = logging.getLogger(__name__)
@@ -177,7 +177,8 @@ HTML_TEMPLATE = """
 </head>
 <body class="bg-white">
   <!-- Passcode Overlay -->
-  <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
+
+  <!-- <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
     <div class="text-center max-w-md mx-auto p-8">
       
       
@@ -192,12 +193,13 @@ HTML_TEMPLATE = """
         </button>
       </div>
     </div>
-  </div>
-  <div class="chat-container w-[70%] mx-auto">
+  </div> -->
+  <div class="chat-container w-[60%] mx-auto">
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-        <img class='h-4 w-auto ml-2' src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-no-logo.png" alt="Logo"> 
+        <h3 class="text-sm font-normal text-gray-700 mt-3">RAGKA - RAG Knowledge Assistant </h3><span class="text-xs font-semibold text-indigo-500 text-center ml-1">v1</span>       
+
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -224,15 +226,16 @@ HTML_TEMPLATE = """
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
         <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo">
-        <h3 class="text-lg font-thin text-gray-900 mt-2">RAG Knowledge Assistant</h3>
+<h3 class="text-md font-normal text-gray-700 mt-4">[Still working on the logo. Hang on tight!]</h3>       
+         <h1 class="text-2xl font-bold text-gray-900 mt-2">RAG Knowledge Assistant</h1>
       </div>
-      <script>
+      <script>  
       (function() {
         const logos = [
           
          
           'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-gif-3.gif',
-           '/assets/animated_2.gif',
+          
         ];
         const chosen = logos[Math.floor(Math.random() * logos.length)];
         document.addEventListener('DOMContentLoaded', () => {
@@ -417,40 +420,7 @@ HTML_TEMPLATE = """
       return message;
     }
 
-    // Generate sources section HTML
-    function generateSourcesSection(sources) {
-      if (!sources || !Array.isArray(sources) || sources.length === 0) {
-        return '';
-      }
-      
-      let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">≈kk';
-      sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">L----------opp Utilized</h4>';
-      sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
-      
-      sources.forEach((source, index) => {
-        let sourceTitle = 'Untitled Source';
-        
-        if (typeof source === 'string') {
-          // If source is just a string, use it as the title (truncated)
-          sourceTitle = source.length > 80 ? source.substring(0, 80) + '...' : source;
-        } else if (typeof source === 'object' && source !== null) {
-          // If source is an object, try to get title, otherwise use content or fallback
-          sourceTitle = source.title || 
-                       (source.content ? (source.content.length > 80 ? source.content.substring(0, 80) + '...' : source.content) : 
-                       `Source ${index + 1}`);
-        }
-        
-        // Escape HTML in the title to prevent XSS
-        sourceTitle = escapeHtml(sourceTitle);
-        
-        sourcesHtml += `<li>${index + 1}. ${sourceTitle}</li>`;
-      });
-      
-      sourcesHtml += '</ol>';
-      sourcesHtml += '</div>';
-      
-      return sourcesHtml;
-    }
+  
 
     // --- DOM elements ---
     const chatMessages = document.getElementById('chat-messages');
@@ -761,8 +731,9 @@ HTML_TEMPLATE = """
 <script src="/static/js/feedback_thumbs.js"></script>
 <!-- Placeholder citation click handler and its listener removed -->
 
-<!-- Passcode protection for staging environment -->
-<script>
+
+
+<!--
 document.addEventListener('DOMContentLoaded', function() {
   const overlay = document.getElementById('passcode-overlay');
   const passcodeInput = document.getElementById('passcode-input');
@@ -787,6 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // The passcode hash (can be changed to any value)
   const correctPasscodeHash = -1633765023; // This would be the hash of your actual passcode "rosebud"
   
+
   // Validate passcode
   function validatePasscode() {
     const enteredPasscode = passcodeInput.value.trim();
@@ -808,7 +780,7 @@ document.addEventListener('DOMContentLoaded', function() {
       validatePasscode();
     }
   });
-});
+}); -->
 </script>
   </body>
 </html>
@@ -941,561 +913,7 @@ def api_dev_eval():
     Expects JSON: { "query": ..., "prompt": ..., "parameters": { "temperature": ..., "top_p": ..., "max_tokens": ... } }
     Returns: { "result": ..., "developer_evaluation": ..., "download_url_json": ..., "download_url_md": ..., "markdown_report": ... }
     """
-    from llm_summary import developer_evaluate_job, generate_markdown_report
-    import uuid
-
-    data = request.get_json()
-    query = data.get("query", "")
-    prompt = data.get("prompt", "")
-    params = data.get("parameters", {}) or {}
-    temperature = params.get("temperature", 0.3)
-    top_p = params.get("top_p", 1.0)
-    max_tokens = params.get("max_tokens", 1000)
-
-    settings = {
-        "temperature": temperature,
-        "top_p": top_p,
-        "max_tokens": max_tokens
-    }
-    if prompt:
-        settings["system_prompt"] = prompt
-        settings["system_prompt_mode"] = "Override"
-
-    try:
-        rag_assistant = FlaskRAGAssistant(settings=settings)
-        answer, sources, _, evaluation, context = rag_assistant.generate_rag_response(query)
-        dev_eval = developer_evaluate_job(
-            query=query,
-            prompt=prompt,
-            parameters=params,
-            result=answer
-        )
-        # Save to file and provide download link
-        result_obj = {
-            "query": query,
-            "prompt": prompt,
-            "parameters": params,
-            "result": answer,
-            "sources": sources,
-            "developer_evaluation": dev_eval
-        }
-        
-        # Generate markdown report
-        markdown_report = generate_markdown_report(result_obj)
-        
-        # Save with a unique filename
-        file_id = str(uuid.uuid4())
-        json_filename = f"dev_eval_{file_id}.json"
-        md_filename = f"dev_eval_{file_id}.md"
-        
-        file_path = os.path.join("reask_dashboard", "static", "dev_eval_reports")
-        os.makedirs(file_path, exist_ok=True)
-        
-        # Save JSON file
-        json_path = os.path.join(file_path, json_filename)
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(result_obj, f, indent=2, ensure_ascii=False)
-        
-        # Save Markdown file
-        md_path = os.path.join(file_path, md_filename)
-        with open(md_path, "w", encoding="utf-8") as f:
-            f.write(markdown_report)
-        
-        # Download URLs
-        json_url = f"/static/dev_eval_reports/{json_filename}"
-        md_url = f"/static/dev_eval_reports/{md_filename}"
-        
-        return jsonify({
-            "result": answer,
-            "sources": sources,
-            "developer_evaluation": dev_eval,
-            "download_url_json": json_url,
-            "download_url_md": md_url,
-            "markdown_report": markdown_report
-        })
-    except Exception as e:
-        logger.error(f"Error in api_dev_eval: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({
-            "error": str(e)
-        }), 500
-# Add these routes to your main.py file
-
-@app.route('/api/dev_eval', methods=['POST'])
-def dev_eval():
-    """Handle developer evaluation mode requests"""
-    data = request.json
     
-    # Extract parameters
-    query = data.get('query', '')
-    prompt = data.get('prompt', '')
-    parameters = data.get('parameters', {})
-    
-    # Log the request
-    logger.info(f"Developer evaluation request: query={query}, prompt={prompt}, parameters={parameters}")
-    
-    # Use your existing RAG assistant
-    settings = {
-        "temperature": parameters.get('temperature', 0.3),
-        "top_p": parameters.get('top_p', 1.0),
-        "max_tokens": parameters.get('max_tokens', 1000)
-    }
-    
-    if prompt:
-        settings["system_prompt"] = prompt
-        settings["system_prompt_mode"] = "Override"
-    
-    try:
-        assistant = FlaskRAGAssistant(settings=settings)
-        answer, sources, _, evaluation, context = assistant.generate_rag_response(query)
-        
-        # Try to get developer evaluation if llm_summary module is available
-        developer_evaluation = None
-        try:
-            from llm_summary import developer_evaluate_job
-            developer_evaluation = developer_evaluate_job(
-                query=query,
-                prompt=prompt,
-                parameters=parameters,
-                result=answer
-            )
-        except ImportError:
-            logger.warning("llm_summary module not available for developer evaluation")
-        
-        # Generate unique ID for this evaluation
-        import uuid
-        eval_id = str(uuid.uuid4())
-        
-        # Save results to files
-        os.makedirs('static/dev_eval_reports', exist_ok=True)
-        
-        # Save JSON report
-        json_file = f"static/dev_eval_reports/dev_eval_{eval_id}.json"
-        json_data = {
-            "query": query,
-            "prompt": prompt,
-            "parameters": parameters,
-            "result": answer,
-            "sources": sources,
-            "developer_evaluation": developer_evaluation
-        }
-        
-        with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, indent=2, ensure_ascii=False)
-        
-        # Save Markdown report
-        md_file = f"static/dev_eval_reports/dev_eval_{eval_id}.md"
-        with open(md_file, 'w', encoding='utf-8') as f:
-            f.write(f"# Developer Evaluation Report\n\n")
-            f.write(f"## Query\n\n{query}\n\n")
-            f.write(f"## Parameters\n\n")
-            f.write(f"- Temperature: {parameters.get('temperature', 0.3)}\n")
-            f.write(f"- Top P: {parameters.get('top_p', 1.0)}\n")
-            f.write(f"- Max Tokens: {parameters.get('max_tokens', 1000)}\n\n")
-            if prompt:
-                f.write(f"## Custom Prompt\n\n{prompt}\n\n")
-            f.write(f"## LLM Output\n\n{answer}\n\n")
-            if sources:
-                f.write(f"## Sources\n\n")
-                for i, source in enumerate(sources):
-                    f.write(f"{i+1}. {source}\n")
-                f.write("\n")
-            if developer_evaluation:
-                f.write(f"## Developer Evaluation\n\n{developer_evaluation}\n\n")
-        
-        # Return response
-        return jsonify({
-            "result": answer,
-            "sources": sources,
-            "developer_evaluation": developer_evaluation,
-            "download_url_json": f"/static/dev_eval_reports/dev_eval_{eval_id}.json",
-            "download_url_md": f"/static/dev_eval_reports/dev_eval_{eval_id}.md",
-            "markdown_report": open(md_file, 'r', encoding='utf-8').read()
-        })
-    
-    except Exception as e:
-        logger.error(f"Error in developer evaluation: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/dev_eval_batch', methods=['POST'])
-def dev_eval_batch():
-    """Handle batch evaluation mode requests"""
-    data = request.json
-    
-    # Extract parameters
-    query = data.get('query', '')
-    prompt = data.get('prompt', '')
-    parameters = data.get('parameters', {})
-    runs = data.get('runs', 1)
-    
-    # Log the request
-    logger.info(f"Batch evaluation request: query={query}, prompt={prompt}, parameters={parameters}, runs={runs}")
-    
-    # Use your existing RAG assistant
-    settings = {
-        "temperature": parameters.get('temperature', 0.3),
-        "top_p": parameters.get('top_p', 1.0),
-        "max_tokens": parameters.get('max_tokens', 1000)
-    }
-    
-    if prompt:
-        settings["system_prompt"] = prompt
-        settings["system_prompt_mode"] = "Override"
-    
-    try:
-        results = []
-        assistant = FlaskRAGAssistant(settings=settings)
-        
-        for i in range(runs):
-            try:
-                answer, sources, _, evaluation, context = assistant.generate_rag_response(query)
-                results.append({
-                    "run": i+1,
-                    "answer": answer,
-                    "sources": sources,
-                    "evaluation": evaluation,
-                    "context": context
-                })
-            except Exception as e:
-                logger.error(f"Error on run {i+1}: {str(e)}")
-                logger.error(traceback.format_exc())
-                results.append({
-                    "run": i+1,
-                    "error": str(e),
-                    "traceback": traceback.format_exc()
-                })
-        
-        # Evaluate prompt effectiveness for this batch
-        prompt_evaluation = None
-        try:
-            from llm_summary_compact import evaluate_prompt_effectiveness
-            prompt_evaluation = evaluate_prompt_effectiveness({
-                "query": query,
-                "system_prompt": prompt,
-                "parameters": parameters,
-                "results": results
-            })
-        except ImportError:
-            logger.warning("llm_summary_compact module not available for prompt evaluation")
-        
-        # Generate unique ID for this evaluation
-        import uuid
-        eval_id = str(uuid.uuid4())
-        
-        # Save results to files
-        os.makedirs('static/dev_eval_reports', exist_ok=True)
-        
-        # Save JSON report
-        json_file = f"static/dev_eval_reports/batch_eval_{eval_id}.json"
-        json_data = {
-            "query": query,
-            "prompt": prompt,
-            "parameters": parameters,
-            "runs": runs,
-            "results": results,
-            "prompt_evaluation": prompt_evaluation
-        }
-        
-        with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, indent=2, ensure_ascii=False)
-        
-        # Save Markdown report
-        md_file = f"static/dev_eval_reports/batch_eval_{eval_id}.md"
-        with open(md_file, 'w', encoding='utf-8') as f:
-            f.write(f"# Batch Evaluation Report\n\n")
-            f.write(f"## Query\n\n{query}\n\n")
-            f.write(f"## Parameters\n\n")
-            f.write(f"- Temperature: {parameters.get('temperature', 0.3)}\n")
-            f.write(f"- Top P: {parameters.get('top_p', 1.0)}\n")
-            f.write(f"- Max Tokens: {parameters.get('max_tokens', 1000)}\n")
-            f.write(f"- Runs: {runs}\n\n")
-            if prompt:
-                f.write(f"## Custom Prompt\n\n{prompt}\n\n")
-        # Ensure prompt evaluation and results are written inside the file context
-        if prompt_evaluation:
-            f.write(f"## Prompt Evaluation\n\n{prompt_evaluation}\n\n")
-            f.write(f"## Results\n\n")
-            for result in results:
-                f.write(f"### Run {result.get('run')}\n\n")
-                if 'error' in result:
-                    f.write(f"**Error:** {result.get('error')}\n\n")
-                else:
-                    f.write(f"**Answer:**\n\n{result.get('answer')}\n\n")
-                    if result.get('sources'):
-                        f.write(f"**Sources:**\n\n")
-                        for i, source in enumerate(result.get('sources', [])):
-                            f.write(f"{i+1}. {source}\n")
-                        f.write("\n")
-        
-        # Return response
-        return jsonify({
-            "results": results,
-            "prompt_evaluation": prompt_evaluation,
-            "download_url_json": f"/static/dev_eval_reports/batch_eval_{eval_id}.json",
-            "download_url_md": f"/static/dev_eval_reports/batch_eval_{eval_id}.md",
-            "markdown_report": open(md_file, 'r', encoding='utf-8').read()
-        })
-    
-    except Exception as e:
-        logger.error(f"Error in batch evaluation: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/api/dev_eval_compare", methods=["POST"])
-def api_dev_eval_compare():
-    """
-    Developer Evaluation Compare API endpoint.
-    Expects JSON: {
-        "query": "...",
-        "prompt": "...",  # Prompt for batch 1
-        "parameters": { "temperature": ..., "top_p": ..., "max_tokens": ... },  # Parameters for batch 1
-        "runs": 1,  # Number of runs for batch 1
-        "batch2": {
-            "temperature": ...,
-            "top_p": ...,
-            "max_tokens": ...,
-            "runs": 1,
-            "prompt": "..."  # Separate prompt for batch 2
-        },
-        "generate_llm_analysis": true/false  # Whether to generate LLM analysis of the comparison
-    }
-    Returns: {
-        "batch1_results": [...],
-        "batch2_results": [...],
-        "download_url_json": "...",
-        "download_url_md": "...",
-        "markdown_report": "...",
-        "llm_analysis": "..." (if requested)
-    }
-    """
-    from llm_summary import developer_evaluate_job, generate_markdown_report
-    import uuid
-
-    data = request.get_json()
-    query = data.get("query", "")
-    
-    # Log the incoming request
-    logger.info(f"Compare evaluation request: query={query}, prompt={data.get('prompt', '')}, batch1={data.get('parameters', {})}, batch2={data.get('batch2', {})}")
-    
-    # Check if LLM analysis is requested
-    generate_llm_analysis = data.get("generate_llm_analysis", True)  # Default to True
-    
-    # Extract batch 1 parameters
-    prompt1 = data.get("prompt", "")
-    params1 = data.get("parameters", {}) or {}
-    temperature1 = params1.get("temperature", 0.3)
-    top_p1 = params1.get("top_p", 1.0)
-    max_tokens1 = params1.get("max_tokens", 1000)
-    runs1 = data.get("runs", 1)
-    
-    # Extract batch 2 parameters
-    batch2 = data.get("batch2", {})
-    prompt2 = batch2.get("prompt", prompt1)  # Default to batch 1 prompt if not specified
-    temperature2 = batch2.get("temperature", 0.3)
-    top_p2 = batch2.get("top_p", 1.0)
-    max_tokens2 = batch2.get("max_tokens", 1000)
-    runs2 = batch2.get("runs", 1)
-    
-    try:
-        # Process batch 1
-        batch1_results = []
-        for i in range(runs1):
-            settings1 = {
-                "temperature": temperature1,
-                "top_p": top_p1,
-                "max_tokens": max_tokens1
-            }
-            if prompt1:
-                settings1["system_prompt"] = prompt1
-                settings1["system_prompt_mode"] = "Override"
-            
-            rag_assistant1 = FlaskRAGAssistant(settings=settings1)
-            answer1, sources1, _, evaluation1, context1 = rag_assistant1.generate_rag_response(query)
-            
-            batch1_results.append({
-                "run": i+1,
-                "answer": answer1,
-                "sources": sources1,
-                "evaluation": evaluation1
-            })
-        
-        # Process batch 2
-        batch2_results = []
-        for i in range(runs2):
-            settings2 = {
-                "temperature": temperature2,
-                "top_p": top_p2,
-                "max_tokens": max_tokens2
-            }
-            if prompt2:
-                settings2["system_prompt"] = prompt2
-                settings2["system_prompt_mode"] = "Override"
-            
-            rag_assistant2 = FlaskRAGAssistant(settings=settings2)
-            answer2, sources2, _, evaluation2, context2 = rag_assistant2.generate_rag_response(query)
-            
-            batch2_results.append({
-                "run": i+1,
-                "answer": answer2,
-                "sources": sources2,
-                "evaluation": evaluation2
-            })
-        
-        # Generate developer evaluation for the comparison
-        dev_eval = developer_evaluate_job(
-            query=query,
-            prompt=f"Batch 1: {prompt1}\nBatch 2: {prompt2}",
-            parameters={
-                "batch1": {
-                    "temperature": temperature1,
-                    "top_p": top_p1,
-                    "max_tokens": max_tokens1,
-                    "runs": runs1
-                },
-                "batch2": {
-                    "temperature": temperature2,
-                    "top_p": top_p2,
-                    "max_tokens": max_tokens2,
-                    "runs": runs2
-                }
-            },
-            result=f"Batch 1 (first run): {batch1_results[0]['answer'] if batch1_results else 'No results'}\n\nBatch 2 (first run): {batch2_results[0]['answer'] if batch2_results else 'No results'}"
-        )
-        
-        # Generate LLM analysis if requested
-        llm_analysis = None
-        if generate_llm_analysis:
-            logger.info("Generating LLM analysis for comparison")
-            # Prepare data for summarize_batch_comparison
-            comparison_data = {
-                "query": query,
-                "batch_1": {
-                    "system_prompt": prompt1,
-                    "parameters": {
-                        "temperature": temperature1,
-                        "top_p": top_p1,
-                        "max_tokens": max_tokens1,
-                        "n_runs": runs1
-                    },
-                    "results": batch1_results
-                },
-                "batch_2": {
-                    "system_prompt": prompt2,
-                    "parameters": {
-                        "temperature": temperature2,
-                        "top_p": top_p2,
-                        "max_tokens": max_tokens2,
-                        "n_runs": runs2
-                    },
-                    "results": batch2_results
-                }
-            }
-            
-            try:
-                llm_analysis = summarize_batch_comparison(comparison_data)
-                logger.info("LLM analysis generated successfully")
-            except Exception as e:
-                logger.error(f"Error generating LLM analysis: {str(e)}")
-                logger.error(traceback.format_exc())
-                llm_analysis = f"Error generating LLM analysis: {str(e)}"
-        
-        # Create a combined result for markdown report compatibility
-        combined_result = f"BATCH 1 (first run):\n{batch1_results[0]['answer'] if batch1_results else 'No results'}\n\nBATCH 2 (first run):\n{batch2_results[0]['answer'] if batch2_results else 'No results'}"
-        
-        # Save to file and provide download link
-        result_obj = {
-            "query": query,
-            "prompt": f"Batch 1: {prompt1}\nBatch 2: {prompt2}",
-            "parameters": {
-                "batch1": {
-                    "temperature": temperature1,
-                    "top_p": top_p1,
-                    "max_tokens": max_tokens1,
-                    "runs": runs1
-                },
-                "batch2": {
-                    "temperature": temperature2,
-                    "top_p": top_p2,
-                    "max_tokens": max_tokens2,
-                    "runs": runs2
-                }
-            },
-            "result": combined_result,  # Add the combined result for markdown report compatibility
-            "batch1": {
-                "prompt": prompt1,
-                "parameters": {
-                    "temperature": temperature1,
-                    "top_p": top_p1,
-                    "max_tokens": max_tokens1,
-                    "runs": runs1
-                },
-                "results": batch1_results
-            },
-            "batch2": {
-                "prompt": prompt2,
-                "parameters": {
-                    "temperature": temperature2,
-                    "top_p": top_p2,
-                    "max_tokens": max_tokens2,
-                    "runs": runs2
-                },
-                "results": batch2_results
-            },
-            "developer_evaluation": dev_eval,
-            "llm_analysis": llm_analysis
-        }
-        
-        # Save with a unique filename
-        file_id = str(uuid.uuid4())
-        json_filename = f"dev_eval_compare_{file_id}.json"
-        md_filename = f"dev_eval_compare_{file_id}.md"
-        
-        file_path = os.path.join("reask_dashboard", "static", "dev_eval_reports")
-        os.makedirs(file_path, exist_ok=True)
-        
-        # Generate markdown report
-        markdown_report = generate_markdown_report(result_obj)
-        
-        # Add LLM analysis to markdown report if available
-        if llm_analysis:
-            markdown_report += f"\n## LLM Analysis\n\n{llm_analysis}\n\n"
-        
-        # Save JSON file
-        json_path = os.path.join(file_path, json_filename)
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(result_obj, f, indent=2, ensure_ascii=False)
-        
-        # Save Markdown file
-        md_path = os.path.join(file_path, md_filename)
-        with open(md_path, "w", encoding="utf-8") as f:
-            f.write(markdown_report)
-        
-        # Download URLs
-        json_url = f"/static/dev_eval_reports/{json_filename}"
-        md_url = f"/static/dev_eval_reports/{md_filename}"
-        
-        response_data = {
-            "batch1_results": batch1_results,
-            "batch2_results": batch2_results,
-            "developer_evaluation": dev_eval,
-            "download_url_json": json_url,
-            "download_url_md": md_url,
-            "markdown_report": markdown_report
-        }
-        
-        # Include LLM analysis in the response if available
-        if llm_analysis:
-            response_data["llm_analysis"] = llm_analysis
-        
-        return jsonify(response_data)
-    except Exception as e:
-        logger.error(f"Error in api_dev_eval_compare: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({
-            "error": str(e)
-        }), 500
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5003))
     logger.info(f"Starting Flask app on port {port}")

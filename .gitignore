@@ -69,3 +69,8 @@ package_dir/
 .env.json
 kson.json
 build_and_push.ps1
+.templates/
+.feedback_dashboard
+.llm_summary.py
+.llm_summary_compact.py
+reask_dashboard

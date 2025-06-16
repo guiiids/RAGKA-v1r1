@@ -5,18 +5,18 @@ load_dotenv()
 # Load environment variables from .env file
 # This is useful for local development
 # OpenAI Configuration
-OPENAI_ENDPOINT = os.getenv("OPENAI_ENDPOINT")
-OPENAI_KEY = os.getenv("OPENAI_KEY")
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-
+OPENAI_ENDPOINT = os.getenv("OPENAI_ENDPOINT", os.getenv("AZURE_OPENAI_ENDPOINT"))
+OPENAI_KEY = os.getenv("OPENAI_KEY", os.getenv("AZURE_OPENAI_KEY"))
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", os.getenv("AZURE_OPENAI_KEY"))
+AZURE_SEARCH_INDEX = os.getenv("AZURE_SEARCH_INDEX")
 OPENAI_API_VERSION = os.getenv("OPENAI_API_VERSION")
 # Azure OpenAI Deployment Names
-EMBEDDING_DEPLOYMENT = os.getenv("EMBEDDING_DEPLOYMENT")
-CHAT_DEPLOYMENT = os.getenv("CHAT_DEPLOYMENT")
+EMBEDDING_DEPLOYMENT = os.getenv("EMBEDDING_DEPLOYMENT", os.getenv("AZURE_OPENAI_EMBEDDING_NAME"))
+CHAT_DEPLOYMENT = os.getenv("CHAT_DEPLOYMENT", os.getenv("AZURE_OPENAI_MODEL"))
 # Azure Cognitive Search Configuration
-SEARCH_ENDPOINT = os.getenv("SEARCH_ENDPOINT")
-SEARCH_INDEX = os.getenv("SEARCH_INDEX")
-SEARCH_KEY = os.getenv("SEARCH_KEY")
+SEARCH_ENDPOINT = os.getenv("SEARCH_ENDPOINT", os.getenv("AZURE_SEARCH_SERVICE"))
+SEARCH_INDEX = os.getenv("SEARCH_INDEX", os.getenv("AZURE_SEARCH_INDEX"))
+SEARCH_KEY = os.getenv("SEARCH_KEY", os.getenv("AZURE_SEARCH_KEY"))
 VECTOR_FIELD = os.getenv("VECTOR_FIELD")
 # Logging Configuration
 LOG_FORMAT = os.getenv("LOG_FORMAT", "%(asctime)s - %(levelname)s - %(message)s")
