@@ -320,7 +320,7 @@ class DynamicContainer {
           const linkifiedContent = rawContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           title = source.title || source.id || `Source [${sourceId}]`;
           content = `
-            <div class="space-y-4">
+            <div class="space-y-4" id="source-content">
               <div>
                 <h3 class="font-medium text-gray-900 mb-2">Source Information</h3>
                 ${source.title ? `<p class="text-sm text-gray-600 mb-2"><strong>Title:</strong> ${source.title}</p>` : ''}

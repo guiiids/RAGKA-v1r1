@@ -46,7 +46,8 @@ HTML_TEMPLATE = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAG Knowledge Assistant</title>
+  <title>SAGE Knowledge Navigator
+</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style id="custom-styles">
@@ -178,11 +179,11 @@ HTML_TEMPLATE = """
 <body class="bg-white">
   <!-- Passcode Overlay -->
 
-  <!-- <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
+ <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
     <div class="text-center max-w-md mx-auto p-8">
       
       
-      <h2 class="text-5xl font-bold mb-8 text-white">Restricted Area</h2>
+      <h2 class="text-xl font-bold mb-8 text-white">Restricted Area</h2>
       <div class="relative mb-6">
         <input type="password" id="passcode-input" class="w-full bg-gray-100 rounded-full py-3 px-4 pl-12 pr-20 text-lg" placeholder="Passcode">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -193,13 +194,12 @@ HTML_TEMPLATE = """
         </button>
       </div>
     </div>
-  </div> -->
+  </div>  
   <div class="chat-container w-[60%] mx-auto">
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-        <h3 class="text-sm font-normal text-gray-700 mt-3">RAGKA - RAG Knowledge Assistant </h3><span class="text-xs font-semibold text-indigo-500 text-center ml-1">v1</span>       
-
+<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src="https://content.ilabsolutions.com/wp-content/uploads/2025/06/sage_inline.png">
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -225,16 +225,14 @@ HTML_TEMPLATE = """
     <div id="chat-messages" class="chat-messages">
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
-        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo">
-<h3 class="text-md font-normal text-gray-700 mt-4">[Still working on the logo. Hang on tight!]</h3>       
-         <h1 class="text-2xl font-bold text-gray-900 mt-2">RAG Knowledge Assistant</h1>
+        <img id="random-logo" class="h-auto max-w-xl inline-block object-cover md:h-96" alt="Logo">
       </div>
       <script>  
       (function() {
         const logos = [
           
          
-          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-gif-3.gif',
+          'https://content.ilabsolutions.com/wp-content/uploads/2025/06/KNOWLEDGE-NAVIGATOR.png',
           
         ];
         const chosen = logos[Math.floor(Math.random() * logos.length)];
@@ -263,7 +261,7 @@ HTML_TEMPLATE = """
     <!-- Chat Input Area -->
     <div class="chat-input">
       <div class="relative">
-        <textarea id="query-input" rows="1" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-2xl pl-3 pr-20 py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow resize-none overflow-hidden" placeholder="Ask me anything about our knowledge base..."></textarea>
+        <textarea id="query-input" rows="1" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-300 rounded-2xl pl-3 pr-20 py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow resize-none overflow-hidden" placeholder="Ask me anything about our knowledge base..."></textarea>
         <button id="submit-btn" class="absolute right-1 bottom-3 rounded-2xl bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
           Send
         </button>
@@ -731,10 +729,9 @@ HTML_TEMPLATE = """
 <script src="/static/js/feedback_thumbs.js"></script>
 <!-- Placeholder citation click handler and its listener removed -->
 
+<script>
 
-
-<!--
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
   const overlay = document.getElementById('passcode-overlay');
   const passcodeInput = document.getElementById('passcode-input');
   const accessBtn = document.getElementById('access-btn');
@@ -780,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
       validatePasscode();
     }
   });
-}); -->
+})();
 </script>
   </body>
 </html>
