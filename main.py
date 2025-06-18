@@ -1,3 +1,5 @@
+
+print("Running:", __file__)
 import traceback
 from flask import Flask, request, jsonify, render_template_string, Response, send_from_directory
 import json
@@ -6,8 +8,11 @@ import sys
 import os
 from dotenv import load_dotenv
 load_dotenv() 
+
+
 # Import directly from the current directory
 from rag_assistant import FlaskRAGAssistant
+from db_manager import DatabaseManager
 
 # Configure logginghttps://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png
 logger = logging.getLogger(__name__)
@@ -199,7 +204,8 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src="https://content.ilabsolutions.com/wp-content/uploads/2025/06/sage_inline.png">
+<!-- <img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src=""> --> 
+<h4 class="text-lg font-semibold text-gray-900 ml-2">RAG Knowledge Assistant</h4>
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -225,14 +231,16 @@ HTML_TEMPLATE = """
     <div id="chat-messages" class="chat-messages">
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
-        <img id="random-logo" class="h-auto max-w-xl inline-block object-cover md:h-96" alt="Logo">
+        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-gif-3.gif">
+<h3 class="text-md font-normal text-gray-700 mt-4">[    Logo approved. <span class=" font-bold"> Upload will start shortly.    </span>]</h3>   
+         <h1 class="text-2xl font-bold text-gray-900 mt-2">RAG Knowledge Assistant</h1>
       </div>
       <script>  
       (function() {
         const logos = [
           
          
-          'https://content.ilabsolutions.com/wp-content/uploads/2025/06/KNOWLEDGE-NAVIGATOR.png',
+          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-2.gif',
           
         ];
         const chosen = logos[Math.floor(Math.random() * logos.length)];
@@ -868,23 +876,31 @@ def api_stream_query():
     
     return Response(generate(), mimetype="text/plain")
 
+
 @app.route("/api/feedback", methods=["POST"])
 def api_feedback():
     data = request.get_json()
+    logger.debug(f"Received feedback data: {json.dumps(data)}")
+    
     feedback_data = {
         "question": data.get("question", ""),
         "response": data.get("response", ""),
         "feedback_tags": data.get("feedback_tags", []),
         "comment": data.get("comment", ""),
-        "evaluation_json": {}
+        "evaluation_json": {},
+        "citations": data.get("citations", [])
     }
     
+    # Log the processed feedback data to help diagnose issues
+    logger.debug(f"Processed feedback data: {json.dumps(feedback_data)}")
+    
     try:
-        # For now, just log the feedback
-        logger.info(f"Feedback received: {feedback_data}")
-        return jsonify({"success": True}), 200
+        vote_id = DatabaseManager.save_feedback(feedback_data)
+        logger.info(f"Feedback saved to DB with ID: {vote_id}")
+        return jsonify({"success": True, "vote_id": vote_id}), 200
     except Exception as e:
-        logger.error(f"Error saving feedback: {str(e)}")
+        logger.error(f"Error saving feedback to database: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 # Serve static files from both static/ and reask_dashboard/static/
@@ -912,7 +928,14 @@ def api_dev_eval():
     """
     
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5003))
+    import argparse
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Run the Flask RAG application')
+    parser.add_argument('--port', type=int, default=int(os.environ.get("PORT", 5002)),
+                        help='Port to run the server on (default: 5002)')
+    args = parser.parse_args()
+    
+    port = args.port
     logger.info(f"Starting Flask app on port {port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
     app.run(host="0.0.0.0", port=port, debug=True)

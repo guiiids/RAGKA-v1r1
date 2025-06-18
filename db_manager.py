@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 import psycopg2
 from psycopg2.extras import RealDictCursor, Json
 import logging
@@ -39,21 +42,40 @@ class DatabaseManager:
         """Save feedback to the PostgreSQL database."""
         conn = None
         try:
+            # Log the incoming feedback data for debugging
+            logger.debug(f"Saving feedback data: {feedback_data}")
+            
+            # Extract the user query and bot response
+            # The frontend might be sending different keys than what we expect
+            user_query = feedback_data.get("question", "")
+            bot_response = feedback_data.get("response", "")
+            
+            # If user_query and bot_response are empty, try to get them from other fields
+            # This is a fallback mechanism to handle different data structures
+            if not user_query and "user_query" in feedback_data:
+                user_query = feedback_data["user_query"]
+            
+            if not bot_response and "bot_response" in feedback_data:
+                bot_response = feedback_data["bot_response"]
+            
+            citations = feedback_data.get("citations", [])
+            
             conn = DatabaseManager.get_connection()
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
                     INSERT INTO votes 
-                    (user_query, bot_response, evaluation_json, feedback_tags, comment)
-                    VALUES (%s, %s, %s, %s, %s)
+                    (user_query, bot_response, evaluation_json, feedback_tags, comment, citations)
+                    VALUES (%s, %s, %s, %s, %s, %s)
                     RETURNING vote_id
                     """,
                     (
-                        feedback_data["question"],
-                        feedback_data["response"],
+                        user_query,
+                        bot_response,
                         Json(feedback_data.get("evaluation_json", {})),
                         feedback_data["feedback_tags"],
-                        feedback_data.get("comment", "")
+                        feedback_data.get("comment", ""),
+                        Json(citations)
                     )
                 )
                 vote_id = cursor.fetchone()[0]

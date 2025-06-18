@@ -76,7 +76,7 @@ class DynamicContainer {
         box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1);
         transform: translateX(100%);
         transition: transform 0.3s ease-in-out;
-        z-index: 30;
+        z-index: 9999;
         display: flex;
         flex-direction: column;
       }
@@ -154,7 +154,7 @@ class DynamicContainer {
     document.head.appendChild(style);
   }
 
-  addEventListeners() {
+    addEventListeners() {
     // Close button event listener
     document.addEventListener('click', (e) => {
       if (e.target.closest('#dynamic-container-close')) {
@@ -162,23 +162,21 @@ class DynamicContainer {
       }
     });
 
-    // Listen for hyperlink clicks in chat messages
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('a[href]');
-      if (link && this.shouldTriggerDynamicContainer(link)) {
-        e.preventDefault();
-        this.handleLinkClick(link);
-      }
-    });
-
-    // Listen for citation clicks
+    // Citation click: open dynamic container with source details
     document.addEventListener('click', (e) => {
       const citationLink = e.target.closest('.citation-link');
       if (citationLink) {
         e.preventDefault();
         this.handleCitationClick(citationLink);
+        return;
       }
     });
+
+
+
+    // Removed global <a[href]> listener to avoid breaking normal links,
+    // only citation links and specifically marked triggers will be handled.
+
 
     // Click outside to close
     document.addEventListener('click', (e) => {
@@ -216,14 +214,14 @@ class DynamicContainer {
   }
 
   shouldTriggerDynamicContainer(link) {
+    // Do not trigger for citation links
+    if (link.classList.contains('citation-link')) {
+      return false;
+    }
     // Check if the link should trigger the dynamic container
-    // You can customize this logic based on your needs
     const href = link.getAttribute('href');
     
-    // Trigger for external links (but not citations)
-    if (href && href.startsWith('http') && !link.classList.contains('citation-link')) {
-      return true;
-    }
+
     
     // Trigger for links with specific classes or data attributes
     if (link.classList.contains('dynamic-trigger') || link.hasAttribute('data-dynamic-content')) {
@@ -252,16 +250,16 @@ class DynamicContainer {
         <div class="space-y-4">
           <div>
             <h3 class="font-medium text-gray-900 mb-2">Link Information</h3>
-            <p class="text-sm text-gray-600 mb-2"><strong>URL:</strong> ${href}</p>
+            <p class="text-sm text-gray-600 mb-2"><strong>URL:</strong> <a href="${href}" target="_blank" class="text-blue-600 hover:underline">${href}</a></p>
             <p class="text-sm text-gray-600 mb-4"><strong>Text:</strong> ${linkText}</p>
           </div>
           <div class="border-t pt-4">
-            <p class="text-sm text-gray-500 mb-3">This link leads to an external website. Would you like to:</p>
+            <p class="text-sm text-gray-500 mb-3">This link leads to an external website. Choose an action:</p>
             <div class="space-y-2">
-              <button onclick="window.open('${href}', '_blank')" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+              <a href="${href}" target="_blank" class="w-full block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-center">
                 Open in New Tab
-              </button>
-              <button onclick="navigator.clipboard.writeText('${href}')" class="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors">
+              </a>
+              <button type="button" onclick="navigator.clipboard.writeText('${href}')" class="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors">
                 Copy URL
               </button>
             </div>
@@ -303,7 +301,7 @@ class DynamicContainer {
         
         if (typeof source === 'string') {
           // Auto-link URLs in text-only source content
-          const linkified = source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
+          const linkified = source.replace(/(?<!href=")(https?:\/\/[^\s<>"'()]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           content = `
             <div class="space-y-4">
               <div>
@@ -317,7 +315,7 @@ class DynamicContainer {
         } else if (typeof source === 'object') {
           // Auto-link URLs in source.content
           const rawContent = source.content || '';
-          const linkifiedContent = rawContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
+          const linkifiedContent = rawContent.replace(/(?<!href=")(https?:\/\/[^\s<>"'()]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           title = source.title || source.id || `Source [${sourceId}]`;
           content = `
             <div class="space-y-4" id="source-content">
@@ -363,8 +361,10 @@ class DynamicContainer {
     if (titleElement) titleElement.textContent = title;
     if (contentElement) {
       contentElement.innerHTML = content;
-      // Auto-link URLs in rendered HTML
-      contentElement.innerHTML = contentElement.innerHTML.replace(/((http|https):\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
+      // Auto-link URLs in rendered HTML if not already linkified
+      if (!contentElement.innerHTML.includes('<a href="')) {
+        contentElement.innerHTML = contentElement.innerHTML.replace(/(?<!href=")(https?:\/\/[^\s<>"'()]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
+      }
     }
     
     // Show the container

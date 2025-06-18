@@ -30,9 +30,10 @@ FEEDBACK_FILE = os.getenv("FEEDBACK_FILE", "feedback.json")
 # --- Database Configuration ---
 # Get database credentials from environment variables loaded from .env
 # Provide default values if needed, though .env should ideally contain them
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost") # Look for POSTGRES_HOST
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")      # Look for POSTGRES_PORT
-POSTGRES_DB = os.getenv("POSTGRES_DB", "postgres")      # Look for POSTGRES_DB
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")    # Look for POSTGRES_USER
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")        # Look for POSTGRES_PASSWORD
-POSTGRES_SSL_MODE = os.getenv("POSTGRES_SSL_MODE", "require") # Default to 'require' for Render
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", os.getenv("PGHOST", "localhost")) # Look for POSTGRES_HOST
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", os.getenv("PGPORT", "5432"))      # Look for POSTGRES_PORT
+POSTGRES_DB = os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "postgres"))      # Look for POSTGRES_DB
+POSTGRES_USER = os.getenv("POSTGRES_USER", os.getenv("PGUSER", "postgres"))    # Look for POSTGRES_USER
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD"))        # Look for POSTGRES_PASSWORD
+
+POSTGRES_SSL_MODE = os.getenv("POSTGRES_SSL_MODE", os.getenv("PGSSLMODE", "require")) # Default to 'require' for Render

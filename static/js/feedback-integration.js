@@ -127,6 +127,14 @@
         function submitFeedback(feedbackData, messageId) {
             feedbackSubmissions.add(messageId);
             
+            const botResponse = getMessageText(messageId);
+            const userQuery = getUserQuery();
+            const citations = getCitations(messageId);
+            
+            feedbackData.response = botResponse;
+            feedbackData.question = userQuery;
+            feedbackData.citations = citations;
+            
             fetch(FEEDBACK_CONFIG.submitEndpoint, {
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
@@ -152,10 +160,35 @@
             container.innerHTML = `<span style="color:#22c55e; font-size:12px;font-weight:bold;">${msg}</span>`;
         }
         
+        function getCitations(messageId) {
+            const container = document.querySelector(`[data-message-id="${messageId}"]`);
+            const msgEl = container.closest('.bot-message');
+            const citationEl = msgEl.querySelector('.citations-container');
+            if (!citationEl) return [];
+
+            const citations = Array.from(citationEl.querySelectorAll('.citation-item')).map(item => {
+                const title = item.querySelector('.citation-title').textContent.trim();
+                const url = item.querySelector('a').href;
+                return { title, url };
+            });
+            return citations;
+        }
+        
         function getMessageText(messageId) {
             const container = document.querySelector(`[data-message-id="${messageId}"]`);
             const msgEl = container.closest('.bot-message');
             const txtEl = msgEl.querySelector('.message-bubble, .bot-bubble');
+            return txtEl ? txtEl.textContent.trim() : '';
+        }
+        
+        function getUserQuery() {
+            // Try to find the most recent user message before the current bot message
+            const messages = document.querySelectorAll('.user-message');
+            if (messages.length === 0) return '';
+            
+            // Get the last user message
+            const lastUserMsg = messages[messages.length - 1];
+            const txtEl = lastUserMsg.querySelector('.message-bubble, .user-bubble');
             return txtEl ? txtEl.textContent.trim() : '';
         }
         

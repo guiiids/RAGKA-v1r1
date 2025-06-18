@@ -6,7 +6,7 @@
 (function() {
   // Configuration
   const STORAGE_KEY = 'useDynamicCitations';
-  const DEFAULT_MODE = false; // Default to classic mode
+  const DEFAULT_MODE = true; // Default to dynamic citation mode
   
   // Initialize the toggle state
   let useDynamicCitations = localStorage.getItem(STORAGE_KEY) === 'true' ? true : DEFAULT_MODE;
