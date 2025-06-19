@@ -12,8 +12,6 @@ import re
 import sys
 import os
 import re
-from openai_logger import log_openai_call
-from db_manager import DatabaseManager
 
 # Import config but handle the case where it might import streamlit
 try:
@@ -162,13 +160,10 @@ class FlaskRAGAssistant:
         if not text:
             return None
         try:
-            request = {
-                # Arguments for self.openai_client.embeddings.create
-                'model': self.embedding_deployment,
-                'input': text.strip(),
-            }
-            resp = self.openai_client.embeddings.create(**request)
-            log_openai_call(request, resp)
+            resp = self.openai_client.embeddings.create(
+                model=self.embedding_deployment,
+                input=text.strip(),
+            )
             return resp.data[0].embedding
             
         
@@ -221,13 +216,11 @@ class FlaskRAGAssistant:
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
         entries, src_map = [], {}
         sid = 1
-        valid_chunks = 0
         for res in results[:5]:
             chunk = res["chunk"].strip()
             if not chunk:
                 continue
 
-            valid_chunks += 1
             formatted_chunk = format_context_text(chunk)
 
             entries.append(f'<source id="{sid}">{formatted_chunk}</source>')
@@ -236,15 +229,7 @@ class FlaskRAGAssistant:
                 "content":  formatted_chunk  # Optional: also store the formatted version
             }
             sid += 1
-
-        context_str = "\n\n".join(entries)
-        if valid_chunks == 0:
-            context_str = "[No context available from knowledge base]"
-            # Optionally log this condition
-            import logging
-            logging.getLogger(__name__).warning("No valid chunks found in _prepare_context, returning fallback context.")
-
-        return context_str, src_map
+        return "\n\n".join(entries), src_map
 
 
     def _chat_answer(self, query: str, context: str, src_map: Dict) -> str:
@@ -318,18 +303,15 @@ class FlaskRAGAssistant:
         }
         logger.info("========== OPENAI RAW PAYLOAD ==========")
         logger.info(json.dumps(payload, indent=2))
-        request = {
-            # Arguments for self.openai_client.chat.completions.create
-            'model': self.deployment_name,
-            'messages': messages,
-            'max_tokens': self.max_tokens,
-            'temperature': self.temperature,
-            'top_p': self.top_p,
-            'presence_penalty': self.presence_penalty,
-            'frequency_penalty': self.frequency_penalty
-        }
-        resp = self.openai_client.chat.completions.create(**request)
-        log_openai_call(request, resp)
+        resp = self.openai_client.chat.completions.create(
+            model=self.deployment_name,
+            messages=messages,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            top_p=self.top_p,
+            presence_penalty=self.presence_penalty,
+            frequency_penalty=self.frequency_penalty
+        )
         
         answer = resp.choices[0].message.content
         logger.info("DEBUG - OpenAI response content: %s", answer)
@@ -393,27 +375,11 @@ class FlaskRAGAssistant:
                 context=context,
                 deployment=self.deployment_name,
             )
-            
-            # Log the query, response, and sources to the database
-            try:
-                # Get the SQL query used to retrieve the results (if available)
-                sql_query = None
-                # If you have access to the actual SQL query used, set it here
-                
-                # Log the query to the database
-                DatabaseManager.log_rag_query(
-                    query=query,
-                    response=answer,
-                    sources=cited_sources,
-                    context=context,
-                    sql_query=sql_query
-                )
-            except Exception as log_exc:
-                logger.error(f"Error logging RAG query to database: {log_exc}")
-                # Continue even if logging fails
+
             
             return answer, cited_sources, [], evaluation, context
         
+
         except Exception as exc:
             logger.error("RAG generation error: %s", exc)
             return (
@@ -510,19 +476,16 @@ class FlaskRAGAssistant:
                 logger.info(f"Content: {msg['content']}")
             
             # Stream the response
-            request = {
-                # Arguments for self.openai_client.chat.completions.create
-                'model': self.deployment_name,
-                'messages': messages,
-                'max_tokens': self.max_tokens,
-                'temperature': self.temperature,
-                'top_p': self.top_p,
-                'presence_penalty': self.presence_penalty,
-                'frequency_penalty': self.frequency_penalty,
-                'stream': True
-            }
-            log_openai_call(request, {"type": "stream_started"})
-            stream = self.openai_client.chat.completions.create(**request)
+            stream = self.openai_client.chat.completions.create(
+                model=self.deployment_name,
+                messages=messages,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                presence_penalty=self.presence_penalty,
+                frequency_penalty=self.frequency_penalty,
+                stream=True
+            )
             
             collected_chunks = []
             collected_answer = ""
@@ -562,24 +525,6 @@ class FlaskRAGAssistant:
                 context=context,
                 deployment=self.deployment_name,
             )
-            
-            # Log the query, response, and sources to the database
-            try:
-                # Get the SQL query used to retrieve the results (if available)
-                sql_query = None
-                # If you have access to the actual SQL query used, set it here
-                
-                # Log the query to the database
-                DatabaseManager.log_rag_query(
-                    query=query,
-                    response=collected_answer,
-                    sources=cited_sources,
-                    context=context,
-                    sql_query=sql_query
-                )
-            except Exception as log_exc:
-                logger.error(f"Error logging RAG query to database: {log_exc}")
-                # Continue even if logging fails
             
             # Yield the metadata
             yield {

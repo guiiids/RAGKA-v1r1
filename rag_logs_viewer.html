@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG Logs Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .source-content {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .log-card {
+      transition: all 0.3s ease;
+    }
+    .log-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .context-content {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">RAG Logs Viewer</h1>
+      <p class="text-gray-600">View logged queries, responses, and source metadata</p>
+    </header>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Filters</h2>
+      <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label for="query-filter" class="block text-sm font-medium text-gray-700 mb-1">Query</label>
+          <input type="text" id="query-filter" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Filter by query text">
+        </div>
+        <div>
+          <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+          <input type="date" id="start-date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+          <input type="date" id="end-date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <i class="fas fa-filter mr-2"></i>Apply Filters
+          </button>
+          <button type="button" id="reset-filters" class="ml-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+            <i class="fas fa-undo mr-2"></i>Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-gray-600">
+        Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> of <span id="total-logs">0</span> logs
+      </div>
+      <div class="flex space-x-2">
+        <button id="prev-page" class="bg-white border border-gray-300 rounded-md px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-chevron-left mr-1"></i>Previous
+        </button>
+        <button id="next-page" class="bg-white border border-gray-300 rounded-md px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed">
+          Next<i class="fas fa-chevron-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading" class="flex justify-center items-center py-12 hidden">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Logs container -->
+    <div id="logs-container" class="space-y-6">
+      <!-- Logs will be inserted here -->
+    </div>
+
+    <!-- No results message -->
+    <div id="no-results" class="hidden bg-white rounded-lg shadow-md p-8 text-center">
+      <i class="fas fa-search text-gray-400 text-5xl mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">No logs found</h3>
+      <p class="text-gray-600">Try adjusting your filters or adding some queries to the system.</p>
+    </div>
+
+    <!-- Error message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+      <div class="flex">
+        <div class="py-1"><i class="fas fa-exclamation-circle mr-2"></i></div>
+        <div>
+          <p class="font-bold">Error loading logs</p>
+          <p class="text-sm" id="error-details"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get today's date in YYYY-MM-DD format
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Pagination state
+    const state = {
+      limit: 5,
+      offset: 0,
+      total: 0,
+      query: '',
+      startDate: '', // Empty string to fetch all logs without date filtering
+      endDate: ''    // Empty string to fetch all logs without date filtering
+    };
+
+    // DOM elements
+    const logsContainer = document.getElementById('logs-container');
+    const loadingIndicator = document.getElementById('loading');
+    const noResultsMessage = document.getElementById('no-results');
+    const errorMessage = document.getElementById('error-message');
+    const errorDetails = document.getElementById('error-details');
+    const showingStart = document.getElementById('showing-start');
+    const showingEnd = document.getElementById('showing-end');
+    const totalLogs = document.getElementById('total-logs');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const filterForm = document.getElementById('filter-form');
+    const queryFilter = document.getElementById('query-filter');
+    const startDateFilter = document.getElementById('start-date');
+    const endDateFilter = document.getElementById('end-date');
+    const resetFiltersBtn = document.getElementById('reset-filters');
+
+    // Format date for display
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    }
+
+    // Format JSON for display
+    function formatJson(json) {
+      if (typeof json === 'string') {
+        try {
+          json = JSON.parse(json);
+        } catch (e) {
+          return json;
+        }
+      }
+      return JSON.stringify(json, null, 2);
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Create a log card
+    function createLogCard(log) {
+      // Format the sources for display
+      let sourcesHtml = '';
+      if (log.sources && log.sources.length > 0) {
+        sourcesHtml = '<div class="mt-4"><h4 class="text-sm font-semibold text-gray-700 mb-2">Sources</h4><div class="source-content bg-gray-50 p-3 rounded-md">';
+        log.sources.forEach((source, index) => {
+          const sourceTitle = source.title || `Source ${index + 1}`;
+          const sourceContent = source.content || '';
+          sourcesHtml += `
+            <div class="mb-3">
+              <div class="font-medium text-blue-600">${escapeHtml(sourceTitle)}</div>
+              <div class="text-sm text-gray-700 mt-1">${escapeHtml(sourceContent.substring(0, 200))}${sourceContent.length > 200 ? '...' : ''}</div>
+            </div>
+          `;
+        });
+        sourcesHtml += '</div></div>';
+      }
+
+      // Format SQL query if available
+      let sqlQueryHtml = '';
+      if (log.sql_query) {
+        sqlQueryHtml = `
+          <div class="mt-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">SQL Query</h4>
+            <pre class="bg-gray-50 p-3 rounded-md text-sm overflow-x-auto">${escapeHtml(log.sql_query)}</pre>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="log-card bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-semibold text-gray-800">${escapeHtml(log.user_query)}</h3>
+              <span class="text-sm text-gray-500">${formatDate(log.timestamp)}</span>
+            </div>
+            <div class="mt-2 text-sm text-gray-600">ID: ${log.id}</div>
+          </div>
+          <div class="p-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Response</h4>
+            <div class="bg-blue-50 p-3 rounded-md text-sm text-gray-800 max-h-64 overflow-auto whitespace-pre-wrap">
+              ${escapeHtml(log.response)}
+            </div>
+            
+            ${sourcesHtml}
+            
+            <div class="mt-4">
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Context</h4>
+              <div class="context-content bg-gray-50 p-3 rounded-md text-sm text-gray-700 whitespace-pre-wrap max-h-64 overflow-auto">
+                ${escapeHtml(log.context)}
+              </div>
+            </div>
+            
+            ${sqlQueryHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    // Fetch logs from the API
+    async function fetchLogs() {
+      showLoading();
+      hideError();
+      
+      try {
+        const url = new URL('/api/rag_logs', window.location.origin);
+        url.searchParams.append('limit', state.limit);
+        url.searchParams.append('offset', state.offset);
+        
+        if (state.query) {
+          url.searchParams.append('query', state.query);
+        }
+        
+        // Only add date parameters if they're not empty strings
+        // This ensures we get all logs when no dates are specified
+        // Helper to convert MM/DD/YYYY to YYYY-MM-DD
+        function convertDateFormat(dateStr) {
+          const parts = dateStr.split('/');
+          if (parts.length === 3) {
+            const [month, day, year] = parts;
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          }
+          return dateStr; // fallback
+        }
+
+        if (state.startDate && state.startDate.trim() !== '') {
+          url.searchParams.append('start_date', convertDateFormat(state.startDate));
+        }
+        
+        if (state.endDate && state.endDate.trim() !== '') {
+          url.searchParams.append('end_date', convertDateFormat(state.endDate));
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (response.ok) {
+          displayLogs(data);
+        } else {
+          showError(data.error || 'Failed to load logs');
+        }
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Display logs in the container
+    function displayLogs(data) {
+      state.total = data.total;
+      const logs = data.logs;
+      
+      // Update pagination info
+      totalLogs.textContent = state.total;
+      
+      if (state.total === 0) {
+        showNoResults();
+        return;
+      }
+      
+      const start = state.offset + 1;
+      const end = Math.min(state.offset + logs.length, state.total);
+      showingStart.textContent = start;
+      showingEnd.textContent = end;
+      
+      // Update pagination buttons
+      prevPageBtn.disabled = state.offset === 0;
+      nextPageBtn.disabled = end >= state.total;
+      
+      // Clear the container
+      logsContainer.innerHTML = '';
+      
+      // Add logs to the container
+      logs.forEach(log => {
+        logsContainer.innerHTML += createLogCard(log);
+      });
+      
+      // Show the container
+      logsContainer.classList.remove('hidden');
+      noResultsMessage.classList.add('hidden');
+    }
+
+    // Show loading indicator
+    function showLoading() {
+      loadingIndicator.classList.remove('hidden');
+      logsContainer.classList.add('hidden');
+      noResultsMessage.classList.add('hidden');
+    }
+
+    // Hide loading indicator
+    function hideLoading() {
+      loadingIndicator.classList.add('hidden');
+    }
+
+    // Show error message
+    function showError(message) {
+      errorMessage.classList.remove('hidden');
+      errorDetails.textContent = message;
+    }
+
+    // Hide error message
+    function hideError() {
+      errorMessage.classList.add('hidden');
+    }
+
+    // Show no results message
+    function showNoResults() {
+      noResultsMessage.classList.remove('hidden');
+      logsContainer.classList.add('hidden');
+      
+      // Update pagination info
+      showingStart.textContent = 0;
+      showingEnd.textContent = 0;
+      
+      // Disable pagination buttons
+      prevPageBtn.disabled = true;
+      nextPageBtn.disabled = true;
+    }
+
+    // Set default date values to today
+    function setDefaultDates() {
+      // Clear default dates to fetch all logs initially
+      startDateFilter.value = '';
+      endDateFilter.value = '';
+    }
+    
+    // Event listeners
+    prevPageBtn.addEventListener('click', () => {
+      if (state.offset > 0) {
+        state.offset = Math.max(0, state.offset - state.limit);
+        fetchLogs();
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      if (state.offset + state.limit < state.total) {
+        state.offset += state.limit;
+        fetchLogs();
+      }
+    });
+
+    filterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.query = queryFilter.value.trim();
+      state.startDate = startDateFilter.value;
+      state.endDate = endDateFilter.value;
+      state.offset = 0; // Reset to first page
+      fetchLogs();
+    });
+
+    resetFiltersBtn.addEventListener('click', () => {
+      queryFilter.value = '';
+      const todayDate = getTodayDate();
+      startDateFilter.value = todayDate;
+      endDateFilter.value = todayDate;
+      state.query = '';
+      state.startDate = todayDate;
+      state.endDate = todayDate;
+      state.offset = 0; // Reset to first page
+      fetchLogs();
+    });
+
+    // Set default dates and initial fetch
+    setDefaultDates();
+    // Update state with default dates before initial fetch
+    state.startDate = startDateFilter.value;
+    state.endDate = endDateFilter.value;
+    fetchLogs();

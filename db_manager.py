@@ -4,6 +4,7 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 import psycopg2
 from psycopg2.extras import RealDictCursor, Json
 import logging
+import json
 from datetime import datetime, timezone
 from config import (
     POSTGRES_HOST,
@@ -209,6 +210,93 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error getting tag distribution: {e}")
             return []
+        finally:
+            if conn is not None:
+                conn.close()
+    
+    @staticmethod
+    def log_rag_query(query, response, sources, context, sql_query=None):
+        """
+        Log a RAG query, response, and source metadata to the database.
+        
+        Args:
+            query (str): The user's query
+            response (str): The generated response
+            sources (list): List of sources used in the response
+            context (str): The context used to generate the response
+            sql_query (str, optional): The SQL query used to retrieve data
+            
+        Returns:
+            int: The ID of the logged entry
+        """
+        conn = None
+        try:
+            # Prepare the data
+            timestamp = datetime.now(timezone.utc)
+            
+            # Create a structured record of the sources with all available metadata
+            source_metadata = []
+            for source in sources:
+                if isinstance(source, dict):
+                    source_metadata.append(source)
+                else:
+                    # If source is not a dict, create a simple dict with the source as content
+                    source_metadata.append({"content": str(source)})
+            
+            # Connect to the database
+            conn = DatabaseManager.get_connection()
+            with conn.cursor() as cursor:
+                # Check if rag_queries table exists, create it if not
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'rag_queries'
+                    );
+                """)
+                table_exists = cursor.fetchone()[0]
+                
+                if not table_exists:
+                    # Create the table if it doesn't exist
+                    cursor.execute("""
+                        CREATE TABLE rag_queries (
+                            id SERIAL PRIMARY KEY,
+                            timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+                            user_query TEXT NOT NULL,
+                            response TEXT NOT NULL,
+                            sources JSONB NOT NULL,
+                            context TEXT NOT NULL,
+                            sql_query TEXT
+                        );
+                    """)
+                    conn.commit()
+                    logger.info("Created rag_queries table")
+                
+                # Insert the data
+                cursor.execute(
+                    """
+                    INSERT INTO rag_queries 
+                    (timestamp, user_query, response, sources, context, sql_query)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (
+                        timestamp,
+                        query,
+                        response,
+                        Json(source_metadata),
+                        context,
+                        sql_query
+                    )
+                )
+                entry_id = cursor.fetchone()[0]
+                conn.commit()
+                logger.info(f"Logged RAG query with ID: {entry_id}")
+                return entry_id
+        except Exception as e:
+            logger.error(f"Error logging RAG query to database: {e}")
+            if conn:
+                conn.rollback()
+            raise
         finally:
             if conn is not None:
                 conn.close()

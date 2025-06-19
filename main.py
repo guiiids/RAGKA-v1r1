@@ -7,6 +7,7 @@ import logging
 import sys
 import os
 from dotenv import load_dotenv
+from psycopg2.extras import RealDictCursor
 load_dotenv() 
 
 
@@ -51,8 +52,7 @@ HTML_TEMPLATE = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAGE Knowledge Navigator
-</title>
+  <title>RAGKA Knowledge Navigator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style id="custom-styles">
@@ -183,7 +183,7 @@ HTML_TEMPLATE = """
 </head>
 <body class="bg-white">
   <!-- Passcode Overlay -->
-
+ <!--
  <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
     <div class="text-center max-w-md mx-auto p-8">
       
@@ -199,7 +199,7 @@ HTML_TEMPLATE = """
         </button>
       </div>
     </div>
-  </div>  
+  </div>  -->
   <div class="chat-container w-[60%] mx-auto">
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
@@ -267,13 +267,22 @@ HTML_TEMPLATE = """
     </div>
     
     <!-- Chat Input Area -->
-    <div class="chat-input">
-      <div class="relative">
-        <textarea id="query-input" rows="1" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-300 rounded-2xl pl-3 pr-20 py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow resize-none overflow-hidden" placeholder="Ask me anything about our knowledge base..."></textarea>
-        <button id="submit-btn" class="absolute right-1 bottom-3 rounded-2xl bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+     <div class="chat-input">
+    <div class="relative rounded-3xl border border-gray-300 p-4 bg-white max-w-3xl mx-auto mt-10 shadow-md">
+  <!-- Dynamic textarea -->
+  <textarea
+    id="query-input"
+    rows="1"
+    placeholder="Type here..."
+    class="w-full resize-none overflow-hidden text-sm leading-relaxed outline-none bg-transparent"
+    oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
+    style="min-height: 34px;"
+  ></textarea>
+  
+<button id="submit-btn" class="absolute right-2 bottom-2 rounded-2xl bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
           Send
         </button>
-      </div>
+</div>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
       <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
@@ -737,7 +746,7 @@ HTML_TEMPLATE = """
 <script src="/static/js/feedback_thumbs.js"></script>
 <!-- Placeholder citation click handler and its listener removed -->
 
-<script>
+<!-- <script>
 
 (function() {
   const overlay = document.getElementById('passcode-overlay');
@@ -786,7 +795,7 @@ HTML_TEMPLATE = """
     }
   });
 })();
-</script>
+</script> -->
   </body>
 </html>
 
@@ -822,6 +831,32 @@ def api_query():
         logger.info(f"API query response generated for: {user_query}")
         logger.info(f"DEBUG - Response length: {len(answer)}")
         logger.info(f"DEBUG - Number of cited sources: {len(cited_sources)}")
+        
+        try:
+            from db_manager import DatabaseManager
+            # Inspired by feedback data structure, build a dict for logging
+            log_data = {
+                "question": user_query,
+                "response": answer,
+                "feedback_tags": [],  # No tags at query time
+                "comment": "",
+                "evaluation_json": {},
+                "citations": cited_sources
+            }
+            # Debug log context and response length and snippet
+            logger.debug(f"Context length: {len(context)}; snippet: {context[:100]}")
+            logger.debug(f"Response length: {len(log_data['response'])}; snippet: {log_data['response'][:100]}")
+            # Log using existing log_rag_query method by unpacking relevant fields
+            vote_id = DatabaseManager.log_rag_query(
+                query=log_data["question"],
+                response=log_data["response"],
+                sources=log_data["citations"],
+                context=context,
+                sql_query=None
+            )
+            logger.info(f"RAG query logged with ID: {vote_id}")
+        except Exception as log_exc:
+            logger.error(f"Failed to log RAG query: {log_exc}", exc_info=True)
         
         return jsonify({
             "answer": answer,
@@ -926,7 +961,141 @@ def api_dev_eval():
     Expects JSON: { "query": ..., "prompt": ..., "parameters": { "temperature": ..., "top_p": ..., "max_tokens": ... } }
     Returns: { "result": ..., "developer_evaluation": ..., "download_url_json": ..., "download_url_md": ..., "markdown_report": ... }
     """
+
+@app.route("/rag_logs", methods=["GET"])
+def rag_logs_viewer():
+    """Serve the RAG logs viewer page."""
+    try:
+        with open('rag_logs_viewer.html', 'r') as f:
+            html_content = f.read()
+        return html_content
+    except Exception as e:
+        logger.error(f"Error serving RAG logs viewer: {e}")
+        return "Error loading RAG logs viewer page", 500
+
+@app.route("/api/rag_logs", methods=["GET"])
+def api_rag_logs():
+    """
+    Retrieve logged RAG queries, responses, and source metadata.
     
+    Query parameters:
+    - limit: Maximum number of records to return (default: 10)
+    - offset: Number of records to skip (default: 0)
+    - query: Filter by user query (optional)
+    - start_date: Filter by start date (format: YYYY-MM-DD, optional)
+    - end_date: Filter by end date (format: YYYY-MM-DD, optional)
+    
+    Returns:
+    {
+        "total": total number of records,
+        "logs": [
+            {
+                "id": record ID,
+                "timestamp": timestamp,
+                "user_query": user query,
+                "response": generated response,
+                "sources": list of sources used,
+                "context": context used to generate the response,
+                "sql_query": SQL query used (if available)
+            },
+            ...
+        ]
+    }
+    """
+    try:
+        # Get query parameters
+        limit = request.args.get("limit", 10, type=int)
+        offset = request.args.get("offset", 0, type=int)
+        query_filter = request.args.get("query", "")
+        start_date = request.args.get("start_date", "")
+        end_date = request.args.get("end_date", "")
+        
+        # Debug logging for request parameters
+        logger.info(f"RAG logs API called with parameters: limit={limit}, offset={offset}, query='{query_filter}', start_date='{start_date}', end_date='{end_date}'")
+        
+        # If no dates are provided, don't filter by date
+        # This ensures all logs are returned when no date filters are applied
+        
+        # Connect to the database
+        conn = None
+        try:
+            logger.info("Attempting to connect to database for RAG logs query")
+            conn = DatabaseManager.get_connection()
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Check if rag_queries table exists
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'rag_queries'
+                    );
+                """)
+                table_exists = cursor.fetchone()["exists"]
+                
+                if not table_exists:
+                    logger.warning("rag_queries table does not exist in the database")
+                    return jsonify({
+                        "total": 0,
+                        "logs": []
+                    })
+                
+                # Build the query
+                query_conditions = []
+                query_params = []
+                
+                if query_filter:
+                    query_conditions.append("user_query ILIKE %s")
+                    query_params.append(f"%{query_filter}%")
+                
+                if start_date:
+                    query_conditions.append("timestamp >= %s")
+                    query_params.append(f"{start_date} 00:00:00")
+                
+                if end_date:
+                    query_conditions.append("timestamp <= %s")
+                    query_params.append(f"{end_date} 23:59:59")
+                
+                where_clause = ""
+                if query_conditions:
+                    where_clause = "WHERE " + " AND ".join(query_conditions)
+                
+                # Get total count
+                count_query = f"SELECT COUNT(*) as total FROM rag_queries {where_clause}"
+                logger.info(f"Executing count query: {count_query} with params: {query_params}")
+                cursor.execute(count_query, query_params)
+                total = cursor.fetchone()["total"]
+                logger.info(f"Total RAG logs found: {total}")
+                
+                # Get the logs
+                logs_query = f"""
+                    SELECT id, timestamp, user_query, response, sources, context, sql_query
+                    FROM rag_queries
+                    {where_clause}
+                    ORDER BY timestamp DESC
+                    LIMIT %s OFFSET %s
+                """
+                logger.info(f"Executing logs query: {logs_query} with params: {query_params + [limit, offset]}")
+                cursor.execute(logs_query, query_params + [limit, offset])
+                logs = cursor.fetchall()
+                logger.info(f"Retrieved {len(logs)} RAG logs")
+                
+                # Debug log the first log if available
+                if logs and len(logs) > 0:
+                    logger.info(f"First log ID: {logs[0]['id']}, timestamp: {logs[0]['timestamp']}, query: {logs[0]['user_query'][:50]}...")
+                
+                return jsonify({
+                    "total": total,
+                    "logs": logs
+                })
+        finally:
+            if conn is not None:
+                conn.close()
+    except Exception as e:
+        logger.error(f"Error retrieving RAG logs: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({
+            "error": str(e)
+        }), 500
+
 if __name__ == "__main__":
     import argparse
     
