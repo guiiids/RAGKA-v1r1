@@ -79,7 +79,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Total Interactions</p>
-                            <p class="text-2xl font-semibold text-gray-800" id="total-interactions">1,248</p>
+                            <p class="text-2xl font-semibold text-gray-800" id="total-interactions"></p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -101,7 +101,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Positive Feedback</p>
-                            <p class="text-2xl font-semibold text-gray-800" id="positive-feedback">78%</p>
+                            <p class="text-2xl font-semibold text-gray-800" id="positive-feedback"></p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -123,7 +123,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Avg Response Time</p>
-                            <p class="text-2xl font-semibold text-gray-800" id="avg-response-time">2.4s</p>
+                            <p class="text-2xl font-semibold text-gray-800" id="avg-response-time"></p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -145,7 +145,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Token Usage</p>
-                            <p class="text-2xl font-semibold text-gray-800" id="token-usage">1.2M</p>
+                            <p class="text-2xl font-semibold text-gray-800" id="token-usage"></p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -276,7 +276,7 @@
                             <i class="fas fa-bullseye text-sm"></i>
                         </div>
                     </div>
-                    <p class="text-2xl font-semibold text-gray-800 mt-2">92.7%</p>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2"></p>
                     <div class="mt-2">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-blue-600 h-2 rounded-full" style="width: 92.7%"></div>
@@ -292,7 +292,7 @@
                             <i class="fas fa-check-circle text-sm"></i>
                         </div>
                     </div>
-                    <p class="text-2xl font-semibold text-gray-800 mt-2">88.3%</p>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2"></p>
                     <div class="mt-2">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-green-600 h-2 rounded-full" style="width: 88.3%"></div>
@@ -308,7 +308,7 @@
                             <i class="fas fa-link text-sm"></i>
                         </div>
                     </div>
-                    <p class="text-2xl font-semibold text-gray-800 mt-2">94.1%</p>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2"></p>
                     <div class="mt-2">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-purple-600 h-2 rounded-full" style="width: 94.1%"></div>
@@ -324,7 +324,7 @@
                             <i class="fas fa-exclamation-triangle text-sm"></i>
                         </div>
                     </div>
-                    <p class="text-2xl font-semibold text-gray-800 mt-2">3.2%</p>
+                    <p class="text-2xl font-semibold text-gray-800 mt-2"></p>
                     <div class="mt-2">
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-red-600 h-2 rounded-full" style="width: 3.2%"></div>
@@ -351,43 +351,200 @@
 
     <!-- JavaScript for Charts and Data -->
     <script>
-        // Sample data - would be replaced with actual data from your database
-        const sampleData = {
-            interactions: [120, 150, 180, 210, 190, 220, 178],
-            feedback: {
-                positive: 78,
-                negative: 22
-            },
-            categories: {
-                'Product Info': 35,
-                'Troubleshooting': 25,
-                'Feature Requests': 15,
-                'Technical Support': 20,
-                'Other': 5
-            },
-            responseTimes: [1.2, 1.8, 2.1, 2.4, 2.7, 3.0, 3.5],
-            tokenUsage: [45000, 52000, 48000, 51000, 49000, 53000, 50000],
-            feedbackTags: {
-                'Looks Good / Accurate & Clear': 65,
-                'Incomplete': 12,
-                'Factual Error': 8,
-                'Irrelevant': 7,
-                'Too Verbose': 5,
-                'Other': 3
-            }
-        };
+        // Global variables for chart instances
+        window.chartInstances = {};
+        window.currentStartDate = null;
+        window.currentEndDate = null;
 
-        // Initialize charts when the DOM is loaded
+        // Initialize dashboard when the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Interactions Over Time Chart
+            // Show loading indicators
+            showLoadingState();
+            
+            // Fetch analytics data from API
+            fetchAnalyticsData();
+            
+            // Initialize Date Range Picker
+            initDateRangePicker();
+            
+            // Add event listener to export button
+            setupExportButton();
+            
+            // Setup export links
+            setupExportLinks();
+            
+            // Initialize word cloud placeholder
+            initWordCloud();
+            
+            // Setup date range presets after a short delay to ensure date range picker is initialized
+            setTimeout(setupDateRangePresets, 500);
+        });
+
+        // Function to show loading state
+        function showLoadingState() {
+            // Add loading overlay to each card
+            document.querySelectorAll('.dashboard-card').forEach(card => {
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                `;
+                card.style.position = 'relative';
+                card.appendChild(loadingOverlay);
+            });
+            
+            // Add loading overlay to the table
+            const tableContainer = document.querySelector('.data-table');
+            if (tableContainer) {
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                `;
+                tableContainer.style.position = 'relative';
+                tableContainer.appendChild(loadingOverlay);
+            }
+        }
+
+        // Function to hide loading state
+        function hideLoadingState() {
+            // Remove all loading overlays
+            document.querySelectorAll('.loading-overlay').forEach(overlay => {
+                overlay.remove();
+            });
+        }
+
+        // Function to show error message
+        function showErrorMessage(message) {
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+            errorAlert.setAttribute('role', 'alert');
+            errorAlert.innerHTML = `
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">${message}</span>
+                <button class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()">
+                    <span class="sr-only">Dismiss</span>
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            document.body.appendChild(errorAlert);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (errorAlert.parentElement) {
+                    errorAlert.remove();
+                }
+            }, 5000);
+        }
+
+        // Function to fetch analytics data from API
+        function fetchAnalyticsData(startDate = null, endDate = null) {
+            // Show loading indicators
+            showLoadingState();
+            
+            // Build API URL with date parameters if provided
+            let apiUrl = '/api/analytics';
+            if (startDate && endDate) {
+                apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
+            }
+            
+            // Fetch data from API
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update dashboard with real data
+                    updateDashboardMetrics(data);
+                    updateCharts(data);
+                    populateRecentInteractions(data.query_analytics ? data.query_analytics.recent_queries : []);
+                    
+                    // Update last updated timestamp
+                    document.getElementById('last-updated').textContent = new Date().toLocaleString();
+                    
+                    // Hide loading indicators
+                    hideLoadingState();
+                })
+                .catch(error => {
+                    console.error('Error fetching analytics data:', error);
+                    // Show error message
+                    showErrorMessage('Failed to load analytics data. Please try again later.');
+                    
+                    // Hide loading indicators
+                    hideLoadingState();
+                });
+        }
+
+        // Function to update dashboard metrics with real data
+        function updateDashboardMetrics(data) {
+            // Update total interactions
+            const totalInteractions = data.feedback_summary ? data.feedback_summary.total_feedback : 0;
+            document.getElementById('total-interactions').textContent = totalInteractions.toLocaleString();
+            
+            // Update positive feedback percentage
+            const positivePercentage = totalInteractions > 0 && data.feedback_summary
+                ? Math.round((data.feedback_summary.positive_feedback / totalInteractions) * 100) 
+                : 0;
+            document.getElementById('positive-feedback').textContent = positivePercentage + '%';
+            
+            // Update average response time
+            const avgResponseTime = data.response_time_metrics ? data.response_time_metrics.avg_response_time : null;
+            document.getElementById('avg-response-time').textContent = avgResponseTime ? avgResponseTime.toFixed(1) + 's' : 'N/A';
+            
+            // Update token usage
+            const totalTokens = data.token_usage_metrics ? data.token_usage_metrics.total_tokens : 0;
+            const totalTokensInMillions = totalTokens / 1000000;
+            document.getElementById('token-usage').textContent = totalTokens > 0 
+                ? totalTokensInMillions.toFixed(1) + 'M' 
+                : '0';
+        }
+
+        // Function to update all charts with real data
+        function updateCharts(data) {
+            // Update interactions over time chart
+            updateInteractionsChart(data.time_metrics || []);
+            
+            // Update feedback distribution chart
+            updateFeedbackChart(data.feedback_summary || {});
+            
+            // Update categories chart (using tag distribution as categories)
+            updateCategoriesChart(data.tag_distribution || []);
+            
+            // Update response time chart
+            updateResponseTimeChart(data.time_metrics || []);
+            
+            // Update token usage chart
+            updateTokenUsageChart(data.token_usage_metrics ? data.token_usage_metrics.daily_usage || [] : []);
+            
+            // Update feedback tags chart
+            updateFeedbackTagsChart(data.tag_distribution || []);
+        }
+
+        // Function to update interactions over time chart
+        function updateInteractionsChart(timeMetrics) {
+            // Extract dates and counts from time metrics
+            const dates = timeMetrics.map(item => formatDate(item.date));
+            const counts = timeMetrics.map(item => item.interaction_count);
+            
+            // Create or update chart
             const interactionsCtx = document.getElementById('interactions-chart').getContext('2d');
-            new Chart(interactionsCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.interactionsChart) {
+                window.chartInstances.interactionsChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.interactionsChart = new Chart(interactionsCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: dates.length > 0 ? dates : ['No Data'],
                     datasets: [{
                         label: 'Interactions',
-                        data: sampleData.interactions,
+                        data: counts.length > 0 ? counts : [0],
                         backgroundColor: 'rgba(79, 70, 229, 0.1)',
                         borderColor: 'rgba(79, 70, 229, 1)',
                         borderWidth: 2,
@@ -418,15 +575,29 @@
                     }
                 }
             });
+        }
 
-            // Feedback Distribution Chart
+        // Function to update feedback distribution chart
+        function updateFeedbackChart(feedbackSummary) {
+            // Get positive and negative feedback counts
+            const positiveCount = feedbackSummary.positive_feedback || 0;
+            const negativeCount = feedbackSummary.negative_feedback || 0;
+            
+            // Create or update chart
             const feedbackCtx = document.getElementById('feedback-chart').getContext('2d');
-            new Chart(feedbackCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.feedbackChart) {
+                window.chartInstances.feedbackChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.feedbackChart = new Chart(feedbackCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Positive', 'Negative'],
                     datasets: [{
-                        data: [sampleData.feedback.positive, sampleData.feedback.negative],
+                        data: [positiveCount, negativeCount],
                         backgroundColor: [
                             'rgba(34, 197, 94, 0.8)',
                             'rgba(239, 68, 68, 0.8)'
@@ -449,16 +620,33 @@
                     cutout: '70%'
                 }
             });
+        }
 
-            // Top Query Categories Chart
+        // Function to update categories chart
+        function updateCategoriesChart(tagDistribution) {
+            // Sort tags by count and take top 5
+            const sortedTags = [...tagDistribution].sort((a, b) => b.count - a.count).slice(0, 5);
+            
+            // Extract tag names and counts
+            const tagNames = sortedTags.map(tag => tag.tag);
+            const tagCounts = sortedTags.map(tag => tag.count);
+            
+            // Create or update chart
             const categoriesCtx = document.getElementById('categories-chart').getContext('2d');
-            new Chart(categoriesCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.categoriesChart) {
+                window.chartInstances.categoriesChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.categoriesChart = new Chart(categoriesCtx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(sampleData.categories),
+                    labels: tagNames.length > 0 ? tagNames : ['No Data'],
                     datasets: [{
                         label: 'Queries',
-                        data: Object.values(sampleData.categories),
+                        data: tagCounts.length > 0 ? tagCounts : [0],
                         backgroundColor: [
                             'rgba(79, 70, 229, 0.8)',
                             'rgba(16, 185, 129, 0.8)',
@@ -492,16 +680,32 @@
                     }
                 }
             });
+        }
 
-            // Response Time Distribution Chart
+        // Function to update response time chart
+        function updateResponseTimeChart(timeMetrics) {
+            // Extract dates and generate response times
+            const dates = timeMetrics.map(item => formatDate(item.date));
+            
+            // Generate response times from API data or empty array if none
+            const responseTimes = timeMetrics.map(item => item.response_time || 0);
+            
+            // Create or update chart
             const responseTimeCtx = document.getElementById('response-time-chart').getContext('2d');
-            new Chart(responseTimeCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.responseTimeChart) {
+                window.chartInstances.responseTimeChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.responseTimeChart = new Chart(responseTimeCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: dates.length > 0 ? dates : ['No Data'],
                     datasets: [{
                         label: 'Response Time (s)',
-                        data: sampleData.responseTimes,
+                        data: responseTimes.length > 0 ? responseTimes : [0],
                         backgroundColor: 'rgba(168, 85, 247, 0.1)',
                         borderColor: 'rgba(168, 85, 247, 1)',
                         borderWidth: 2,
@@ -533,16 +737,30 @@
                     }
                 }
             });
+        }
 
-            // Token Usage by Day Chart
+        // Function to update token usage chart
+        function updateTokenUsageChart(dailyUsage) {
+            // Extract dates and token counts
+            const dates = dailyUsage.map(item => formatDate(item.date));
+            const tokenCounts = dailyUsage.map(item => item.daily_tokens);
+            
+            // Create or update chart
             const tokenUsageCtx = document.getElementById('token-usage-chart').getContext('2d');
-            new Chart(tokenUsageCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.tokenUsageChart) {
+                window.chartInstances.tokenUsageChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.tokenUsageChart = new Chart(tokenUsageCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: dates.length > 0 ? dates : ['No Data'],
                     datasets: [{
                         label: 'Token Usage',
-                        data: sampleData.tokenUsage,
+                        data: tokenCounts.length > 0 ? tokenCounts : [0],
                         backgroundColor: 'rgba(234, 179, 8, 0.8)',
                         borderWidth: 0
                     }]
@@ -570,15 +788,29 @@
                     }
                 }
             });
+        }
 
-            // Feedback Tags Distribution Chart
+        // Function to update feedback tags chart
+        function updateFeedbackTagsChart(tagDistribution) {
+            // Extract tag names and counts
+            const tagNames = tagDistribution.map(tag => tag.tag);
+            const tagCounts = tagDistribution.map(tag => tag.count);
+            
+            // Create or update chart
             const feedbackTagsCtx = document.getElementById('feedback-tags-chart').getContext('2d');
-            new Chart(feedbackTagsCtx, {
+            
+            // Check if chart already exists and destroy it
+            if (window.chartInstances.feedbackTagsChart) {
+                window.chartInstances.feedbackTagsChart.destroy();
+            }
+            
+            // Create new chart
+            window.chartInstances.feedbackTagsChart = new Chart(feedbackTagsCtx, {
                 type: 'pie',
                 data: {
-                    labels: Object.keys(sampleData.feedbackTags),
+                    labels: tagNames.length > 0 ? tagNames : ['No Data'],
                     datasets: [{
-                        data: Object.values(sampleData.feedbackTags),
+                        data: tagCounts.length > 0 ? tagCounts : [1],
                         backgroundColor: [
                             'rgba(34, 197, 94, 0.8)',
                             'rgba(239, 68, 68, 0.8)',
@@ -600,34 +832,30 @@
                     }
                 }
             });
+        }
 
-            // Populate Recent Interactions Table
-            populateRecentInteractions();
+        // Helper function to format dates
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
 
-            // Initialize Date Range Picker
-            initDateRangePicker();
-        });
-
-        // Function to populate recent interactions table
-        function populateRecentInteractions() {
+        // Function to populate recent interactions table with real data
+        function populateRecentInteractions(interactions) {
             const tableBody = document.getElementById('recent-interactions-table');
             
-            // Sample data for the table
-            const interactions = [
-                { id: 1001, query: "How do I reset my password?", feedback: "Positive", responseTime: "1.8s", tokens: 320, timestamp: "2025-06-18 16:45:23" },
-                { id: 1002, query: "What are the system requirements?", feedback: "Positive", responseTime: "2.1s", tokens: 412, timestamp: "2025-06-18 15:32:17" },
-                { id: 1003, query: "Can I integrate with third-party APIs?", feedback: "Negative", responseTime: "2.5s", tokens: 528, timestamp: "2025-06-18 14:21:05" },
-                { id: 1004, query: "How to export data in CSV format?", feedback: "Positive", responseTime: "1.9s", tokens: 375, timestamp: "2025-06-18 13:15:42" },
-                { id: 1005, query: "What's the difference between plans?", feedback: "Positive", responseTime: "2.3s", tokens: 490, timestamp: "2025-06-18 12:08:31" },
-                { id: 1006, query: "How to set up two-factor authentication?", feedback: "Negative", responseTime: "2.7s", tokens: 615, timestamp: "2025-06-18 11:02:19" },
-                { id: 1007, query: "Is there a mobile app available?", feedback: "Positive", responseTime: "1.6s", tokens: 280, timestamp: "2025-06-18 10:45:07" },
-                { id: 1008, query: "How to customize dashboard widgets?", feedback: "Positive", responseTime: "2.2s", tokens: 450, timestamp: "2025-06-18 09:38:54" },
-                { id: 1009, query: "Can I schedule automated reports?", feedback: "Negative", responseTime: "2.4s", tokens: 520, timestamp: "2025-06-18 08:27:42" },
-                { id: 1010, query: "How to invite team members?", feedback: "Positive", responseTime: "1.7s", tokens: 310, timestamp: "2025-06-18 07:15:30" }
-            ];
-
             // Clear existing rows
             tableBody.innerHTML = '';
+            
+            // Check if we have interactions
+            if (!interactions || interactions.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No interactions found</td>
+                `;
+                tableBody.appendChild(row);
+                return;
+            }
             
             // Add new rows
             interactions.forEach(interaction => {
@@ -635,16 +863,16 @@
                 row.className = 'hover:bg-gray-50';
                 
                 // Create badge for feedback
-                const feedbackBadge = interaction.feedback === 'Positive' 
+                const feedbackBadge = interaction.feedback_status === 'Positive' 
                     ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Positive</span>'
                     : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Negative</span>';
                 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${interaction.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.query}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${interaction.vote_id || interaction.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" title="${interaction.user_query}">${interaction.user_query.length > 50 ? interaction.user_query.substring(0, 50) + '...' : interaction.user_query}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${feedbackBadge}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.responseTime}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.tokens}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.response_time || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.tokens || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.timestamp}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <button class="px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50">
@@ -655,6 +883,14 @@
                 
                 tableBody.appendChild(row);
             });
+            
+            // Update pagination info
+            const paginationInfo = document.querySelector('.text-sm.text-gray-700');
+            if (paginationInfo) {
+                paginationInfo.innerHTML = `
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">${interactions.length}</span> of <span class="font-medium">${interactions.length}</span> results
+                `;
+            }
         }
 
         // Function to initialize date range picker
@@ -663,6 +899,10 @@
             const dateRangeText = document.getElementById('date-range-text');
             
             if (!dateRangeBtn) return;
+            
+            // Store current date range globally
+            window.currentStartDate = moment().subtract(6, 'days').format('YYYY-MM-DD');
+            window.currentEndDate = moment().format('YYYY-MM-DD');
             
             // Initialize with daterangepicker library
             $(dateRangeBtn).daterangepicker({
@@ -682,25 +922,190 @@
                 // Update the button text with the selected range
                 dateRangeText.textContent = label;
                 
-                // Here you would typically fetch new data based on the date range
-                console.log('Date range selected:', start.format('YYYY-MM-DD'), 'to', end.format('YYYY-MM-DD'));
+                // Store current date range for export and filtering
+                window.currentStartDate = start.format('YYYY-MM-DD');
+                window.currentEndDate = end.format('YYYY-MM-DD');
                 
-                // For demo purposes, we'll just update the last updated text
+                // Show loading state
+                showLoadingState();
+                
+                // Fetch new data based on the date range
+                fetchAnalyticsData(window.currentStartDate, window.currentEndDate);
+                
+                // Update last updated text
                 document.getElementById('last-updated').textContent = moment().format('MMMM D, YYYY h:mm A');
+                
+                // Log the date range change
+                console.log('Date range changed:', window.currentStartDate, 'to', window.currentEndDate);
             });
             
             // Initialize with default range
             dateRangeText.textContent = 'Last 7 Days';
         }
 
-        // Initialize word cloud (placeholder)
-        document.addEventListener('DOMContentLoaded', function() {
+        // Function to set up export button
+        function setupExportButton() {
+            const exportBtn = document.querySelector('button.ml-4');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove any existing dropdown
+                    const existingDropdown = document.querySelector('.export-dropdown');
+                    if (existingDropdown) {
+                        existingDropdown.remove();
+                    }
+                    
+                    // Get current date range
+                    let exportUrlBase = '/api/analytics/export';
+                    
+                    // Add date parameters if a specific range is selected
+                    if (window.currentStartDate && window.currentEndDate) {
+                        exportUrlBase += `?start_date=${window.currentStartDate}&end_date=${window.currentEndDate}`;
+                    }
+                    
+                    // Create dropdown menu for export options
+                    const dropdown = document.createElement('div');
+                    dropdown.className = 'absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 export-dropdown';
+                    dropdown.innerHTML = `
+                        <a href="${exportUrlBase}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-file-code mr-2"></i>Export as JSON
+                        </a>
+                        <a href="${exportUrlBase}${exportUrlBase.includes('?') ? '&' : '?'}format=csv" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-file-csv mr-2"></i>Export as CSV
+                        </a>
+                        <a href="${exportUrlBase}${exportUrlBase.includes('?') ? '&' : '?'}format=excel" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-file-excel mr-2"></i>Export as Excel
+                        </a>
+                    `;
+                    
+                    // Position the dropdown relative to the button
+                    const buttonRect = exportBtn.getBoundingClientRect();
+                    dropdown.style.position = 'fixed';
+                    dropdown.style.top = (buttonRect.bottom + window.scrollY) + 'px';
+                    dropdown.style.right = (window.innerWidth - buttonRect.right) + 'px';
+                    
+                    // Add to document
+                    document.body.appendChild(dropdown);
+                    
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if (!dropdown.contains(e.target) && e.target !== exportBtn) {
+                            dropdown.remove();
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    });
+                    
+                    // Prevent event bubbling
+                    e.stopPropagation();
+                });
+            }
+        }
+
+        // Function to show export loading state
+        function showExportLoadingState() {
+            // Create loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 export-loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                    <p class="text-lg font-semibold">Preparing Export...</p>
+                    <p class="text-sm text-gray-500 mt-2">This may take a moment for large datasets.</p>
+                </div>
+            `;
+            
+            // Add to document
+            document.body.appendChild(loadingOverlay);
+            
+            // Return the overlay element for later removal
+            return loadingOverlay;
+        }
+
+        // Function to hide export loading state
+        function hideExportLoadingState() {
+            // Remove loading overlay
+            const loadingOverlay = document.querySelector('.export-loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+
+        // Function to setup export links
+        function setupExportLinks() {
+            document.addEventListener('click', function(e) {
+                // Check if the clicked element is an export link
+                if (e.target.closest('.export-dropdown a')) {
+                    // Show loading state
+                    showExportLoadingState();
+                    
+                    // Hide loading state after 5 seconds (or when download starts)
+                    setTimeout(hideExportLoadingState, 5000);
+                }
+            });
+        }
+
+        // Function to setup date range presets
+        function setupDateRangePresets() {
+            // Create preset buttons container
+            const presetsContainer = document.createElement('div');
+            presetsContainer.className = 'flex items-center space-x-2 mt-4 date-range-presets';
+            presetsContainer.innerHTML = `
+                <span class="text-sm text-gray-500">Quick Select:</span>
+                <button class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" data-days="7">Last 7 Days</button>
+                <button class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" data-days="30">Last 30 Days</button>
+                <button class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" data-days="90">Last 90 Days</button>
+                <button class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" data-range="month">This Month</button>
+                <button class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" data-range="year">This Year</button>
+            `;
+            
+            // Add container after the date range button
+            const dateRangeBtn = document.getElementById('date-range-btn');
+            if (dateRangeBtn && dateRangeBtn.parentNode) {
+                dateRangeBtn.parentNode.appendChild(presetsContainer);
+            }
+            
+            // Add event listeners to preset buttons
+            presetsContainer.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', function() {
+                    let start, end;
+                    
+                    if (this.dataset.days) {
+                        // Last X days
+                        const days = parseInt(this.dataset.days);
+                        start = moment().subtract(days - 1, 'days');
+                        end = moment();
+                    } else if (this.dataset.range === 'month') {
+                        // This month
+                        start = moment().startOf('month');
+                        end = moment().endOf('month');
+                    } else if (this.dataset.range === 'year') {
+                        // This year
+                        start = moment().startOf('year');
+                        end = moment().endOf('year');
+                    }
+                    
+                    if (start && end) {
+                        // Update date range picker
+                        $(dateRangeBtn).data('daterangepicker').setStartDate(start);
+                        $(dateRangeBtn).data('daterangepicker').setEndDate(end);
+                        
+                        // Trigger change event
+                        $(dateRangeBtn).data('daterangepicker').callback(start, end, this.textContent);
+                    }
+                });
+            });
+        }
+
+        // Function to initialize word cloud placeholder
+        function initWordCloud() {
             const wordCloudElement = document.getElementById('issues-word-cloud');
             if (wordCloudElement) {
                 // This would typically use a word cloud library like d3-cloud
                 // For now, we'll just add a placeholder message
-                wordCloudElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">Word cloud visualization would appear here</div>';
+                wordCloudElement.innerHTML = '';
             }
-        });
+        }
     </script>
-</body></html>
+</body>
+</html>

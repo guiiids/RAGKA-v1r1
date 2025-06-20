@@ -271,6 +271,7 @@ class TestDatabaseMethods(unittest.TestCase):
     @patch('psycopg2.connect')
     def test_get_feedback_summary(self, mock_connect):
         """Test the get_feedback_summary method."""
+        from datetime import datetime, timedelta
         # Set up mock cursor
         mock_cursor = MagicMock()
         mock_cursor.fetchone.side_effect = [{'total_feedback': 100}, {'positive_feedback': 75}]
@@ -281,14 +282,25 @@ class TestDatabaseMethods(unittest.TestCase):
         mock_conn.__enter__.return_value = mock_cursor
         mock_connect.return_value = mock_conn
         
-        # Call the method
+        # Call the method without date filters
         result = DatabaseManager.get_feedback_summary()
         
-        # Verify result
+        # Verify result keys
         self.assertIn('total_feedback', result)
         self.assertIn('positive_feedback', result)
         self.assertIn('negative_feedback', result)
         self.assertIn('recent_feedback', result)
+        
+        # Call the method with date filters
+        start_date = datetime.now() - timedelta(days=30)
+        end_date = datetime.now()
+        result_with_dates = DatabaseManager.get_feedback_summary(start_date=start_date, end_date=end_date)
+        
+        # Verify result keys again
+        self.assertIn('total_feedback', result_with_dates)
+        self.assertIn('positive_feedback', result_with_dates)
+        self.assertIn('negative_feedback', result_with_dates)
+        self.assertIn('recent_feedback', result_with_dates)
     
     # Add similar tests for other database methods
 

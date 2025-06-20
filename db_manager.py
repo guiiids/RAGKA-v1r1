@@ -91,31 +91,47 @@ class DatabaseManager:
                 conn.close()
     
     @staticmethod
-    def get_feedback_summary():
-        """Get summary statistics of collected feedback."""
+    def get_feedback_summary(start_date=None, end_date=None):
+        """Get summary statistics of collected feedback, optionally filtered by date range."""
+        import logging
         conn = None
         try:
+            logging.info(f"get_feedback_summary called with start_date={start_date}, end_date={end_date}")
             conn = DatabaseManager.get_connection()
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                # Count total feedback entries
-                cursor.execute("SELECT COUNT(*) as total_feedback FROM votes")
+                # Build date filter clause and parameters
+                date_filter = ""
+                params = []
+                if start_date and end_date:
+                    date_filter = "WHERE timestamp BETWEEN %s AND %s"
+                    params = [start_date, end_date]
+                elif start_date:
+                    date_filter = "WHERE timestamp >= %s"
+                    params = [start_date]
+                elif end_date:
+                    date_filter = "WHERE timestamp <= %s"
+                    params = [end_date]
+
+                # Count total feedback entries with optional date filter
+                cursor.execute(f"SELECT COUNT(*) as total_feedback FROM votes {date_filter}", params)
                 total_feedback = cursor.fetchone()["total_feedback"]
                 
-                # Count positive feedback (contains "Looks Good")
+                # Count positive feedback (contains "Looks Good") with optional date filter
                 cursor.execute(
-                    "SELECT COUNT(*) as positive_feedback FROM votes WHERE 'Looks Good / Accurate & Clear' = ANY(feedback_tags)"
+                    f"SELECT COUNT(*) as positive_feedback FROM votes {date_filter} AND 'Looks Good / Accurate & Clear' = ANY(feedback_tags)" if date_filter else "SELECT COUNT(*) as positive_feedback FROM votes WHERE 'Looks Good / Accurate & Clear' = ANY(feedback_tags)",
+                    params
                 )
                 positive_feedback = cursor.fetchone()["positive_feedback"]
                 
-                # Get recent feedback (last 5 entries)
-                cursor.execute(
-                    """
+                # Get recent feedback (last 5 entries) with optional date filter
+                recent_query = f"""
                     SELECT vote_id, user_query, feedback_tags, comment, timestamp
                     FROM votes
+                    {date_filter}
                     ORDER BY timestamp DESC
                     LIMIT 5
                     """
-                )
+                cursor.execute(recent_query, params)
                 recent_feedback = cursor.fetchall()
                 
                 summary = {
@@ -139,35 +155,55 @@ class DatabaseManager:
                 conn.close()
     
     @staticmethod
-    def get_query_analytics():
-        """Analyze query patterns and generate statistics."""
+    def get_query_analytics(start_date=None, end_date=None):
+        """Analyze query patterns and generate statistics, optionally filtered by date range."""
+        import logging
         conn = None
         try:
+            logging.info(f"get_query_analytics called with start_date={start_date}, end_date={end_date}")
             conn = DatabaseManager.get_connection()
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                date_filter = ""
+                params = []
+                if start_date and end_date:
+                    date_filter = "WHERE timestamp BETWEEN %s AND %s"
+                    params = [start_date, end_date]
+                elif start_date:
+                    date_filter = "WHERE timestamp >= %s"
+                    params = [start_date]
+                elif end_date:
+                    date_filter = "WHERE timestamp <= %s"
+                    params = [end_date]
+
                 # Count total unique queries
-                cursor.execute("SELECT COUNT(DISTINCT user_query) as total_queries FROM votes")
+                cursor.execute(f"SELECT COUNT(DISTINCT user_query) as total_queries FROM votes {date_filter}", params)
                 total_queries = cursor.fetchone()["total_queries"]
                 
                 # Count total feedback entries
-                cursor.execute("SELECT COUNT(*) as queries_with_feedback FROM votes")
+                cursor.execute(f"SELECT COUNT(*) as queries_with_feedback FROM votes {date_filter}", params)
                 queries_with_feedback = cursor.fetchone()["queries_with_feedback"]
                 
                 # Count successful queries (with "Looks Good" tag)
-                cursor.execute(
-                    "SELECT COUNT(*) as successful_queries FROM votes WHERE 'Looks Good / Accurate & Clear' = ANY(feedback_tags)"
-                )
+                if date_filter:
+                    cursor.execute(
+                        f"SELECT COUNT(*) as successful_queries FROM votes {date_filter} AND 'Looks Good / Accurate & Clear' = ANY(feedback_tags)",
+                        params
+                    )
+                else:
+                    cursor.execute(
+                        "SELECT COUNT(*) as successful_queries FROM votes WHERE 'Looks Good / Accurate & Clear' = ANY(feedback_tags)"
+                    )
                 successful_queries = cursor.fetchone()["successful_queries"]
                 
                 # Get recent queries
-                cursor.execute(
-                    """
+                recent_query = f"""
                     SELECT user_query, timestamp
                     FROM votes
+                    {date_filter}
                     ORDER BY timestamp DESC
                     LIMIT 5
                     """
-                )
+                cursor.execute(recent_query, params)
                 recent_queries = cursor.fetchall()
                 
                 analytics = {
@@ -179,7 +215,7 @@ class DatabaseManager:
                 
                 return analytics
         except Exception as e:
-            logger.error(f"Error generating query analytics: {e}")
+            logging.error(f"Error generating query analytics: {e}")
             return {
                 'total_queries': 0,
                 'queries_with_feedback': 0,
@@ -191,28 +227,54 @@ class DatabaseManager:
                 conn.close()
     
     @staticmethod
-    def get_tag_distribution():
-        """Get distribution of feedback tags."""
+    def get_tag_distribution(start_date=None, end_date=None):
+        """Get distribution of feedback tags, optionally filtered by date range."""
+        import logging
         conn = None
         try:
+            logging.info(f"get_tag_distribution called with start_date={start_date}, end_date={end_date}")
             conn = DatabaseManager.get_connection()
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(
-                    """
+                date_filter = ""
+                params = []
+                if start_date and end_date:
+                    date_filter = "WHERE timestamp BETWEEN %s AND %s"
+                    params = [start_date, end_date]
+                elif start_date:
+                    date_filter = "WHERE timestamp >= %s"
+                    params = [start_date]
+                elif end_date:
+                    date_filter = "WHERE timestamp <= %s"
+                    params = [end_date]
+
+                query = f"""
                     SELECT unnest(feedback_tags) as tag, COUNT(*) as count
                     FROM votes
+                    {date_filter}
                     GROUP BY tag
                     ORDER BY count DESC
                     """
-                )
+                cursor.execute(query, params)
                 tag_distribution = cursor.fetchall()
                 return tag_distribution
         except Exception as e:
-            logger.error(f"Error getting tag distribution: {e}")
+            logging.error(f"Error getting tag distribution: {e}")
             return []
         finally:
             if conn is not None:
                 conn.close()
+
+    @staticmethod
+    def get_time_metrics(start_date=None, end_date=None):
+        """Calculate response time metrics, optionally filtered by date range."""
+        import logging
+        logging.warning("Response time metrics cannot be calculated: missing user query timestamps.")
+        # Return placeholder metrics as 'N/A' strings to clearly indicate no data
+        return {
+            "avg_response_time": "N/A",
+            "min_response_time": "N/A",
+            "max_response_time": "N/A"
+        }
     
     @staticmethod
     def log_rag_query(query, response, sources, context, sql_query=None):

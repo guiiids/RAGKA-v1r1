@@ -44,6 +44,50 @@ app = Flask(__name__)
 def serve_assets(filename):
     return send_from_directory('assets', filename)
 
+# Serve the analytics dashboard HTML
+@app.route('/analytics')
+def analytics_dashboard():
+    with open('analytics_dashboard.html', 'r') as f:
+        html_content = f.read()
+    return html_content
+
+# API endpoint to provide analytics data
+@app.route('/api/analytics', methods=['GET'])
+def analytics():
+    from datetime import datetime
+    # Parse optional date range parameters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    # Validate and convert dates if provided
+    try:
+        if start_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        if end_date:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
+
+    # Fetch data from db_manager
+    feedback_summary = DatabaseManager.get_feedback_summary(start_date, end_date)
+    query_analytics = DatabaseManager.get_query_analytics(start_date, end_date)
+    tag_distribution = DatabaseManager.get_tag_distribution(start_date, end_date)
+    time_metrics = DatabaseManager.get_time_metrics(start_date, end_date)
+    token_usage_metrics = {
+        'total_tokens': 0,
+        'daily_usage': []
+    }  # Placeholder, implement if data available
+
+    # Prepare response data
+    response_data = {
+        'feedback_summary': feedback_summary,
+        'query_analytics': query_analytics,
+        'tag_distribution': tag_distribution,
+        'time_metrics': time_metrics,
+        'token_usage_metrics': token_usage_metrics
+    }
+
+    return jsonify(response_data)
 
 # HTML template with Tailwind CSS
 HTML_TEMPLATE = """
@@ -1095,6 +1139,288 @@ def api_rag_logs():
         return jsonify({
             "error": str(e)
         }), 500
+
+@app.route("/analytics", methods=["GET"])
+def analytics_dashboard_v2():
+    """Serve the analytics dashboard page."""
+    try:
+        with open('analytics_dashboard.html', 'r') as f:
+            html_content = f.read()
+        return html_content
+    except Exception as e:
+        logger.error(f"Error serving analytics dashboard: {e}")
+        return "Error loading analytics dashboard page", 500
+
+@app.route("/api/analytics", methods=["GET"])
+def api_analytics():
+    """
+    API endpoint to get analytics data for the dashboard.
+    Accepts optional date range parameters.
+    """
+    try:
+        # Get date range parameters from request
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        
+        logger.info(f"Analytics data requested with date range: {start_date} to {end_date}")
+        
+        # Get analytics data from database
+        analytics_data = get_analytics_data(start_date, end_date)
+        
+        return jsonify(analytics_data)
+        
+    except Exception as e:
+        logger.error(f"Error retrieving analytics data: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/analytics/export", methods=["GET"])
+def export_analytics():
+    """
+    API endpoint to export analytics data as a JSON file.
+    Accepts optional date range parameters.
+    """
+    try:
+        # Get date range parameters from request
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        
+        # Get format parameter (default to json)
+        export_format = request.args.get("format", "json").lower()
+        
+        logger.info(f"Analytics data export requested with date range: {start_date} to {end_date}, format: {export_format}")
+        
+        # Get analytics data from database
+        analytics_data = get_analytics_data(start_date, end_date)
+        
+        # Generate timestamp for filename
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        if export_format == "csv":
+            # Export as CSV (only recent interactions)
+            return export_as_csv(analytics_data, timestamp)
+        elif export_format == "excel":
+            # Export as Excel (more comprehensive)
+            return export_as_excel(analytics_data, timestamp)
+        else:
+            # Default: Export as JSON
+            response = Response(
+                json.dumps(analytics_data, indent=2, default=str),
+                mimetype="application/json",
+                headers={"Content-Disposition": f"attachment;filename=analytics_export_{timestamp}.json"}
+            )
+            return response
+            
+    except Exception as e:
+        logger.error(f"Error exporting analytics data: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+def get_analytics_data(start_date=None, end_date=None):
+    """
+    Get analytics data from the database.
+    Returns a dictionary with all analytics metrics.
+    """
+    import logging
+    try:
+        logging.info(f"get_analytics_data called with start_date={start_date}, end_date={end_date}")
+        # Get analytics data using DatabaseManager methods
+        feedback_summary = DatabaseManager.get_feedback_summary(start_date, end_date)
+        tag_distribution = DatabaseManager.get_tag_distribution(start_date, end_date)
+        time_metrics = DatabaseManager.get_time_metrics(start_date, end_date)
+        query_analytics = DatabaseManager.get_query_analytics(start_date, end_date)
+        
+        # Calculate response time metrics (placeholder - would need actual data)
+        response_time_metrics = {
+            "avg_response_time": 2.4,
+            "min_response_time": 1.2,
+            "max_response_time": 4.8
+        }
+        
+        # Calculate token usage metrics (placeholder - would need actual data)
+        token_usage_metrics = {
+            "total_tokens": 1200000,
+            "avg_tokens_per_query": 450,
+            "daily_usage": []
+        }
+        
+        # Add daily usage data based on time metrics
+        for metric in time_metrics:
+            token_usage_metrics["daily_usage"].append({
+                "date": metric["date"],
+                "daily_tokens": metric["interaction_count"] * 450  # Estimated tokens per interaction
+            })
+        
+        return {
+            "feedback_summary": feedback_summary,
+            "tag_distribution": tag_distribution,
+            "time_metrics": time_metrics,
+            "query_analytics": query_analytics,
+            "response_time_metrics": response_time_metrics,
+            "token_usage_metrics": token_usage_metrics
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting analytics data: {e}")
+        raise
+
+def export_as_csv(analytics_data, timestamp):
+    """
+    Export analytics data as CSV.
+    Focuses on recent interactions for simplicity.
+    """
+    try:
+        # Get recent interactions
+        recent_interactions = analytics_data.get("query_analytics", {}).get("recent_queries", [])
+        
+        # Create CSV content
+        csv_content = "vote_id,user_query,feedback_status,response_time,tokens,timestamp\n"
+        for interaction in recent_interactions:
+            # Escape quotes in user query
+            user_query = interaction.get('user_query', '').replace('"', '""')
+            
+            csv_content += f"{interaction.get('vote_id', '')},\"{user_query}\",{interaction.get('feedback_status', '')},{interaction.get('response_time', '')},{interaction.get('tokens', '')},{interaction.get('timestamp', '')}\n"
+        
+        # Set headers for file download
+        response = Response(
+            csv_content,
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment;filename=interactions_export_{timestamp}.csv"}
+        )
+        
+        return response
+    except Exception as e:
+        logger.error(f"Error exporting as CSV: {e}")
+        raise
+
+def export_as_excel(analytics_data, timestamp):
+    """
+    Export analytics data as Excel.
+    More comprehensive than CSV, includes multiple sheets.
+    Requires openpyxl package.
+    """
+    try:
+        from io import BytesIO
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment, PatternFill
+        from datetime import datetime
+        
+        # Create workbook
+        wb = Workbook()
+        
+        # Create Overview sheet
+        overview = wb.active
+        overview.title = "Overview"
+        
+        # Add headers
+        overview['A1'] = "Analytics Overview"
+        overview['A1'].font = Font(bold=True, size=14)
+        overview.merge_cells('A1:B1')
+        
+        # Add summary data
+        overview['A3'] = "Total Interactions"
+        overview['B3'] = analytics_data.get("feedback_summary", {}).get("total_feedback", 0)
+        
+        overview['A4'] = "Positive Feedback"
+        overview['B4'] = analytics_data.get("feedback_summary", {}).get("positive_feedback", 0)
+        
+        overview['A5'] = "Negative Feedback"
+        overview['B5'] = analytics_data.get("feedback_summary", {}).get("negative_feedback", 0)
+        
+        overview['A6'] = "Average Response Time"
+        overview['B6'] = f"{analytics_data.get('response_time_metrics', {}).get('avg_response_time', 0):.2f}s"
+        
+        overview['A7'] = "Total Tokens Used"
+        overview['B7'] = analytics_data.get("token_usage_metrics", {}).get("total_tokens", 0)
+        
+        overview['A9'] = "Export Date"
+        overview['B9'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Create Interactions sheet
+        interactions = wb.create_sheet("Recent Interactions")
+        
+        # Add headers
+        headers = ["ID", "Query", "Feedback", "Response Time", "Tokens", "Timestamp"]
+        for col, header in enumerate(headers, 1):
+            cell = interactions.cell(row=1, column=col, value=header)
+            cell.font = Font(bold=True)
+            cell.fill = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
+        
+        # Add data
+        recent_interactions = analytics_data.get("query_analytics", {}).get("recent_queries", [])
+        for row, interaction in enumerate(recent_interactions, 2):
+            interactions.cell(row=row, column=1, value=interaction.get('vote_id', ''))
+            interactions.cell(row=row, column=2, value=interaction.get('user_query', ''))
+            interactions.cell(row=row, column=3, value=interaction.get('feedback_status', ''))
+            interactions.cell(row=row, column=4, value=interaction.get('response_time', ''))
+            interactions.cell(row=row, column=5, value=interaction.get('tokens', ''))
+            interactions.cell(row=row, column=6, value=interaction.get('timestamp', ''))
+        
+        # Create Tags sheet
+        tags = wb.create_sheet("Feedback Tags")
+        
+        # Add headers
+        tags['A1'] = "Tag"
+        tags['B1'] = "Count"
+        tags['A1'].font = Font(bold=True)
+        tags['B1'].font = Font(bold=True)
+        
+        # Add data
+        tag_distribution = analytics_data.get("tag_distribution", [])
+        for row, tag_data in enumerate(tag_distribution, 2):
+            tags.cell(row=row, column=1, value=tag_data.get('tag', ''))
+            tags.cell(row=row, column=2, value=tag_data.get('count', 0))
+        
+        # Create Daily Metrics sheet
+        daily = wb.create_sheet("Daily Metrics")
+        
+        # Add headers
+        daily['A1'] = "Date"
+        daily['B1'] = "Interactions"
+        daily['C1'] = "Positive Feedback"
+        daily['A1'].font = Font(bold=True)
+        daily['B1'].font = Font(bold=True)
+        daily['C1'].font = Font(bold=True)
+        
+        # Add data
+        time_metrics = analytics_data.get("time_metrics", [])
+        for row, metric in enumerate(time_metrics, 2):
+            daily.cell(row=row, column=1, value=metric.get('date', ''))
+            daily.cell(row=row, column=2, value=metric.get('interaction_count', 0))
+            daily.cell(row=row, column=3, value=metric.get('positive_count', 0))
+        
+        # Auto-adjust column widths
+        for sheet in wb.sheetnames:
+            for column in wb[sheet].columns:
+                max_length = 0
+                column_letter = column[0].column_letter
+                for cell in column:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except:
+                        pass
+                adjusted_width = (max_length + 2)
+                wb[sheet].column_dimensions[column_letter].width = adjusted_width
+        
+        # Save to BytesIO
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
+        # Return as response
+        return Response(
+            output.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment;filename=analytics_export_{timestamp}.xlsx"}
+        )
+    except ImportError:
+        logger.error("openpyxl package not installed, falling back to CSV export")
+        return export_as_csv(analytics_data, timestamp)
+    except Exception as e:
+        logger.error(f"Error exporting as Excel: {e}")
+        raise
 
 if __name__ == "__main__":
     import argparse
