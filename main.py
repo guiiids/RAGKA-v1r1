@@ -6,6 +6,8 @@ import json
 import logging
 import sys
 import os
+from logging.handlers import RotatingFileHandler
+from pythonjsonlogger import jsonlogger
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
 load_dotenv() 
@@ -29,6 +31,28 @@ logger.addHandler(file_handler)
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
+
+# Add JSON-formatted rotating file handlers for usage and error logs
+json_formatter = jsonlogger.JsonFormatter()
+
+# Determine log base directory (container vs local)
+LOG_BASE = os.getenv('LOG_BASE', 'logs')
+# Ensure log directories exist
+usage_log_path = os.path.join(LOG_BASE, 'usage', 'usage.log')
+error_log_path = os.path.join(LOG_BASE, 'errors', 'error.log')
+os.makedirs(os.path.dirname(usage_log_path), exist_ok=True)
+os.makedirs(os.path.dirname(error_log_path), exist_ok=True)
+
+usage_handler = RotatingFileHandler(usage_log_path, maxBytes=10485760, backupCount=5)
+usage_handler.setLevel(logging.INFO)
+usage_handler.setFormatter(json_formatter)
+logger.addHandler(usage_handler)
+
+error_handler = RotatingFileHandler(error_log_path, maxBytes=10485760, backupCount=5)
+error_handler.setLevel(logging.ERROR)
+error_handler.setFormatter(json_formatter)
+logger.addHandler(error_handler)
+
 logger.setLevel(logging.DEBUG)
 import os
 print(os.path.abspath(__file__))
