@@ -75,3 +75,5 @@ build_and_push.ps1
 .llm_summary_compact.py
 reask_dashboard
 migration.py    
+testing_url_decoder.html
+proxy.js
