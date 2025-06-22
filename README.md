@@ -1,141 +1,200 @@
-# PostgreSQL Integration for RAGKA Analytics Dashboard
+# RAG Knowledge Assistant & Analytics Dashboard
 
-This repository contains a comprehensive implementation plan and detailed code examples for integrating a PostgreSQL database with the RAGKA Analytics Dashboard. The implementation is structured in a phased approach, allowing for incremental development and testing.
+A Retrieval-Augmented Generation (RAG) assistant built with Flask, integrating a vector‐based knowledge store, OpenAI (or Azure OpenAI) LLMs, and PostgreSQL analytics. This project provides:
+- Chat interface with inline citations  
+- Feedback collection  
+- Analytics dashboard with date filtering & export (JSON/CSV/Excel)  
+- Developer evaluation modes  
 
-## Project Structure
+---
 
-- `postgres_integration_plan.md`: Master implementation plan with all phases outlined
-- `phase1_implementation.md`: Backend API Development implementation details
-- `phase2_implementation.md`: Database Manager Enhancement implementation details
-- `phase3_implementation.md`: Dashboard Route and Integration implementation details
-- `phase4_implementation.md`: Frontend JavaScript Implementation details
-- `phase5_implementation.md`: Date Range and Export Functionality implementation details
-- `phase6_implementation.md`: Testing and Optimization implementation details
-- `implementation_summary.md`: Comprehensive summary of the entire implementation
-- `analytics_dashboard.html`: The HTML template for the analytics dashboard
-- `analytics_dashboard.md`: Documentation for the analytics dashboard
+## Table of Contents
 
-## Implementation Phases
+1. [How It Works](#how-it-works)  
+2. [Features](#features)  
+3. [Architecture & Modules](#architecture--modules)  
+4. [Configuration](#configuration)  
+5. [Installation & Setup](#installation--setup)  
+6. [Usage](#usage)  
+7. [Analytics Dashboard](#analytics-dashboard)  
+8. [Testing](#testing)  
+9. [Deployment](#deployment)  
+10. [Contributing](#contributing)  
+11. [License](#license)  
 
-### Phase 1: Backend API Development
-This phase focuses on creating the foundational API endpoints and functions needed to serve analytics data from the PostgreSQL database.
+---
 
-Key components:
-- API endpoint for analytics data
-- Core analytics data function
-- Time-based metrics function
+## How It Works
 
-### Phase 2: Database Manager Enhancement
-This phase enhances the DatabaseManager class with additional methods for retrieving specific analytics metrics.
-
-Key components:
-- Response time metrics method
-- Token usage metrics method
-- Recent interactions method
-
-### Phase 3: Dashboard Route and Integration
-This phase creates a dedicated route for the analytics dashboard and ensures the API returns complete data.
-
-Key components:
-- Dashboard HTML route
-- Enhanced API with complete data
-- Export functionality
-
-### Phase 4: Frontend JavaScript Implementation
-This phase updates the frontend JavaScript to fetch and display real data from the API.
-
-Key components:
-- Data fetching with loading states
-- Dashboard metrics update
-- Chart updates
-- Recent interactions table
-
-### Phase 5: Date Range and Export Functionality
-This phase enhances the date range picker and export functionality for a better user experience.
-
-Key components:
-- Enhanced date range picker
-- Multiple export formats
-- Loading states for export
-- Date range presets
-
-### Phase 6: Testing and Optimization
-This phase focuses on testing, optimization, and handling edge cases to ensure the integration works correctly and performs well.
-
-Key components:
-- Comprehensive testing plan
-- Database query optimization
-- Caching implementation
-- Error handling improvements
-
-## Getting Started
-
-1. Review the `postgres_integration_plan.md` file to understand the overall implementation strategy.
-2. Follow each phase implementation file in order, starting with `phase1_implementation.md`.
-3. Implement the code examples in your project, adapting as needed for your specific environment.
-4. Test each phase thoroughly before moving to the next.
-5. Use the testing and optimization strategies in `phase6_implementation.md` to ensure performance and reliability.
-
-## Prerequisites
-
-- PostgreSQL database with the 'votes' table already set up
-- Flask web application
-- Python 3.7+
-- Required Python packages (see below)
-
-## Required Packages
-
-```
-Flask==2.0.1
-psycopg2-binary==2.9.1
-python-dotenv==0.19.0
-openpyxl==3.1.2
-matplotlib==3.4.3
-numpy==1.21.2
-requests==2.26.0
-psutil==5.8.0
+```mermaid
+flowchart LR
+  A[User Browser] -->|POST /api/query| B[Flask App (main.py)]
+  B --> C[FlaskRAGAssistant]
+  C --> D[Vector Store / Retrieval]
+  C --> E[OpenAI / Azure LLM]
+  E --> C
+  C --> B
+  B --> F[DatabaseManager → PostgreSQL]
+  B --> A[JSON Response]
+  A -->|/analytics| G[Analytics Dashboard]
+  G -->|GET /api/analytics| B
 ```
 
-## Database Schema
+1. **User** sends a query via `/api/query`.
+2. **FlaskRAGAssistant** retrieves relevant documents from the vector store, constructs prompt, calls the LLM, and returns answer + sources.
+3. **DatabaseManager** logs each query, response, citations, and feedback in PostgreSQL.
+4. **Web UI** (chat and analytics) displays responses and dashboards.
 
-The implementation works with a PostgreSQL database containing a 'votes' table with the following key columns:
+---
 
-- `vote_id`: Unique identifier for each interaction
-- `user_query`: The query submitted by the user
-- `feedback_tags`: Array of feedback tags
-- `evaluation_json`: JSON object containing evaluation metrics
-- `timestamp`: When the interaction occurred
+## Features
+
+- **Retrieval-Augmented QA Chat** with inline citations  
+- **Source Tracking** and citation links  
+- **Feedback Collection** and tagging  
+- **Analytics Dashboard**  
+  - Feedback summary, tag distribution, query metrics  
+  - Date‐range picker  
+  - Export JSON, CSV, or Excel  
+- **Developer Evaluation Modes** (parameter controls)  
+
+---
+
+## Architecture & Modules
+
+- **`main.py`** – Flask app, routes (`/`, `/api/query`, `/api/feedback`, `/analytics`, `/api/analytics`, export endpoints)  
+- **`config.py`** – `.env` loading & default env var definitions  
+- **`rag_assistant.py`** – `FlaskRAGAssistant` (vector retrieval + LLM wrapper)  
+- **`db_manager.py`** – `DatabaseManager` (logging queries, feedback, analytics queries)  
+- **`openai_logger_injector.py`**, **`openai_logger.py`** – Automatic JSON logging of OpenAI calls  
+- **Feedback dashboards** (`export_feedback.py`, `feedback_dashboard*.py`) – standalone analytics  
+- **Static assets** (`static/`, `assets/`) – JS/CSS for chat UI and analytics  
+- **Templates** – inline HTML in `main.py` for chat UI (Tailwind CSS) and analytics  
+
+---
+
+## Configuration
+
+Environment variables are loaded via `python-dotenv` from a `.env` file:
+
+```ini
+# OpenAI / Azure
+OPENAI_KEY=…
+AZURE_OPENAI_KEY=…
+AZURE_OPENAI_ENDPOINT=…
+AZURE_SEARCH_INDEX=…
+
+# PostgreSQL
+POSTGRES_HOST=…
+POSTGRES_PORT=5432
+POSTGRES_DB=…
+POSTGRES_USER=…
+POSTGRES_PASSWORD=…
+POSTGRES_SSL_MODE=require
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=app.log
+
+# Feedback
+FEEDBACK_DIR=feedback_data
+FEEDBACK_FILE=feedback.json
+```
+
+---
+
+## Installation & Setup
+
+```bash
+# 1. Clone repo
+git clone <repo-url>
+cd RAGKA-v1r1-Git
+
+# 2. Create virtualenv & install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Populate .env
+cp .env.example .env
+# Edit .env with API keys and DB credentials
+
+# 4. Initialize database (ensure `votes` & `rag_queries` tables exist)
+# See `docs/postgres_integration_plan.md`
+
+# 5. Run the app
+python main.py --port 5002
+```
+
+---
+
+## Usage
+
+- **Chat UI**:  
+  Open http://localhost:5002/ in your browser.  
+- **Query API**:  
+  POST `/api/query` with JSON `{ "query": "Your question" }`  
+- **Feedback API**:  
+  POST `/api/feedback` with JSON `{ "question":…, "response":…, "feedback_tags": […], "comment":…, "citations": […] }`  
+- **Analytics Dashboard**:  
+  GET `/analytics`  
+- **Analytics API**:  
+  GET `/api/analytics?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD`  
+- **Export**:  
+  GET `/api/analytics/export?format=json|csv|excel`
+
+---
+
+## Analytics Dashboard
+
+Navigate to `/analytics` to view:
+- Feedback totals & trend charts  
+- Tag distribution pie chart  
+- Query frequency & response-time metrics  
+- Recent interactions table  
+- Export options (JSON/CSV/Excel)  
+
+---
 
 ## Testing
 
-Comprehensive testing instructions and code examples are provided in `phase6_implementation.md`, including:
+Run unit tests and coverage:
 
-- Automated tests for API endpoints and database methods
-- Load testing for performance evaluation
-- Manual testing checklist
+```bash
+pytest --maxfail=1 --disable-warnings -q
+```
+
+Key test files:
+- `test_db_manager.py`  
+- `test_feedback.py`  
+- `test_feedback_api.py`  
+
+---
 
 ## Deployment
 
-A deployment checklist is provided in `phase6_implementation.md` to guide the deployment process, including:
+- **Docker**  
+  ```bash
+  docker build -t ragka-app .
+  docker-compose up -d
+  ```
+- **Heroku / Render**  
+  - `Procfile` provided  
+  - `runtime.txt`, `requirements.txt`  
+- **Azure**  
+  Use `Docker_To_Azure.sh` for automated deployment  
 
-- Pre-deployment preparation
-- Database backup
-- Code deployment
-- Configuration updates
-- Testing verification
-- Monitoring setup
+---
 
-## Next Steps
+## Contributing
 
-After completing the implementation, consider the following next steps:
+1. Fork the repo  
+2. Create feature branch (`git checkout -b feature/xyz`)  
+3. Commit changes & push  
+4. Open a Pull Request  
 
-- Add more advanced metrics and visualizations
-- Implement predictive analytics
-- Add user segmentation and cohort analysis
-- Set up continuous performance monitoring
-- Add customizable dashboard layouts
-- Integrate with other data sources
+---
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
