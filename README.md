@@ -27,16 +27,16 @@ A Retrieval-Augmented Generation (RAG) assistant built with Flask, integrating a
 ## How It Works
 
 ```mermaid
-flowchart LR
-  UB(User Browser) --> QP(API Query)
-  QP --> FA(Flask App)
-  FA --> RA(FlaskRAGAssistant)
-  RA --> VS(Vector Store)
-  RA --> LLM(OpenAI or Azure LLM)
-  RA --> DBM(DatabaseManager)
-  DBM --> PG(PostgreSQL)
-  FA --> AN(Analytics Route)
-  AN --> AD(Analytics Dashboard)
+graph LR
+  UB[User Browser] --> QP[API Query]
+  QP --> FA[Flask App]
+  FA --> RA[FlaskRAGAssistant]
+  RA --> VS[Vector Store]
+  RA --> LLM[OpenAI or Azure LLM]
+  RA --> DBM[DatabaseManager]
+  DBM --> PG[PostgreSQL]
+  FA --> AN[Analytics Route]
+  AN --> AD[Analytics Dashboard]
 ```
 
 1. **User** sends a query via `/api/query`.
