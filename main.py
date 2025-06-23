@@ -33,7 +33,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 # Add JSON-formatted rotating file handlers for usage and error logs
-json_formatter = jsonlogger.JsonFormatter()
+json_formatter = jsonlogger.JsonFormatter('%(asctime)s %(levelname)s %(message)s')
 
 # Determine log base directory (container vs local)
 LOG_BASE = os.getenv('LOG_BASE', 'logs')
