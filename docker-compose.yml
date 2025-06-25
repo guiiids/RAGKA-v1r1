@@ -11,7 +11,7 @@ services:
       - "${PORT:-8000}:8000"
     restart: unless-stopped
     command: >
-      sh -c "python export_feedback.py & gunicorn main:app --bind 0.0.0.0:8000"
+      sh -c "/startup.sh python export_feedback.py & gunicorn main:app --bind 0.0.0.0:8000"
     volumes:
       - azure-rag-assistant-feedback:/app/feedback_data
       - azure-rag-assistant-logs:/app/logs

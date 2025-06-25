@@ -3,9 +3,35 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Feedback Dashboard</title>
+    <title>Feedback Analytics Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         .truncate-text {
             max-width: 250px;
@@ -35,124 +61,264 @@
         .badge-yellow { background-color: #fef3c7; color: #92400e; }
         .badge-blue { background-color: #dbeafe; color: #1e40af; }
         .badge-gray { background-color: #f3f4f6; color: #4b5563; }
-        .size-4 { width: 1rem; height: 1rem; }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Transitions */
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-50 font-sans">
+    <!-- Header with gradient background -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-3xl font-bold">Feedback Analytics Dashboard</h1>
+                    <p class="text-blue-100 mt-1">Comprehensive analysis of user feedback data</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                        <p class="text-sm text-white">Generated: <span class="font-medium">2025-06-24 09:05:42</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container mx-auto px-4 py-8">
-        <header class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">Feedback Dashboard</h1>
-            <p class="text-sm text-gray-500 mt-2">Displaying all feedback data from PostgreSQL database</p>
-        </header>
-        
         <!-- Metrics Summary Section -->
-        <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Key Metrics</h2>
             
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
-  <div>
-    <p class="text-sm text-gray-500">Total Queries</p>
-    <p class="text-2xl font-medium text-gray-900">28</p>
-  </div>
-  <div class="inline-flex gap-2 rounded-lg bg-blue-100 p-2 text-blue-600">
-    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/></svg>
-    <span class="text-xs font-medium"></span>
-  </div>
-</article>
-
-
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
-  <div>
-    <p class="text-sm text-gray-500">Total Feedback Entries</p>
-    <p class="text-2xl font-medium text-gray-900">34</p>
-  </div>
-  <div class="inline-flex gap-2 rounded-lg bg-blue-100 p-2 text-blue-600">
-    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/></svg>
-    <span class="text-xs font-medium"></span>
-  </div>
-</article>
-
-
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
-  <div>
-    <p class="text-sm text-gray-500">Positive Feedback</p>
-    <p class="text-2xl font-medium text-gray-900">11 (32.4%)</p>
-  </div>
-  <div class="inline-flex gap-2 rounded-lg bg-green-100 p-2 text-green-600">
-    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-    <span class="text-xs font-medium">32.4%</span>
-  </div>
-</article>
-
-
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
-  <div>
-    <p class="text-sm text-gray-500">Avg. Tokens per Call</p>
-    <p class="text-2xl font-medium text-gray-900">0.0</p>
-  </div>
-  <div class="inline-flex gap-2 rounded-lg bg-blue-100 p-2 text-blue-600">
-    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/></svg>
-    <span class="text-xs font-medium"></span>
-  </div>
-</article>
-
+    <!-- Main metrics row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Queries Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Total Queries</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">28</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-blue-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-blue-600">
+                    <span>Unique user questions</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Feedback Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Total Feedback</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">34</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-indigo-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-indigo-600">
+                    <span>All feedback entries</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Positive Feedback Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Positive Feedback</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">32.4%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-green-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-green-600">
+                    <span>11 of 34 responses</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Avg Tokens Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-purple-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Avg. Tokens</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">0.0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-purple-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-purple-600">
+                    <span>Per API call</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional metrics row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <!-- Response Time Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-amber-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Avg. Response Time</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">644.5s</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Min: 39.0s</span>
+                        <span class="text-gray-500">Median: 335.9s</span>
+                        <span class="text-gray-500">Max: 2691.3s</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-amber-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-amber-600">
+                    <span>Time between interactions</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Query Complexity Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+            <div class="p-5 flex-grow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-teal-500 rounded-md p-3 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500 truncate">Query Complexity</p>
+                        <p class="mt-1 text-3xl font-semibold text-gray-900">32.4</p>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="bg-green-50 rounded-lg p-2 text-center">
+                        <p class="text-xs text-gray-500">Positive Queries</p>
+                        <p class="text-sm font-medium text-green-600">42.9 chars</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-2 text-center">
+                        <p class="text-xs text-gray-500">Negative Queries</p>
+                        <p class="text-sm font-medium text-red-600">27.4 chars</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-teal-50 px-5 py-3 mt-auto">
+                <div class="text-sm text-teal-600">
+                    <span>Average query length in characters</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
         </div>
 
         <!-- Charts Section -->
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">Requests Per Hour (Last 6 Hours)</h2>
-          <canvas id="requestsPerHourChart" class="w-full h-64"></canvas>
-        </div>
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">Word Cloud of Queries and Tags</h2>
-          <canvas id="wordCloudCanvas" width="600" height="400"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Requests Per Hour (Last 6 Hours)</h2>
+                <div style="height: 300px; max-height: 300px;">
+                    <canvas id="requestsPerHourChart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Word Cloud of Queries and Tags</h2>
+                <div style="height: 300px; max-height: 300px;">
+                    <canvas id="wordCloudCanvas" class="w-full h-full"></canvas>
+                </div>
+            </div>
         </div>
         
-        <div class="relative isolate overflow-hidden bg-white py-24 sm:py-32">
-          <!-- Decorative background gradient element -->
-          <div class="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56" aria-hidden="true">
-            <div class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)"></div>
-          </div>
+        <!-- Analytics Overview Section -->
+        <div class="relative isolate overflow-hidden bg-white rounded-xl shadow-md mb-8 fade-in">
+            <!-- Decorative background gradient element -->
+            <div class="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56" aria-hidden="true">
+                <div class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)"></div>
+            </div>
   
-          <!-- Centered content area -->
-          <div class="mx-auto max-w-7xl px-6 lg:px-8">
-              <!-- User's feedback analytics list, styled as a glassmorphism card -->
-              <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-6 sm:p-10 max-w-6xl mx-auto space-y-8 text-gray-800 ring-1 ring-gray-900/5">
-                  <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 pb-4 text-gray-900">Feedback Analytics Overview</h2>
-                  <div class="grid md:grid-cols-2 gap-8">
-                      <!-- Card 1 -->
-                      <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5">
-                          <h3 class="text-xl font-semibold mb-2 text-gray-900">1. Feedback Volume Over Time</h3>
-                          <p class="text-sm leading-relaxed text-gray-700">Show total feedback counts per day/week/month to spot usage spikes or lulls.<br>Overlay positive vs. negative trends to see sentiment shifts over time.</p>
-                      </div>
-                      <!-- Card 2 -->
-                      <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5">
-                          <h3 class="text-xl font-semibold mb-2 text-gray-900">2. Positive vs. Negative Ratio</h3>
-                          <p class="text-sm leading-relaxed text-gray-700">A simple card showing % positive feedback this period.<br>A sparkline next to it tracking change over the last N days.</p>
-                      </div>
-                      <!-- Card 3 -->
-                      <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5">
-                          <h3 class="text-xl font-semibold mb-2 text-gray-900">3. Tag Frequency Distribution</h3>
-                          <p class="text-sm leading-relaxed text-gray-700">Count of each feedback tag (e.g. “helpful”, “inaccurate”, “confusing”).<br>Helps identify the most common user concerns or praises.</p>
-                      </div>
-                      <!-- Card 4 -->
-                      <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5">
-                          <h3 class="text-xl font-semibold mb-2 text-gray-900">4. Top Queries by Feedback</h3>
-                          <p class="text-sm leading-relaxed text-gray-700">List the top 10 user queries that received the most feedback.<br>Show counts and average sentiment per query.</p>
-                      </div>
-                  </div>
-              </div>
-          </div>
+            <!-- Centered content area -->
+            <div class="relative py-12 sm:py-16 px-6 lg:px-8">
+                <!-- User's feedback analytics list, styled as a glassmorphism card -->
+                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 sm:p-10 max-w-6xl mx-auto space-y-8 text-gray-800 ring-1 ring-gray-900/5">
+                    <h2 class="text-3xl font-bold tracking-tight border-b border-gray-200 pb-4 text-gray-900">Feedback Analytics Overview</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Card 1 -->
+                        <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5 hover:bg-gray-50 transition-all">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-900">1. Feedback Volume Over Time</h3>
+                            <p class="text-sm leading-relaxed text-gray-700">Show total feedback counts per day/week/month to spot usage spikes or lulls.<br>Overlay positive vs. negative trends to see sentiment shifts over time.</p>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5 hover:bg-gray-50 transition-all">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-900">2. Positive vs. Negative Ratio</h3>
+                            <p class="text-sm leading-relaxed text-gray-700">A simple card showing % positive feedback this period.<br>A sparkline next to it tracking change over the last N days.</p>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5 hover:bg-gray-50 transition-all">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-900">3. Tag Frequency Distribution</h3>
+                            <p class="text-sm leading-relaxed text-gray-700">Count of each feedback tag (e.g. "helpful", "inaccurate", "confusing").<br>Helps identify the most common user concerns or praises.</p>
+                        </div>
+                        <!-- Card 4 -->
+                        <div class="bg-gray-50/70 rounded-xl p-6 shadow-sm ring-1 ring-gray-900/5 hover:bg-gray-50 transition-all">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-900">4. Top Queries by Feedback</h3>
+                            <p class="text-sm leading-relaxed text-gray-700">List the top 10 user queries that received the most feedback.<br>Show counts and average sentiment per query.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
   
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="p-4 border-b border-gray-200">
-                <div class="flex justify-between items-center mb-4">
+        <!-- Feedback Data Table Section -->
+        <div class="bg-white shadow-md rounded-xl overflow-hidden mb-8 fade-in">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-700">All Feedback</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">All Feedback</h2>
                         <p class="text-sm text-gray-500">Total: <span id="total-count">34</span> entries</p>
                     </div>
-                    <div class="flex items-center">
-                        <input type="text" id="search-input" placeholder="Search..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <div class="w-full md:w-auto">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input type="text" id="search-input" placeholder="Search feedback..." class="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -536,49 +702,171 @@
             </div>
         </div>
         
-        <footer class="mt-8 text-center text-sm text-gray-500">
-            <p>Generated on 2025-06-23 14:33:56</p>
+        <footer class="mt-8 text-center text-sm text-gray-500 pb-8">
+            <p>Generated on 2025-06-24 09:05:42</p>
             <p>Connected directly to PostgreSQL database: ragka-v1r1-server.postgres.database.azure.com</p>
         </footer>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/wordcloud/dist/wordcloud2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.js"></script>
     <script>
-      // Requests per hour chart
-      const ctx = document.getElementById('requestsPerHourChart').getContext('2d');
-      new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: ["2025-06-23 09:00", "2025-06-23 10:00", "2025-06-23 11:00", "2025-06-23 12:00", "2025-06-23 13:00", "2025-06-23 14:00"],
-              datasets: [{
-                  label: 'Requests per Hour',
-                  data: [0, 0, 0, 1, 0, 0],
-                  backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                  borderColor: 'rgba(59, 130, 246, 1)',
-                  borderWidth: 1
-              }]
-          },
-          options: {
-              scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-              responsive: true,
-              maintainAspectRatio: false
-          }
-      });
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const tableRows = document.querySelectorAll('#feedback-table-body tr');
+            
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if(text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Update count of visible rows
+                const visibleRows = document.querySelectorAll('#feedback-table-body tr[style=""]').length;
+                document.getElementById('total-count').textContent = visibleRows;
+            });
+        });
+      
+        // Requests per hour chart
+        const ctx = document.getElementById('requestsPerHourChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ["2025-06-24 04:00", "2025-06-24 05:00", "2025-06-24 06:00", "2025-06-24 07:00", "2025-06-24 08:00", "2025-06-24 09:00"],
+                datasets: [{
+                    label: 'Requests per Hour',
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { stepSize: 1 },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: 'Inter'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            family: 'Inter'
+                        },
+                        bodyFont: {
+                            family: 'Inter'
+                        }
+                    }
+                }
+            }
+        });
 
-      // Word cloud
-      const wordCloudData = [["test", 3], ["looks", 2], ["good", 2], ["accurate", 2], ["clear", 2], ["incomplete", 10], ["other", 3], ["issue", 3], ["user", 2], ["query", 2], ["ilab", 12], ["helpful", 9], ["how", 9], ["detach", 3], ["invoices", 3], ["api", 1], ["incorrect", 4], ["troubleshoot", 2], ["agilent", 1], ["lm", 1], ["irrelevant", 4], ["submit", 1], ["service", 2], ["request", 1], ["illab", 1], ["hard", 1], ["understand", 1], ["lab", 3], ["data", 4], ["source", 4], ["quality", 4], ["get", 1], ["list", 2], ["features", 2], ["present", 1], ["managing", 1], ["group", 1], ["openlab", 2], ["versus", 1], ["crosslab", 1], ["main", 1], ["help", 1], ["vcalendat", 1], ["warranty", 1], ["policy", 1], ["gc", 1], ["products", 1], ["o", 1], ["update", 1], ["core", 3], ["contact", 2], ["info", 1], ["iilab", 1], ["support", 1], ["change", 1], ["invoice", 2], ["number", 2], ["pattern", 1], ["want", 1], ["add", 2], ["first", 1], ["three", 1], ["letter", 1], ["like", 1], ["hed", 1], ["xxx", 1], ["then", 1], ["ab", 1], ["yor", 1], ["new", 2], ["icp", 2], ["ms", 2], ["engineer", 1], ["facing", 1], ["48v", 1], ["error", 3], ["7850", 1], ["background", 1], ["chemistry", 1], ["therefore", 1], ["no", 1], ["idea", 1], ["fix", 2], ["provide", 2], ["explanation", 1], ["root", 1], ["cause", 1], ["spare", 1], ["parts", 1], ["order", 1], ["fund", 1], ["hey", 1], ["clean", 1], ["up", 1], ["stale", 1], ["ecmxt", 1], ["tickets", 1]];
-      if (wordCloudData.length > 0) {
-          WordCloud(document.getElementById('wordCloudCanvas'), {
-              list: wordCloudData,
-              gridSize: 10,
-              weightFactor: 5,
-              fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-              color: 'random-dark',
-              rotateRatio: 0.5,
-              backgroundColor: '#fff'
-          });
-      }
+        // Word cloud with fallback to simple bar chart
+        const wordCloudData = [["ilab", 12], ["incomplete", 10], ["helpful", 9], ["how", 9], ["incorrect", 4], ["irrelevant", 4], ["data", 4], ["source", 4], ["quality", 4], ["test", 3], ["other", 3], ["issue", 3], ["detach", 3], ["invoices", 3], ["lab", 3], ["core", 3], ["error", 3], ["looks", 2], ["good", 2], ["accurate", 2], ["clear", 2], ["user", 2], ["query", 2], ["troubleshoot", 2], ["service", 2], ["list", 2], ["features", 2], ["openlab", 2], ["contact", 2], ["invoice", 2], ["number", 2], ["add", 2], ["new", 2], ["icp", 2], ["ms", 2], ["fix", 2], ["provide", 2], ["api", 1], ["agilent", 1], ["lm", 1], ["submit", 1], ["request", 1], ["illab", 1], ["hard", 1], ["understand", 1], ["get", 1], ["present", 1], ["managing", 1], ["group", 1], ["versus", 1]];
+        if (wordCloudData.length > 0) {
+            // Check if WordCloud is defined
+            if (typeof WordCloud !== 'undefined') {
+                try {
+                    WordCloud(document.getElementById('wordCloudCanvas'), {
+                        list: wordCloudData,
+                        gridSize: 8,
+                        weightFactor: 3,
+                        fontFamily: 'Inter, sans-serif',
+                        color: function(word, weight) {
+                            return weight > 10 ? '#3b82f6' : 
+                                   weight > 5 ? '#6366f1' : 
+                                   weight > 3 ? '#8b5cf6' : '#a855f7';
+                        },
+                        rotateRatio: 0.5,
+                        backgroundColor: '#fff',
+                        shape: 'circle',
+                        drawOutOfBound: false,
+                        shrinkToFit: true,
+                        clearCanvas: true
+                    });
+                } catch (e) {
+                    console.error("Error generating word cloud:", e);
+                    createFallbackWordChart();
+                }
+            } else {
+                console.warn("WordCloud library not available, using fallback visualization");
+                createFallbackWordChart();
+            }
+        }
+        
+        // Fallback function to create a simple bar chart of top words
+        function createFallbackWordChart() {
+            const ctx = document.getElementById('wordCloudCanvas').getContext('2d');
+            
+            // Sort and take top 10 words for the bar chart
+            const sortedData = wordCloudData.sort((a, b) => b[1] - a[1]).slice(0, 10);
+            const labels = sortedData.map(item => item[0]);
+            const values = sortedData.map(item => item[1]);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Top Words',
+                        data: values,
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',  // Horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Top 10 Words (Fallback View)',
+                            font: { size: 14 }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true,
+                            grid: { display: false }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
     </script>
-    </body>
+</body>
 </html>

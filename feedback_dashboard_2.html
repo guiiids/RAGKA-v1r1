@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .truncate-text {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        @media (max-width: 1024px) {
+            .truncate-text {
+                max-width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .truncate-text {
+                max-width: 150px;
+            }
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+        }
+        
+        .badge-green {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .badge-yellow {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-gray {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        .size-4 {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Feedback Dashboard</h1>
+            <p class="text-sm text-gray-500 mt-2">Displaying all feedback data from PostgreSQL database</p>
+        </header>
+        
+        <!-- Metrics Summary Section -->
+        <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+  <div>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Total Queries</p>
+    <p class="text-2xl font-medium text-gray-900 dark:text-white">34</p>
+  </div>
+  <div class="inline-flex gap-2 rounded-sm bg-blue-100 p-1 text-blue-600 dark:bg-blue-700 dark:text-blue-50">
+    
+<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+</svg>
+
+    <span class="text-xs font-medium"></span>
+  </div>
+</article>
+
+
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+  <div>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Total Feedback Entries</p>
+    <p class="text-2xl font-medium text-gray-900 dark:text-white">34</p>
+  </div>
+  <div class="inline-flex gap-2 rounded-sm bg-blue-100 p-1 text-blue-600 dark:bg-blue-700 dark:text-blue-50">
+    
+<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+</svg>
+
+    <span class="text-xs font-medium"></span>
+  </div>
+</article>
+
+
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+  <div>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Positive Feedback</p>
+    <p class="text-2xl font-medium text-gray-900 dark:text-white">11 (32.4%)</p>
+  </div>
+  <div class="inline-flex gap-2 rounded-sm bg-green-100 p-1 text-green-600 dark:bg-green-700 dark:text-green-50">
+    
+<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+</svg>
+
+    <span class="text-xs font-medium">32.4%</span>
+  </div>
+</article>
+
+
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+  <div>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Avg. Tokens per OpenAI Call</p>
+    <p class="text-2xl font-medium text-gray-900 dark:text-white">0.0</p>
+  </div>
+  <div class="inline-flex gap-2 rounded-sm bg-blue-100 p-1 text-blue-600 dark:bg-blue-700 dark:text-blue-50">
+    
+<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+</svg>
+
+    <span class="text-xs font-medium">0.0</span>
+  </div>
+</article>
+
+        </div>
+
+        <!-- Charts Section -->
+        <div class="my-8 bg-white p-6 rounded-lg shadow-md max-h-64">
+          <h2 class="text-xl font-semibold mb-4">Requests Per Hour</h2>
+          <canvas id="requestsPerHourChart" class="w-full h-64"  style="height:16rem;"></canvas>
+        </div>
+        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">Word Cloud of Queries and Tags</h2>
+          <canvas id="wordCloudCanvas" width="600" height="400"></canvas>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-700">All Feedback</h2>
+                        <p class="text-sm text-gray-500">Total: <span id="total-count">34</span> entries</p>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="text" id="search-input" placeholder="Search..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    </div>
+                </div>
+                
+                <!-- Date Range Filter -->
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center">
+                        <label for="date-range" class="mr-2 text-sm font-medium text-gray-700">Date Range:</label>
+                        <select id="date-range" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="all">All Time</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="last7">Last 7 Days</option>
+                            <option value="last14">Last 14 Days</option>
+                            <option value="last30">Last 30 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="flex items-center">
+                        <label for="status-filter" class="mr-2 text-sm font-medium text-gray-700">Status:</label>
+                        <select id="status-filter" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="all">All</option>
+                            <option value="positive">Positive</option>
+                            <option value="negative">Negative</option>
+                        </select>
+                    </div>
+                    
+                    <div id="custom-date-range" class="hidden flex items-center gap-2">
+                        <label for="start-date" class="text-sm font-medium text-gray-700">From:</label>
+                        <input type="date" id="start-date" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                        
+                        <label for="end-date" class="text-sm font-medium text-gray-700">To:</label>
+                        <input type="date" id="end-date" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                        
+                        <button id="apply-date-filter" class="px-3 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(0)">
+                                Timestamp <span class="sort-icon">↕</span>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                User Query
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Response
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tags
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Comments
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="feedback-table-body">
+                        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 12:41:19</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="How do you clean up stale ecmxt tickets?">How do you clean up stale ecmxt tickets?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To clean up stale ECMXT tickets, you can follow the approach outlined for handling massive data deletion and cleanup in ECMXT:1. Adjust Batch Size: Increase the batch size for the trashcan cleaner job to delete more files per batch. For example, increasing the batch size to 50,000 files can help expedite the cleanup process and reduce the duration significantly [1].2. Modify Cleanup Frequency: Configure settings to run cleanup jobs more frequently. This ensures that stale tickets or deleted data are processed faster [1].3. Restart Services: After modifying these settings, restart the `alfrescoTomcat` service to apply changes effectively [1].4. Use Configuration Utility: Access the server and use a configuration utility to make necessary adjustments to settings related to cleanup jobs [1].5. Empty Trash Manually (if needed): If files are moved to Alfresco&#x27;s trash can during deletion, ensure you manually empty it within Alfresco for permanent removal of stale tickets or data [2]. Be cautious as this action is irreversible.These steps should help streamline and accelerate the cleanup process for stale ECMXT tickets while maintaining system efficiency.
+          Sources Utilized1. SID-90587.txt2. SID-90589.txt">To clean up stale ECMXT tickets, you can follow the approach outlined for handling massive data deletion and cleanup in ECMXT:1. Adjust Batch Size: Increase the batch size for the trashcan cleaner job to delete more files per batch. For example, increasing the batch size to 50,000 files can help expedite the cleanup process and reduce the duration significantly [1].2. Modify Cleanup Frequency: Configure settings to run cleanup jobs more frequently. This ensures that stale tickets or deleted data are processed faster [1].3. Restart Services: After modifying these settings, restart the `alfrescoTomcat` service to apply changes effectively [1].4. Use Configuration Utility: Access the server and use a configuration utility to make necessary adjustments to settings related to cleanup jobs [1].5. Empty Trash Manually (if needed): If files are moved to Alfresco&#x27;s trash can during deletion, ensure you manually empty it within Alfresco for permanent removal of stale tickets or data [2]. Be cautious as this action is irreversible.These steps should help streamline and accelerate the cleanup process for stale ECMXT tickets while maintaining system efficiency.
+          Sources Utilized1. SID-90587.txt2. SID-90589.txt</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Irrelevant</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="beep poop im bad feedback">beep poop im bad feedback</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 10:06:01</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="detach invoices">detach invoices</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To detach invoices, you need to follow these steps:1. Navigate to the core&#x27;s Billing tab to view your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;2. Find the billing event containing the invoice(s) you want to detach.3. Click on the appropriate invoice link to display all invoices within that billing event.4. Open the specific invoice you wish to detach by selecting the magnifying glass icon located on the far right.5. Once inside the invoice, select the &quot;Detach Invoice&quot; icon at the top of the page.6. A Detach Invoice window will open where you can optionally enter a note in the provided field (not mandatory).7. Click &quot;Detach Invoice,&quot; and this will remove it from its current billing event.After detachment:- The detached invoice will be moved into a new section called View Detached Invoices, found under the core facility&#x27;s Billing tab.- It can also be identified by its red-lettered &quot;Detached&quot; status and filtered using options available in the Invoices filter panel [2], [3].Keep in mind:- Not all institutions allow detached invoices; this functionality depends on institutional settings [1].- An invoice cannot be detached if marked as Paid/Partially Paid or if its billing event has a status of File Sent for final processing [2].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">To detach invoices, you need to follow these steps:1. Navigate to the core&#x27;s Billing tab to view your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;2. Find the billing event containing the invoice(s) you want to detach.3. Click on the appropriate invoice link to display all invoices within that billing event.4. Open the specific invoice you wish to detach by selecting the magnifying glass icon located on the far right.5. Once inside the invoice, select the &quot;Detach Invoice&quot; icon at the top of the page.6. A Detach Invoice window will open where you can optionally enter a note in the provided field (not mandatory).7. Click &quot;Detach Invoice,&quot; and this will remove it from its current billing event.After detachment:- The detached invoice will be moved into a new section called View Detached Invoices, found under the core facility&#x27;s Billing tab.- It can also be identified by its red-lettered &quot;Detached&quot; status and filtered using options available in the Invoices filter panel [2], [3].Keep in mind:- Not all institutions allow detached invoices; this functionality depends on institutional settings [1].- An invoice cannot be detached if marked as Paid/Partially Paid or if its billing event has a status of File Sent for final processing [2].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="testing dashboard">testing dashboard</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 10:05:22</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="How to detach invoiceS?">How to detach invoiceS?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To detach invoices, follow these steps:1. Navigate to the Billing Tab: Go to the core&#x27;s Billing tab and locate your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;   2. Find the Relevant Billing Event: Identify the billing event containing the invoice(s) you want to detach.3. Open the Invoice: Click on the appropriate invoice link to display all invoices within that billing event. Open the specific invoice by selecting the magnifying glass icon located on its far right.4. Detach Invoice Option: Once inside the invoice view, select the &quot;Detach Invoice&quot; icon at the top of the invoice.5. Detach Invoice Window: A window will open where you can optionally add a note explaining why you&#x27;re detaching it (this is not mandatory).6. Confirm Detachment: Click &quot;Detach Invoice,&quot; and it will be removed from this billing event. A note indicating that the invoice has been detached will appear at the top of its page [1], [2].Keep in mind:- Detached invoices retain their original number and details.- Some institutions may not allow detaching invoices due to administrative settings.- Invoices marked as Paid or Partially Paid, or those associated with a billing event having a status of &quot;File Sent,&quot; cannot be detached [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf">To detach invoices, follow these steps:1. Navigate to the Billing Tab: Go to the core&#x27;s Billing tab and locate your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;   2. Find the Relevant Billing Event: Identify the billing event containing the invoice(s) you want to detach.3. Open the Invoice: Click on the appropriate invoice link to display all invoices within that billing event. Open the specific invoice by selecting the magnifying glass icon located on its far right.4. Detach Invoice Option: Once inside the invoice view, select the &quot;Detach Invoice&quot; icon at the top of the invoice.5. Detach Invoice Window: A window will open where you can optionally add a note explaining why you&#x27;re detaching it (this is not mandatory).6. Confirm Detachment: Click &quot;Detach Invoice,&quot; and it will be removed from this billing event. A note indicating that the invoice has been detached will appear at the top of its page [1], [2].Keep in mind:- Detached invoices retain their original number and details.- Some institutions may not allow detaching invoices due to administrative settings.- Invoices marked as Paid or Partially Paid, or those associated with a billing event having a status of &quot;File Sent,&quot; cannot be detached [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="testing feedback dashboarf">testing feedback dashboarf</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 09:37:30</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is ilab">what is ilab</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to streamline operations and management for core facilities, laboratories, and research institutions. It provides tools for scheduling, billing, resource management, and user access. iLab serves a global user base with instances hosted on regional servers to optimize performance and comply with local data regulations [4]. Users can sign up using institutional credentials if their institution has ID integration or by creating an account through specific links provided by the core facility or institution [2], [5]. For assistance in navigating its features, resources such as FAQs, video tutorials, quick-start guides, and support are available [1], [3], [4].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf4. helpjuice_articles_simple.pdf5. helpjuice_articles_simple.pdf">iLab is a software platform designed to streamline operations and management for core facilities, laboratories, and research institutions. It provides tools for scheduling, billing, resource management, and user access. iLab serves a global user base with instances hosted on regional servers to optimize performance and comply with local data regulations [4]. Users can sign up using institutional credentials if their institution has ID integration or by creating an account through specific links provided by the core facility or institution [2], [5]. For assistance in navigating its features, resources such as FAQs, video tutorials, quick-start guides, and support are available [1], [3], [4].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf4. helpjuice_articles_simple.pdf5. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="missing. stiuff">missing. stiuff</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 03:50:02</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="HEY">HEY</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Hola, ¿puedes proporcionar más detalles o aclarar tu consulta? Estoy aquí para ayudarte.">Hola, ¿puedes proporcionar más detalles o aclarar tu consulta? Estoy aquí para ayudarte.</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-22 19:03:45</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="How to add a new fund to a lab in iLab?">How to add a new fund to a lab in iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To add a new fund to a lab in iLab, follow these steps:1. Navigate to the Manually Add a New Fund Number section of the tab.2. Type the new fund number in the correct format.3. Click on Add to submit the request.For certain institutions, adding a fund may require additional approval from the fund owner. If approval is needed, you will receive a notification once it has been approved. If no approval is required, the screen will refresh automatically and the fund number will be added to the Fund Grid [1].Once added, this fund can then be assigned to group members as needed [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf">To add a new fund to a lab in iLab, follow these steps:1. Navigate to the Manually Add a New Fund Number section of the tab.2. Type the new fund number in the correct format.3. Click on Add to submit the request.For certain institutions, adding a fund may require additional approval from the fund owner. If approval is needed, you will receive a notification once it has been approved. If no approval is required, the screen will refresh automatically and the fund number will be added to the Fund Grid [1].Once added, this fund can then be assigned to group members as needed [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-22 18:50:27</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Yor are a new ICP-MS service engineer and facing now a 48V error on 7850 ICP-MS. Your background is chemistry and therefore you have no idea how to fix the error. Provide an explanation for the error, the root cause and how to fix it. Provide a list of spare parts you will have to order">Yor are a new ICP-MS service engineer and facing now a 48V error on 7850 ICP-MS. Your background is chemistry and therefore you have no idea how to fix the error. Provide an explanation for the error, the root cause and how to fix it. Provide a list of spare parts you will have to order</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The 48V error on the ICP-MS instrument, specifically a 7850 model, indicates an issue with the +48V power supply to the Quadrupole (QP) system. This error prevents startup or tuning of the instrument and typically arises due to a hardware malfunction in either the QP Tank PCA or QP Controller PCA.### Explanation of Error:The error occurs when the +48V power supply is not detected while connected to the QP Tank PCA. However, when disconnected, voltage readings show that +48V is present. This suggests that there is no issue with the power supply itself but rather with one of the boards responsible for managing this voltage.### Root Cause:- Faulty QP Driver Board: Either the QP Tank PCA or QP Controller PCA could be defective.- Ribbon Cable Damage: The main ribbon cable connecting the controller board to other components may have a burned-out red strip.- Feedback Error: A feedback mechanism failure might prevent proper voltage detection.### Steps to Fix:1. Check Ribbon Cable: Inspect the main ribbon cable from the main board to controller for any visible damage (e.g., burned-out sections).2. Test Boards Separately:   - Disconnect and test both QP Tank PCA and QP Controller PCA using another working ICP-MS instrument (e.g., another 7850 model).   - Identify which board fails during testing.3. Replace Faulty Component:   - If testing confirms that either QP Tank PCA or Controller PCA is faulty, order replacements for these parts.4. Verify Voltage Readings:   - Ensure +48V is consistently supplied after replacing faulty components by checking through maintenance screen settings.5. Reassemble and Test Instrument:   - Reconnect all cables and boards properly.   - Perform startup and tuning procedures to confirm functionality.### Spare Parts Required:Based on troubleshooting steps outlined above, you may need to order:1. QP Tank PCA – Replacement part if this board is identified as faulty.2. QP Controller PCA – Replacement part if this board fails during testing.3. Main Ribbon Cable – Order if physical inspection reveals damage such as burns or breaks in connectivity.By systematically following these steps, you should be able to resolve this issue even without prior engineering experience [1].
+          Sources Utilized1. 2023-02-27_Error 1301 and No QP +48, ICP-MS_b8af9b08-5bb0-4292-b2a0-1a59e6620bc6.pdf">The 48V error on the ICP-MS instrument, specifically a 7850 model, indicates an issue with the +48V power supply to the Quadrupole (QP) system. This error prevents startup or tuning of the instrument and typically arises due to a hardware malfunction in either the QP Tank PCA or QP Controller PCA.### Explanation of Error:The error occurs when the +48V power supply is not detected while connected to the QP Tank PCA. However, when disconnected, voltage readings show that +48V is present. This suggests that there is no issue with the power supply itself but rather with one of the boards responsible for managing this voltage.### Root Cause:- Faulty QP Driver Board: Either the QP Tank PCA or QP Controller PCA could be defective.- Ribbon Cable Damage: The main ribbon cable connecting the controller board to other components may have a burned-out red strip.- Feedback Error: A feedback mechanism failure might prevent proper voltage detection.### Steps to Fix:1. Check Ribbon Cable: Inspect the main ribbon cable from the main board to controller for any visible damage (e.g., burned-out sections).2. Test Boards Separately:   - Disconnect and test both QP Tank PCA and QP Controller PCA using another working ICP-MS instrument (e.g., another 7850 model).   - Identify which board fails during testing.3. Replace Faulty Component:   - If testing confirms that either QP Tank PCA or Controller PCA is faulty, order replacements for these parts.4. Verify Voltage Readings:   - Ensure +48V is consistently supplied after replacing faulty components by checking through maintenance screen settings.5. Reassemble and Test Instrument:   - Reconnect all cables and boards properly.   - Perform startup and tuning procedures to confirm functionality.### Spare Parts Required:Based on troubleshooting steps outlined above, you may need to order:1. QP Tank PCA – Replacement part if this board is identified as faulty.2. QP Controller PCA – Replacement part if this board fails during testing.3. Main Ribbon Cable – Order if physical inspection reveals damage such as burns or breaks in connectivity.By systematically following these steps, you should be able to resolve this issue even without prior engineering experience [1].
+          Sources Utilized1. 2023-02-27_Error 1301 and No QP +48, ICP-MS_b8af9b08-5bb0-4292-b2a0-1a59e6620bc6.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-21 16:49:20</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What is i:ab?">What is i:ab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The context provided does not include information about &quot;i:ab.&quot; If you meant &quot;iLab,&quot; it is mentioned in the Agilent Knowledge Base as a resource for FAQs related to Core Users and Admins, but no specific details are provided beyond that [1]. If you need more information or clarification, please let me know!
+          Sources Utilized1. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf">The context provided does not include information about &quot;i:ab.&quot; If you meant &quot;iLab,&quot; it is mentioned in the Agilent Knowledge Base as a resource for FAQs related to Core Users and Admins, but no specific details are provided beyond that [1]. If you need more information or clarification, please let me know!
+          Sources Utilized1. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Incorrect</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="did notadress my issue">did notadress my issue</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-21 03:30:30</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="how do I change the invoice number pattern for my core? I want to add our core first three letter, so it is like HED-XXX then invoice number">how do I change the invoice number pattern for my core? I want to add our core first three letter, so it is like HED-XXX then invoice number</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To change the invoice number pattern for your core and include the first three letters of your core (e.g., HED-XXX followed by the invoice number), you need to adjust specific settings in iLab. Here&#x27;s how:1. Enable Custom Core Name in Invoice Numbers:    - Define the setting &quot;Include custom core name as part of the invoice number after the institution initials&quot; as YES [1].   2. Set Institution Permissions:   - Ensure that your institution has enabled &quot;Allow custom core name in invoice numbers.&quot; This should be defined per core [1].3. Enter Your Custom Core Name:   - Enter &quot;HED&quot; (or any desired prefix) as your custom core name for invoice numbers. This will display the custom core name followed by the invoice number [1].If you encounter difficulties or require advanced configuration, contact iLab support for assistance with these settings [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf">To change the invoice number pattern for your core and include the first three letters of your core (e.g., HED-XXX followed by the invoice number), you need to adjust specific settings in iLab. Here&#x27;s how:1. Enable Custom Core Name in Invoice Numbers:    - Define the setting &quot;Include custom core name as part of the invoice number after the institution initials&quot; as YES [1].   2. Set Institution Permissions:   - Ensure that your institution has enabled &quot;Allow custom core name in invoice numbers.&quot; This should be defined per core [1].3. Enter Your Custom Core Name:   - Enter &quot;HED&quot; (or any desired prefix) as your custom core name for invoice numbers. This will display the custom core name followed by the invoice number [1].If you encounter difficulties or require advanced configuration, contact iLab support for assistance with these settings [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Missing complete path where to go to.">Missing complete path where to go to.</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 21:08:00</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What is iLab?">What is iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for tasks such as scheduling equipment, tracking usage, billing, and managing memberships. iLab serves a global user base with regional servers to optimize performance and comply with local data regulations [2]. Users can register for accounts based on their institution or facility location using specific links provided for different regions [3]. Additionally, it offers resources like FAQs, video tutorials, and guides to assist users in navigating its functionalities [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for tasks such as scheduling equipment, tracking usage, billing, and managing memberships. iLab serves a global user base with regional servers to optimize performance and comply with local data regulations [2]. Users can register for accounts based on their institution or facility location using specific links provided for different regions [3]. Additionally, it offers resources like FAQs, video tutorials, and guides to assist users in navigating its functionalities [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 21:02:17</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="contact iilab support">contact iilab support</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="You can contact iLab Support through several methods:1. Support Portal: Access the iLab Support Portal by clicking on the &#x27;Help&#x27; link in the upper-right corner of the iLab interface. From there, you can submit a ticket, review tickets, or use other support resources [1].2. Email: Submit a ticket via email if preferred [1].3. Phone: Call iLab Support directly using the appropriate regional phone number:   - U.S. &amp; Canada: +1-800-690-2957   - Australia: +61-1-800-572-319   - China: +86-400-820-0661 or +86-800-820-0661   - France: +33-0-800-918-672   - Germany: +49-0-800-181-9513   - Norway: +47 800 15 105   - Spain: +34 900 958 741   - U.K.: +44 0 808 234 2050 [2].4. SMS: Send your question via SMS to +1 (408)-413–3760 to connect with an agent (standard rates may apply) [2].5. Live Chat: Initiate a live chat session with a support agent from the bottom-right corner of the Support Portal page [2].6. Issue Tracking: Use the &#x27;Issue Tracking&#x27; feature in the portal to monitor major disruptions and their resolutions [2]. If you encounter login issues or need account reactivation assistance, follow specific steps outlined within iLab&#x27;s HelpJuice articles or contact support for further help [3].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">You can contact iLab Support through several methods:1. Support Portal: Access the iLab Support Portal by clicking on the &#x27;Help&#x27; link in the upper-right corner of the iLab interface. From there, you can submit a ticket, review tickets, or use other support resources [1].2. Email: Submit a ticket via email if preferred [1].3. Phone: Call iLab Support directly using the appropriate regional phone number:   - U.S. &amp; Canada: +1-800-690-2957   - Australia: +61-1-800-572-319   - China: +86-400-820-0661 or +86-800-820-0661   - France: +33-0-800-918-672   - Germany: +49-0-800-181-9513   - Norway: +47 800 15 105   - Spain: +34 900 958 741   - U.K.: +44 0 808 234 2050 [2].4. SMS: Send your question via SMS to +1 (408)-413–3760 to connect with an agent (standard rates may apply) [2].5. Live Chat: Initiate a live chat session with a support agent from the bottom-right corner of the Support Portal page [2].6. Issue Tracking: Use the &#x27;Issue Tracking&#x27; feature in the portal to monitor major disruptions and their resolutions [2]. If you encounter login issues or need account reactivation assistance, follow specific steps outlined within iLab&#x27;s HelpJuice articles or contact support for further help [3].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Other Issue</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Broken link in the citation">Broken link in the citation</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 13:28:14</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="how o I update the core contact info?">how o I update the core contact info?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To update the core contact information, follow these steps:1. Navigate to the &quot;Email Settings&quot; sub-group within the &quot;Other Settings&quot; panel.2. In the first section, you will see a list of all members of your core. These are the core staff members available for selection as contacts.3. Click on the box beside each person you wish to designate as a core contact.4. Core contacts will receive general customer questions and notifications about new service requests.It is recommended to select one or two people as core contacts to limit email messages [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf">To update the core contact information, follow these steps:1. Navigate to the &quot;Email Settings&quot; sub-group within the &quot;Other Settings&quot; panel.2. In the first section, you will see a list of all members of your core. These are the core staff members available for selection as contacts.3. Click on the box beside each person you wish to designate as a core contact.4. Core contacts will receive general customer questions and notifications about new service requests.It is recommended to select one or two people as core contacts to limit email messages [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 13:26:52</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is the warranty policy for gc products?">what is the warranty policy for gc products?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The warranty policy for GC products varies depending on the manufacturer:1. Varian, Inc.:    - Hardware products are warranted to be free from defects in material and workmanship for specified periods as outlined in Varian&#x27;s quotation or agreed upon in writing.   - The warranty period begins on the shipment date unless installation is included, in which case it starts upon completion of installation.   - If installation is delayed by more than 30 days after delivery due to customer-related issues, the warranty period starts on the 31st day from shipment [1], [4].2. Agilent Technologies:   - Analytical products are warranted against defects in materials and workmanship during the warranty period.   - For products with installation included, the warranty begins after successful installation and testing; otherwise, it starts upon delivery.   - If installation is delayed by over 30 days (or 60 days for international orders), the warranty begins on the 31st (or 61st) day following shipment [2], [3].Both companies provide repair or replacement options for defective products within their respective warranty periods.
+          Sources Utilized1. 490 Micro GC User Manual.pdf2. G3158-90000.pdf3. SD-AJ000262_A.pdf4. 240MS Hardware Operation Manual.pdf">The warranty policy for GC products varies depending on the manufacturer:1. Varian, Inc.:    - Hardware products are warranted to be free from defects in material and workmanship for specified periods as outlined in Varian&#x27;s quotation or agreed upon in writing.   - The warranty period begins on the shipment date unless installation is included, in which case it starts upon completion of installation.   - If installation is delayed by more than 30 days after delivery due to customer-related issues, the warranty period starts on the 31st day from shipment [1], [4].2. Agilent Technologies:   - Analytical products are warranted against defects in materials and workmanship during the warranty period.   - For products with installation included, the warranty begins after successful installation and testing; otherwise, it starts upon delivery.   - If installation is delayed by over 30 days (or 60 days for international orders), the warranty begins on the 31st (or 61st) day following shipment [2], [3].Both companies provide repair or replacement options for defective products within their respective warranty periods.
+          Sources Utilized1. 490 Micro GC User Manual.pdf2. G3158-90000.pdf3. SD-AJ000262_A.pdf4. 240MS Hardware Operation Manual.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Irrelevant</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="content from competitor">content from competitor</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 11:52:27</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="help me troubleshoot my vcalendat in ilab">help me troubleshoot my vcalendat in ilab</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The provided context does not include specific information about troubleshooting a &quot;vcalendar&quot; issue in iLab. However, I recommend the following general steps to troubleshoot issues within iLab:1. Check System Status: Visit the iLab Status Page to ensure there are no ongoing system outages or updates that might affect functionality [3].2. Consult Help Resources: Use the iLab Help Site for detailed articles and step-by-step guides on using various features, including calendars [3]. You can also explore video tutorials for visual guidance [1].3. Verify Settings: If your issue is related to calendar management (e.g., adding or updating schedules), check out resources like &quot;Adding and Updating Calendars&quot; under webinar topics for administrators [1].4. Contact Support: If you cannot resolve the issue using available resources, contact the iLab Support Team directly through their portal or support widget [2][3].If you need more specific help regarding your vcalendar issue, please provide additional details so I can assist further!
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf">The provided context does not include specific information about troubleshooting a &quot;vcalendar&quot; issue in iLab. However, I recommend the following general steps to troubleshoot issues within iLab:1. Check System Status: Visit the iLab Status Page to ensure there are no ongoing system outages or updates that might affect functionality [3].2. Consult Help Resources: Use the iLab Help Site for detailed articles and step-by-step guides on using various features, including calendars [3]. You can also explore video tutorials for visual guidance [1].3. Verify Settings: If your issue is related to calendar management (e.g., adding or updating schedules), check out resources like &quot;Adding and Updating Calendars&quot; under webinar topics for administrators [1].4. Contact Support: If you cannot resolve the issue using available resources, contact the iLab Support Team directly through their portal or support widget [2][3].If you need more specific help regarding your vcalendar issue, please provide additional details so I can assist further!
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf3. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span><span class="badge badge-blue">Data Source Quality</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="vague">vague</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 11:51:43</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What are the main features of the OpenLab?">What are the main features of the OpenLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The main features of OpenLab include:1. Data Security: It offers unmatched data security to protect labs from data exposure, cyberattacks, and data loss. Secure data transfer and encryption methods ensure the safety of information [1].2. Backup System: OpenLab provides a simple and reliable backup system that automates the backup and restoration of important information, whether onsite or in the cloud. It also supports long-term data retention with low-cost storage options [1].3. Data Integrity Tools: The platform includes technical controls to securely acquire and store data while complying with regulations such as FDA 21 CFR Part 11, EU Annex 11, GAMP5, ISO/IEC 17025, and EPA’s 40 CFR Part 160 [1].4. Disaster Recovery: Enhances disaster recovery plans by enabling quick restoration and recovery of critical information to support business continuity during operational disruptions [1].5. Cloud Connectivity: Built-in cloud connectivity optimizes storage costs and reduces maintenance overheads while allowing easy setup and expansion [1].6. Scalable Architecture: OpenLab&#x27;s scalable architecture allows for quick addition of new instruments to meet increased workloads [1].7. Multilanguage User Interface: Supports multiple languages including English, Chinese, Japanese, and Brazilian Portuguese for ease of use across global teams [1].8. Integration with Analytical Systems: Provides seamless integration with various analytical systems for single-point access to all types of analytical data ensuring accuracy and consistency [1]. These features make OpenLab a robust solution for managing laboratory operations efficiently while maintaining compliance standards.
+          Sources Utilized1. OpenLab-EZChrom-Functional-Design-Specification-A.04.10.pdf">The main features of OpenLab include:1. Data Security: It offers unmatched data security to protect labs from data exposure, cyberattacks, and data loss. Secure data transfer and encryption methods ensure the safety of information [1].2. Backup System: OpenLab provides a simple and reliable backup system that automates the backup and restoration of important information, whether onsite or in the cloud. It also supports long-term data retention with low-cost storage options [1].3. Data Integrity Tools: The platform includes technical controls to securely acquire and store data while complying with regulations such as FDA 21 CFR Part 11, EU Annex 11, GAMP5, ISO/IEC 17025, and EPA’s 40 CFR Part 160 [1].4. Disaster Recovery: Enhances disaster recovery plans by enabling quick restoration and recovery of critical information to support business continuity during operational disruptions [1].5. Cloud Connectivity: Built-in cloud connectivity optimizes storage costs and reduces maintenance overheads while allowing easy setup and expansion [1].6. Scalable Architecture: OpenLab&#x27;s scalable architecture allows for quick addition of new instruments to meet increased workloads [1].7. Multilanguage User Interface: Supports multiple languages including English, Chinese, Japanese, and Brazilian Portuguese for ease of use across global teams [1].8. Integration with Analytical Systems: Provides seamless integration with various analytical systems for single-point access to all types of analytical data ensuring accuracy and consistency [1]. These features make OpenLab a robust solution for managing laboratory operations efficiently while maintaining compliance standards.
+          Sources Utilized1. OpenLab-EZChrom-Functional-Design-Specification-A.04.10.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Incorrect</span><span class="badge badge-yellow">Incomplete</span><span class="badge badge-blue">Data Source Quality</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="too lonng and wrong &quot;g laboratory operations efficiently while&quot;">too lonng and wrong &quot;g laboratory operations efficiently while&quot;</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20 11:49:22</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="openlab, versus crosslab?">openlab, versus crosslab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Agilent OpenLab and CrossLab serve different purposes but are complementary in their offerings.OpenLab is primarily a suite of software products designed to enhance laboratory operations. It includes tools like the Chromatography Data System (CDS), Electronic Lab Notebook (ELN), and Enterprise Content Manager (ECM). These tools help laboratories capture, analyze, share information securely, and manage data across its lifecycle. OpenLab supports various instruments (both Agilent and non-Agilent) for tasks such as instrument control, data acquisition, processing, reporting, and secure storage [1][2].On the other hand, CrossLab focuses on services and consumables that optimize laboratory workflows and outcomes. It integrates repair services, maintenance plans, asset management insights, method optimization support for both Agilent and select non-Agilent instruments. CrossLab also offers training programs to improve user skills while ensuring compliance with strict performance standards [3][4].In summary:- OpenLab: Software solutions for managing scientific data.- CrossLab: Services and consumables aimed at improving lab productivity and operational efficiency.
+          Sources Utilized1. 5991-2796EN QC Applications Compendium.pdf2. OpenLab_CDS_v2.7_FunctionalDesignSpecification.pdf3. application-fod-cannabis_5994-0431en-agilent.pdf4. agilent-infinitylab-lcmsd-series-supplies-quick-reference-guide-5990-8580EN.pdf">Agilent OpenLab and CrossLab serve different purposes but are complementary in their offerings.OpenLab is primarily a suite of software products designed to enhance laboratory operations. It includes tools like the Chromatography Data System (CDS), Electronic Lab Notebook (ELN), and Enterprise Content Manager (ECM). These tools help laboratories capture, analyze, share information securely, and manage data across its lifecycle. OpenLab supports various instruments (both Agilent and non-Agilent) for tasks such as instrument control, data acquisition, processing, reporting, and secure storage [1][2].On the other hand, CrossLab focuses on services and consumables that optimize laboratory workflows and outcomes. It integrates repair services, maintenance plans, asset management insights, method optimization support for both Agilent and select non-Agilent instruments. CrossLab also offers training programs to improve user skills while ensuring compliance with strict performance standards [3][4].In summary:- OpenLab: Software solutions for managing scientific data.- CrossLab: Services and consumables aimed at improving lab productivity and operational efficiency.
+          Sources Utilized1. 5991-2796EN QC Applications Compendium.pdf2. OpenLab_CDS_v2.7_FunctionalDesignSpecification.pdf3. application-fod-cannabis_5994-0431en-agilent.pdf4. agilent-infinitylab-lcmsd-series-supplies-quick-reference-guide-5990-8580EN.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-19 15:54:50</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Get me a list of features present in iLab as for managing a lab group">Get me a list of features present in iLab as for managing a lab group</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="In iLab, the features available for managing a lab group include:1. Membership Requests &amp; Fund Numbers: Accept or reject group membership requests and manage funding assignments to group members [1].2. Members Management: Manage group members and set automatic approval levels across the lab or per member [1].3. Budgets Monitoring: Receive alerts based on core-level spending by members [1].4. Bulletin Board: Post messages within your group [1].5. Group Settings Modification: Adjust various settings for the lab/group [1].These functionalities are accessed through tabs in the Lab/Group interface, which serves as a central hub for Principal Investigators (PIs) and Lab/Group Managers to oversee their groups effectively.
+          Sources Utilized1. helpjuice_articles_simple.pdf">In iLab, the features available for managing a lab group include:1. Membership Requests &amp; Fund Numbers: Accept or reject group membership requests and manage funding assignments to group members [1].2. Members Management: Manage group members and set automatic approval levels across the lab or per member [1].3. Budgets Monitoring: Receive alerts based on core-level spending by members [1].4. Bulletin Board: Post messages within your group [1].5. Group Settings Modification: Adjust various settings for the lab/group [1].These functionalities are accessed through tabs in the Lab/Group interface, which serves as a central hub for Principal Investigators (PIs) and Lab/Group Managers to oversee their groups effectively.
+          Sources Utilized1. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Data Source Quality</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="links not working">links not working</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-19 04:38:13</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is ilab">what is ilab</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support the management and operation of core facilities, laboratories, and research resources. It serves as a centralized system for scheduling, billing, and tracking usage of laboratory equipment and services. iLab caters to various user roles, including core customers, lab group managers, and administrators, providing tailored functionalities for each role.The platform offers features such as account registration (including Single Sign-On integration for institutions), resource scheduling, cancellation notifications, and access management. Additionally, it provides tools like video tutorials and guides to help users navigate its functionalities effectively [1], [2], [3].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">iLab is a software platform designed to support the management and operation of core facilities, laboratories, and research resources. It serves as a centralized system for scheduling, billing, and tracking usage of laboratory equipment and services. iLab caters to various user roles, including core customers, lab group managers, and administrators, providing tailored functionalities for each role.The platform offers features such as account registration (including Single Sign-On integration for institutions), resource scheduling, cancellation notifications, and access management. Additionally, it provides tools like video tutorials and guides to help users navigate its functionalities effectively [1], [2], [3].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-18 23:20:38</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="ilab">ilab</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to assist institutions, researchers, and administrators in managing core facilities, lab groups, and related resources. It offers features such as service ordering, financial approvals, budgeting tools, and reporting workflows. Depending on your role (e.g., Core Customer, Lab Group Manager, or Core Administrator), iLab provides tailored articles and guides to help navigate its functionalities [1].For new users or those seeking assistance with registration and login processes, iLab offers resources like the Signup and Login Assistant widget and detailed guides for regional server access based on institutional requirements [2]. Visual learners can benefit from video tutorials that provide step-by-step instructions for using various iLab features [2].If you need further support or have specific questions about using iLab&#x27;s modules or functionalities, you can contact the iLab Support Team or explore their comprehensive Help Site [1].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf">iLab is a software platform designed to assist institutions, researchers, and administrators in managing core facilities, lab groups, and related resources. It offers features such as service ordering, financial approvals, budgeting tools, and reporting workflows. Depending on your role (e.g., Core Customer, Lab Group Manager, or Core Administrator), iLab provides tailored articles and guides to help navigate its functionalities [1].For new users or those seeking assistance with registration and login processes, iLab offers resources like the Signup and Login Assistant widget and detailed guides for regional server access based on institutional requirements [2]. Visual learners can benefit from video tutorials that provide step-by-step instructions for using various iLab features [2].If you need further support or have specific questions about using iLab&#x27;s modules or functionalities, you can contact the iLab Support Team or explore their comprehensive Help Site [1].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Irrelevant</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-18 22:35:47</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is ilab?">what is ilab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support core facilities, laboratories, and research institutions in managing their operations efficiently. It provides tools for scheduling resources, tracking usage, billing, and facilitating communication between users and administrators. iLab serves a global user base with institutions hosted on regional servers to optimize performance and comply with local data regulations [1], [2]. Users can access iLab through institution-specific login links or credentials provided by the platform. The system also supports Single Sign-On (SSO) integration for institutions that have implemented it [3]. For new users, there are resources like quick-start guides, FAQs, video tutorials, and help articles available to assist them in navigating the platform [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">iLab is a software platform designed to support core facilities, laboratories, and research institutions in managing their operations efficiently. It provides tools for scheduling resources, tracking usage, billing, and facilitating communication between users and administrators. iLab serves a global user base with institutions hosted on regional servers to optimize performance and comply with local data regulations [1], [2]. Users can access iLab through institution-specific login links or credentials provided by the platform. The system also supports Single Sign-On (SSO) integration for institutions that have implemented it [3]. For new users, there are resources like quick-start guides, FAQs, video tutorials, and help articles available to assist them in navigating the platform [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-18 12:53:28</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is :Lab?">what is :Lab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The context provided does not mention &quot;:Lab&quot; explicitly, and it is unclear what you are referring to. If you meant &quot;iLab,&quot; it is a platform designed to assist users with lab operations, offering resources such as FAQs, video tutorials, quick-start guides, and articles tailored for different user roles like Core Customers, Lab Group Managers, and Core Administrators [1]. If &quot;:Lab&quot; refers to something else, could you clarify or provide additional details?
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf">The context provided does not mention &quot;:Lab&quot; explicitly, and it is unclear what you are referring to. If you meant &quot;iLab,&quot; it is a platform designed to assist users with lab operations, offering resources such as FAQs, video tutorials, quick-start guides, and articles tailored for different user roles like Core Customers, Lab Group Managers, and Core Administrators [1]. If &quot;:Lab&quot; refers to something else, could you clarify or provide additional details?
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Data Source Quality</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-18 12:26:39</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="what is illab\">what is illab\</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="The term &quot;iLab&quot; refers to a web-based platform used for managing core facilities and shared resources at institutions. It provides tools for scheduling, billing, and reporting related to these facilities. Users can log in using their institution-specific credentials or iLab-provided credentials if ID integration is not available [1], [2]. If you need more specific details about its functionality or setup, feel free to ask!
+          Sources Utilized1. helpjuice_articles_simple.pdf2. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf">The term &quot;iLab&quot; refers to a web-based platform used for managing core facilities and shared resources at institutions. It provides tools for scheduling, billing, and reporting related to these facilities. Users can log in using their institution-specific credentials or iLab-provided credentials if ID integration is not available [1], [2]. If you need more specific details about its functionality or setup, feel free to ask!
+          Sources Utilized1. helpjuice_articles_simple.pdf2. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Hard to Understand</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-18 00:14:34</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What is iLab?">What is iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for scheduling, billing, and resource management, catering to various user roles such as Core Customers, Lab Group Managers, and Core Administrators. iLab is hosted on multiple regional servers to optimize performance and comply with local data regulations [3]. Users can register for an account based on their institution&#x27;s location or specific requirements [4]. Additionally, the platform offers resources like FAQs, video tutorials, and guides to assist users throughout their journey [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf3. helpjuice_articles_simple.pdf4. helpjuice_articles_simple.pdf">iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for scheduling, billing, and resource management, catering to various user roles such as Core Customers, Lab Group Managers, and Core Administrators. iLab is hosted on multiple regional servers to optimize performance and comply with local data regulations [3]. Users can register for an account based on their institution&#x27;s location or specific requirements [4]. Additionally, the platform offers resources like FAQs, video tutorials, and guides to assist users throughout their journey [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. 2023-12-04_iLab FAQs_dc1de2c0-0540-4ee5-a389-3215171dd94b.pdf3. helpjuice_articles_simple.pdf4. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Other Issue</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Broken links">Broken links</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 23:50:59</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="How to submit a service request in iLab?">How to submit a service request in iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To submit a service request in iLab, follow these steps:1. Access the Support Portal: Click on the &#x27;Help&#x27; link in the upper-right corner of the screen within iLab. This will take you to the Support Portal.2. Submit a Ticket: On the Support Portal page, click on the &#x27;Submit a Ticket&#x27; button. A New Ticket window will pop up.3. Fill Out Details:   - Enter a brief description of your issue or request in the &quot;Subject&quot; field.   - Provide detailed information about your request in the &quot;Description&quot; field to help support agents address it efficiently.   4. Optional Features:   - You can add attachments by dragging and dropping files or uploading them manually.   - Use the screen recording feature (if needed) to record and narrate your issue for clarity.5. Finalize Submission: Once all details are filled out, submit your ticket through this interface [1].Let me know if you need further clarification!
+          Sources Utilized1. helpjuice_articles_simple.pdf">To submit a service request in iLab, follow these steps:1. Access the Support Portal: Click on the &#x27;Help&#x27; link in the upper-right corner of the screen within iLab. This will take you to the Support Portal.2. Submit a Ticket: On the Support Portal page, click on the &#x27;Submit a Ticket&#x27; button. A New Ticket window will pop up.3. Fill Out Details:   - Enter a brief description of your issue or request in the &quot;Subject&quot; field.   - Provide detailed information about your request in the &quot;Description&quot; field to help support agents address it efficiently.   4. Optional Features:   - You can add attachments by dragging and dropping files or uploading them manually.   - Use the screen recording feature (if needed) to record and narrate your issue for clarity.5. Finalize Submission: Once all details are filled out, submit your ticket through this interface [1].Let me know if you need further clarification!
+          Sources Utilized1. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Incorrect</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is how to submit a ticket, not a service request.">This is how to submit a ticket, not a service request.</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 23:29:41</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="troubleshoot agilent LM">troubleshoot agilent LM</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To troubleshoot an Agilent LC pump, the preferred solution is to use the Agilent Lab Advisor Software. This software provides a detailed system overview, including instrument status, Early Maintenance Feedback (EMF) counters, configuration information, and diagnostic tests. It can generate detailed diagnostic reports that users can send to Agilent for improved troubleshooting and repair processes [1], [2].The software is available in two versions:- Lab Advisor Basic: Included with every Agilent 1200 Infinity Series and InfinityLab LC Series instrument.- Lab Advisor Advanced: Offers additional features like real-time monitoring of instrument actuals, signals, state machines, and data sharing capabilities through a network folder after purchasing a license key [1], [2].If you need further assistance or clarification regarding specific diagnostics or procedures, please let me know!
+          Sources Utilized1. G7121-FLD-SerMa-en-SD-29000221.pdf2. G2198-2D-LC-MassHunter-UseMa-en-D0028445.pdf">To troubleshoot an Agilent LC pump, the preferred solution is to use the Agilent Lab Advisor Software. This software provides a detailed system overview, including instrument status, Early Maintenance Feedback (EMF) counters, configuration information, and diagnostic tests. It can generate detailed diagnostic reports that users can send to Agilent for improved troubleshooting and repair processes [1], [2].The software is available in two versions:- Lab Advisor Basic: Included with every Agilent 1200 Infinity Series and InfinityLab LC Series instrument.- Lab Advisor Advanced: Offers additional features like real-time monitoring of instrument actuals, signals, state machines, and data sharing capabilities through a network folder after purchasing a license key [1], [2].If you need further assistance or clarification regarding specific diagnostics or procedures, please let me know!
+          Sources Utilized1. G7121-FLD-SerMa-en-SD-29000221.pdf2. G2198-2D-LC-MassHunter-UseMa-en-D0028445.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Irrelevant</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 23:27:33</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What is iLab?">What is iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for scheduling, billing, resource management, and communication among users and administrators. iLab serves a global user base with regional server configurations to optimize performance and comply with local data regulations [2]. Users can register for an account based on their institution&#x27;s location or specific requirements (e.g., Dana Farber Cancer Institute or Stanford University) [3]. Additionally, the platform offers resources such as video tutorials, quick-start guides, FAQs, and detailed articles tailored for different roles like Core Customers, Lab Group Managers, and Core Administrators [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for scheduling, billing, resource management, and communication among users and administrators. iLab serves a global user base with regional server configurations to optimize performance and comply with local data regulations [2]. Users can register for an account based on their institution&#x27;s location or specific requirements (e.g., Dana Farber Cancer Institute or Stanford University) [3]. Additionally, the platform offers resources such as video tutorials, quick-start guides, FAQs, and detailed articles tailored for different roles like Core Customers, Lab Group Managers, and Core Administrators [1], [2].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Incorrect</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="bad chunk">bad chunk</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 21:03:16</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test API user query">This is a test API user query</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test API bot response">This is a test API bot response</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test API comment">This is a test API comment</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 21:01:30</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="How to detach invoices">How to detach invoices</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="To detach an invoice, follow these steps:1. Navigate to the Billing Tab: Go to the core&#x27;s Billing tab and locate your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;2. Find the Relevant Billing Event: Identify the billing event that contains the invoice(s) you want to detach.3. Open the Invoice: Click on the appropriate invoice link to display all invoices within that billing event. Select the magnifying glass icon next to the specific invoice you wish to detach.4. Detach Invoice:   - Once the invoice is open, click on the &quot;Detach Invoice&quot; icon at the top of the page.   - A Detach Invoice window will appear where you can optionally add a note in the provided field.   - Click &quot;Detach Invoice&quot; to remove it from this billing event.5. Confirmation: After detaching, a note stating that the invoice has been detached will display at the top of its view [1], [2].Keep in mind:- Detached invoices retain their original number and details.- Certain criteria prevent detachment (e.g., if marked as Paid or Partially Paid, or if associated with a completed billing event sent for final processing) [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf">To detach an invoice, follow these steps:1. Navigate to the Billing Tab: Go to the core&#x27;s Billing tab and locate your list of existing billing events with a status of either &quot;Billing Initialized&quot; or &quot;Draft.&quot;2. Find the Relevant Billing Event: Identify the billing event that contains the invoice(s) you want to detach.3. Open the Invoice: Click on the appropriate invoice link to display all invoices within that billing event. Select the magnifying glass icon next to the specific invoice you wish to detach.4. Detach Invoice:   - Once the invoice is open, click on the &quot;Detach Invoice&quot; icon at the top of the page.   - A Detach Invoice window will appear where you can optionally add a note in the provided field.   - Click &quot;Detach Invoice&quot; to remove it from this billing event.5. Confirmation: After detaching, a note stating that the invoice has been detached will display at the top of its view [1], [2].Keep in mind:- Detached invoices retain their original number and details.- Certain criteria prevent detachment (e.g., if marked as Paid or Partially Paid, or if associated with a completed billing event sent for final processing) [1].
+          Sources Utilized1. helpjuice_articles_simple.pdf2. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="It could have included the complete path to the invoice tab/page.">It could have included the complete path to the invoice tab/page.</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 21:00:05</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="What is iLab?">What is iLab?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for tasks such as account registration, lab membership management, payment processing, scheduling resources, and accessing external core facilities. iLab serves a global user base and is hosted on regional servers to optimize performance and comply with local data regulations [1], [2]. If you need further assistance or want to explore its features, you can access resources like FAQs, video tutorials, quick-start guides, and help articles tailored for different user roles (e.g., Core Customers, Lab Group Managers, Core Administrators) [1], [3].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf">iLab is a software platform designed to support research institutions and core facilities in managing their operations efficiently. It provides tools for tasks such as account registration, lab membership management, payment processing, scheduling resources, and accessing external core facilities. iLab serves a global user base and is hosted on regional servers to optimize performance and comply with local data regulations [1], [2]. If you need further assistance or want to explore its features, you can access resources like FAQs, video tutorials, quick-start guides, and help articles tailored for different user roles (e.g., Core Customers, Lab Group Managers, Core Administrators) [1], [3].
+          Sources Utilized1. 2023-11-16_Collection of iLab Operations Software Resources - Test_a813497d-e580-4b4e-ae51-fcc125dc3954.pdf2. helpjuice_articles_simple.pdf3. helpjuice_articles_simple.pdf</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">helpful</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 20:58:47</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test user query">This is a test user query</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test bot response">This is a test bot response</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Looks Good / Accurate &amp; Clear</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="This is a test comment">This is a test comment</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 20:52:58</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="Very generic.">Very generic.</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 20:47:29</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-blue">Other Issue</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="loco">loco</div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 20:40:37</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-red">Negative</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-yellow">Incomplete</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-17 18:32:58</td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="test?">test?</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title="ok">ok</div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Positive</span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="badge badge-green">Looks Good / Accurate &amp; Clear</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <div class="truncate-text" title=""></div>
+                </td>
+            </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            <p>Generated on 2025-06-23 09:08:05</p>
+            <p>Connected directly to PostgreSQL database: ragka-v1r1-server.postgres.database.azure.com</p>
+        </footer>
+    </div>
+
+      
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.1.2/src/wordcloud2.min.js"></script>
+    <script>
+    
+      // Requests per hour chart
+      const ctx = document.getElementById('requestsPerHourChart').getContext('2d');
+       const maxPoints = 72  // last 3 days
+      const requestsPerHourChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: ['2025-06-17 18:00', '2025-06-17 20:00', '2025-06-17 21:00', '2025-06-17 23:00', '2025-06-18 00:00', '2025-06-18 12:00', '2025-06-18 22:00', '2025-06-18 23:00', '2025-06-19 04:00', '2025-06-19 15:00', '2025-06-20 11:00', '2025-06-20 13:00', '2025-06-20 21:00', '2025-06-21 03:00', '2025-06-21 16:00', '2025-06-22 18:00', '2025-06-22 19:00', '2025-06-23 03:00', '2025-06-23 09:00', '2025-06-23 10:00', '2025-06-23 12:00'],
+              datasets: [{
+                  label: 'Requests per Hour',
+                  data: [1, 4, 3, 3, 1, 2, 1, 1, 1, 1, 3, 2, 2, 1, 1, 1, 1, 1, 1, 2, 1],
+                  backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                  borderColor: 'rgba(59, 130, 246, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  x: {
+                      ticks: {
+                          maxRotation: 90,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 20
+                      }
+                  },
+                  y: {
+                      beginAtZero: true,
+                      precision: 0
+                  }
+              },
+              responsive: true,
+              maintainAspectRatio: false
+          }
+      });
+
+      // Word cloud
+      const wordCloudData = [["test", 3], ["looks", 2], ["good", 2], ["accurate", 2], ["clear", 2], ["incomplete", 10], ["other", 3], ["issue", 3], ["this", 2], ["is", 15], ["a", 10], ["user", 2], ["query", 2], ["what", 12], ["ilab", 12], ["helpful", 9], ["how", 9], ["to", 10], ["detach", 3], ["invoices", 3], ["api", 1], ["incorrect", 4], ["troubleshoot", 2], ["agilent", 1], ["lm", 1], ["irrelevant", 4], ["submit", 1], ["service", 2], ["request", 1], ["in", 4], ["illab", 1], ["hard", 1], ["understand", 1], ["lab", 3], ["data", 4], ["source", 4], ["quality", 4], ["get", 1], ["me", 2], ["list", 2], ["of", 3], ["features", 2], ["present", 1], ["as", 1], ["for", 4], ["managing", 1], ["group", 1], ["openlab", 2], ["versus", 1], ["crosslab", 1], ["are", 2], ["the", 8], ["main", 1], ["help", 1], ["my", 2], ["vcalendat", 1], ["warranty", 1], ["policy", 1], ["gc", 1], ["products", 1], ["o", 1], ["i", 4], ["update", 1], ["core", 3], ["contact", 2], ["info", 1], ["iilab", 1], ["support", 1], ["do", 2], ["change", 1], ["invoice", 2], ["number", 2], ["pattern", 1], ["want", 1], ["add", 2], ["our", 1], ["first", 1], ["three", 1], ["letter", 1], ["so", 1], ["it", 2], ["like", 1], ["hed", 1], ["xxx", 1], ["then", 1], ["ab", 1], ["yor", 1], ["new", 2], ["icp", 2], ["ms", 2], ["engineer", 1], ["and", 3], ["facing", 1], ["now", 1], ["48v", 1], ["error", 3], ["on", 1], ["7850", 1], ["your", 1], ["background", 1], ["chemistry", 1], ["therefore", 1], ["you", 3], ["have", 2], ["no", 1], ["idea", 1], ["fix", 2], ["provide", 2], ["an", 1], ["explanation", 1], ["root", 1], ["cause", 1], ["spare", 1], ["parts", 1], ["will", 1], ["order", 1], ["fund", 1], ["hey", 1], ["clean", 1], ["up", 1], ["stale", 1], ["ecmxt", 1], ["tickets", 1]];
+      WordCloud(document.getElementById('wordCloudCanvas'), {
+          list: wordCloudData,
+          gridSize: 8,
+          weightFactor: 10,
+          fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+          color: 'random-dark',
+          rotateRatio: 0.5,
+          backgroundColor: '#f9fafb'
+      });
+    </script>
+    </body>
+      </html>
