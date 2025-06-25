@@ -272,8 +272,7 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-<!-- <img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src=""> --> 
-<h4 class="text-lg font-semibold text-gray-900 ml-2">RAG Knowledge Assistant</h4>
+<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/5.png"">
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
         <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
@@ -299,16 +298,15 @@ HTML_TEMPLATE = """
     <div id="chat-messages" class="chat-messages">
       <!-- Logo centered in message area before first message -->
       <div id="center-logo" class="flex flex-col items-center justify-center h-full ">
-        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-gif-3.gif">
-<h3 class="text-md font-normal text-gray-700 mt-4">[    Logo approved. <span class=" font-bold"> Upload will start shortly.    </span>]</h3>   
-         <h1 class="text-2xl font-bold text-gray-900 mt-2">RAG Knowledge Assistant</h1>
+        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo" src="/assets/">
+
       </div>
       <script>  
       (function() {
         const logos = [
           
          
-          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/logo-2.gif',
+          'https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/sage_icon_logo.png',
           
         ];
         const chosen = logos[Math.floor(Math.random() * logos.length)];
@@ -323,7 +321,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
             <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 dark:text-white">RAGKA/<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-gray-900 dark:text-white">
             Hi there! I'm an AI assistant trained on your knowledge base. What would you like to know?
@@ -347,7 +345,7 @@ HTML_TEMPLATE = """
     style="min-height: 34px;"
   ></textarea>
   
-<button id="submit-btn" class="absolute right-2 bottom-2 rounded-2xl bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+<button id="submit-btn" class="absolute right-2 bottom-2 rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
           Send
         </button>
 </div>
@@ -564,7 +562,7 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white">RAGKA/<span class="mt-1 text-sm leading-tight font-strong text-indigo-500 hover:underline">AI</span></span>
+            <span class="text-xs font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 hover:underline"> AI Agent</span></span>
           </div>
           <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
              ${formatMessage(message)}
