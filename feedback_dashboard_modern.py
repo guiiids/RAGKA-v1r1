@@ -24,6 +24,8 @@ import os
 import webbrowser
 from pathlib import Path
 from dotenv import load_dotenv
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
 import html
 from datetime import datetime, timedelta
 import json
@@ -1051,11 +1053,6 @@ def main():
         import traceback
         traceback.print_exc()
 
-    """Main function to generate and display the dashboard."""
-+    # set up Jinja2 environment for template rendering
-+    from jinja2 import Environment, FileSystemLoader
-+    env = Environment(loader=FileSystemLoader('templates'))
-+    template = env.get_template('feedback_dashboard_modern.html')
     try:
         print("\n" + "="*80)
         print("FEEDBACK DASHBOARD GENERATOR - MODERN VERSION")
@@ -1112,3 +1109,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
