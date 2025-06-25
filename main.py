@@ -71,9 +71,55 @@ def serve_assets(filename):
 # Serve the analytics dashboard HTML
 @app.route('/analytics')
 def analytics_dashboard():
-    with open('analytics_dashboard.html', 'r') as f:
-        html_content = f.read()
-    return html_content
+    """Execute the feedback_dashboard_modern.py script and return its generated HTML content."""
+    try:
+        # Import the necessary functions from feedback_dashboard_modern.py
+        from feedback_dashboard_modern import get_all_feedback, get_total_queries, get_requests_per_hour
+        from feedback_dashboard_modern import get_query_complexity_metrics, get_feedback_response_time
+        from feedback_dashboard_modern import parse_openai_calls, generate_dashboard_html
+        
+        logger.info("Generating modern feedback dashboard")
+        
+        # Get the data
+        feedback_data = get_all_feedback()
+        total_queries = get_total_queries()
+        
+        # Calculate metrics
+        total_feedback = len(feedback_data)
+        positive_feedback_count = sum(1 for fb in feedback_data 
+                                     if any('helpful' in tag.lower() or 'good' in tag.lower() 
+                                           for tag in (fb.get('feedback_tags') or [])))
+        positive_feedback_pct = (positive_feedback_count / total_feedback * 100) if total_feedback else 0.0
+        
+        # Token usage metrics
+        token_list = parse_openai_calls()
+        avg_tokens = (sum(token_list) / len(token_list)) if token_list else 0.0
+        
+        # Additional metrics
+        query_complexity = get_query_complexity_metrics()
+        response_time = get_feedback_response_time()
+        
+        # Combine all metrics
+        metrics = {
+            'total_queries': total_queries,
+            'total_feedback': total_feedback,
+            'positive_feedback_count': positive_feedback_count,
+            'positive_feedback_pct': positive_feedback_pct,
+            'avg_tokens': avg_tokens,
+            'query_complexity': query_complexity,
+            'response_time': response_time
+        }
+        
+        # Generate the HTML content
+        html_content = generate_dashboard_html(feedback_data, metrics)
+        
+        logger.info("Modern feedback dashboard generated successfully")
+        return html_content
+        
+    except Exception as e:
+        logger.error(f"Error generating modern feedback dashboard: {e}")
+        logger.error(traceback.format_exc())
+        return f"Error generating dashboard: {str(e)}", 500
 
 # API endpoint to provide analytics data
 @app.route('/api/analytics', methods=['GET'])
