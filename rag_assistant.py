@@ -185,6 +185,7 @@ class FlaskRAGAssistant:
     # ───────────── Azure Search ───────────
     def search_knowledge_base(self, query: str) -> List[Dict]:
         try:
+            logger.info(f"Searching knowledge base for query: {query}")
             client = SearchClient(
                 endpoint=f"https://{self.search_endpoint}.search.windows.net",
                 index_name=self.search_index,
@@ -192,58 +193,90 @@ class FlaskRAGAssistant:
             )
             q_vec = self.generate_embedding(query)
             if not q_vec:
+                logger.error("Failed to generate embedding for query")
                 return []
 
+            logger.info(f"Executing vector search with fields: {self.vector_field}")
             vec_q = VectorizedQuery(
                 vector=q_vec,
                 k_nearest_neighbors=10,
                 fields=self.vector_field,
             )
+            
+            # Log the search parameters
+            logger.info(f"Search parameters: index={self.search_index}, vector_field={self.vector_field}, top=10")
+            
+            # Add parent_id to select fields
             results = client.search(
                 search_text=query,
                 vector_queries=[vec_q],
-                select=["chunk", "title"],
+                select=["chunk", "title", "parent_id"],  # Added parent_id here
                 top=10,
             )
+            
+            # Convert results to list and log count
+            result_list = list(results)
+            logger.info(f"Search returned {len(result_list)} results")
+            
+            # Debug log the first result if available
+            if result_list and len(result_list) > 0:
+                first_result = result_list[0]
+                logger.debug(f"First result - title: {first_result.get('title', 'No title')}")
+                logger.debug(f"First result - has parent_id: {'Yes' if 'parent_id' in first_result else 'No'}")
+                if 'parent_id' in first_result:
+                    logger.debug(f"First result - parent_id: {first_result.get('parent_id')[:30]}..." if first_result.get('parent_id') else "None")
+            
             return [
                 {
                     "chunk": r.get("chunk", ""),
                     "title": r.get("title", "Untitled"),
+                    "parent_id": r.get("parent_id", ""),  # Include parent_id
                     "relevance": 1.0,
                 }
-                for r in results
+                for r in result_list
             ]
         except Exception as exc:
-            logger.error("Search error: %s", exc)
+            logger.error(f"Search error: {exc}", exc_info=True)
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return []
 
     # ───────── context & citations ────────
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
+        logger.info(f"Preparing context from {len(results)} search results")
         entries, src_map = [], {}
         sid = 1
         valid_chunks = 0
+        
         for res in results[:5]:
             chunk = res["chunk"].strip()
             if not chunk:
+                logger.warning(f"Empty chunk found in result {sid}, skipping")
                 continue
 
             valid_chunks += 1
             formatted_chunk = format_context_text(chunk)
+            
+            # Log parent_id if available
+            parent_id = res.get("parent_id", "")
+            if parent_id:
+                logger.info(f"Source {sid} has parent_id: {parent_id[:30]}..." if len(parent_id) > 30 else parent_id)
+            else:
+                logger.warning(f"Source {sid} missing parent_id")
 
             entries.append(f'<source id="{sid}">{formatted_chunk}</source>')
             src_map[str(sid)] = {
-                "title":    res["title"],
-                "content":  formatted_chunk  # Optional: also store the formatted version
+                "title": res["title"],
+                "content": formatted_chunk,
+                "parent_id": parent_id  # Include parent_id in source map
             }
             sid += 1
 
         context_str = "\n\n".join(entries)
         if valid_chunks == 0:
+            logger.warning("No valid chunks found in _prepare_context, returning fallback context")
             context_str = "[No context available from knowledge base]"
-            # Optionally log this condition
-            import logging
-            logging.getLogger(__name__).warning("No valid chunks found in _prepare_context, returning fallback context.")
 
+        logger.info(f"Prepared context with {valid_chunks} valid chunks and {len(src_map)} sources")
         return context_str, src_map
 
 
@@ -336,17 +369,30 @@ class FlaskRAGAssistant:
         return answer
 
     def _filter_cited(self, answer: str, src_map: Dict) -> List[Dict]:
+        logger.info("Filtering cited sources from answer")
         cited_sources = []
+        
         for sid, sinfo in src_map.items():
             if f"[{sid}]" in answer:
-                # carry over id, title, and content
-                cited_sources.append({
+                logger.info(f"Source {sid} is cited in the answer")
+                
+                # Check if parent_id exists
+                parent_id = sinfo.get("parent_id", "")
+                if parent_id:
+                    logger.info(f"Source {sid} has parent_id: {parent_id[:30]}..." if len(parent_id) > 30 else parent_id)
+                else:
+                    logger.warning(f"Cited source {sid} missing parent_id")
+                
+                # Add source to cited sources
+                cited_source = {
                     "id": sid,
                     "title": sinfo["title"],
                     "content": sinfo["content"],
-                    # include URL here if you have one in sinfo
-                    **({"url": sinfo["url"]} if "url" in sinfo else {})
-                })
+                    "parent_id": parent_id  # Include parent_id
+                }
+                cited_sources.append(cited_source)
+        
+        logger.info(f"Found {len(cited_sources)} cited sources")
         return cited_sources
 
     # ─────────── public API ───────────────
@@ -380,7 +426,12 @@ class FlaskRAGAssistant:
             for new_id, src in enumerate(cited_raw, 1):
                 old_id = src["id"]
                 renumber_map[old_id] = str(new_id)
-                entry = {"id": str(new_id), "title": src["title"], "content": src["content"]}
+                entry = {
+                    "id": str(new_id), 
+                    "title": src["title"], 
+                    "content": src["content"],
+                    "parent_id": src.get("parent_id", "")  # Include parent_id in cited sources
+                }
                 if "url" in src:
                     entry["url"] = src["url"]
                 cited_sources.append(entry)
@@ -546,7 +597,12 @@ class FlaskRAGAssistant:
             for new_id, src in enumerate(cited_raw, 1):
                 old_id = src["id"]
                 renumber_map[old_id] = str(new_id)
-                entry = {"id": str(new_id), "title": src["title"], "content": src["content"]}
+                entry = {
+                    "id": str(new_id), 
+                    "title": src["title"], 
+                    "content": src["content"],
+                    "parent_id": src.get("parent_id", "")  # Include parent_id in cited sources
+                }
                 if "url" in src:
                     entry["url"] = src["url"]
                 cited_sources.append(entry)

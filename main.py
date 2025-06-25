@@ -11,6 +11,7 @@ from pythonjsonlogger import jsonlogger
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
 load_dotenv() 
+sas_token = os.getenv("SAS_TOKEN", "")
 
 
 # Import directly from the current directory
@@ -852,6 +853,10 @@ HTML_TEMPLATE = """
 <!-- <script src="/static/js/unifiedEval.js"></script> -->
 <script src="/static/js/custom.js"></script> <!-- This file is empty/deprecated -->
 <script src="/static/js/debug-logger.js"></script>
+<script>
+  window.APP_CONFIG = { sasToken: "{{ sas_token }}" };
+</script>
+<script src="/static/js/url-decoder.js"></script> <!-- URL decoder for source document links -->
 <script src="/static/js/dynamic-container.js"></script>
 <!-- <script src="/static/js/citation-toggle.js"></script> --> <!-- Removed -->
 <script src="/static/js/feedback-integration.js"></script>
@@ -916,7 +921,7 @@ HTML_TEMPLATE = """
 @app.route("/", methods=["GET"])
 def index():
     logger.info("Index page accessed")
-    return render_template_string(HTML_TEMPLATE, file_executed=file_executed)
+    return render_template_string(HTML_TEMPLATE, file_executed=file_executed, sas_token=sas_token)
 
 @app.route("/api/query", methods=["POST"])
 def api_query():

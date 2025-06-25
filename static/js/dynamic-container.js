@@ -2,6 +2,8 @@
  * Dynamic Container Module
  * Implements a right-side container that shows programmatically and takes 30% of the area
  * When shown, the main chat area compresses from 70% to 50% width
+ * 
+ * Enhanced with URL decoding capabilities for source documents
  */
 
 class DynamicContainer {
@@ -154,7 +156,7 @@ class DynamicContainer {
     document.head.appendChild(style);
   }
 
-    addEventListeners() {
+  addEventListeners() {
     // Close button event listener
     document.addEventListener('click', (e) => {
       if (e.target.closest('#dynamic-container-close')) {
@@ -172,11 +174,8 @@ class DynamicContainer {
       }
     });
 
-
-
     // Removed global <a[href]> listener to avoid breaking normal links,
     // only citation links and specifically marked triggers will be handled.
-
 
     // Click outside to close
     document.addEventListener('click', (e) => {
@@ -220,8 +219,6 @@ class DynamicContainer {
     }
     // Check if the link should trigger the dynamic container
     const href = link.getAttribute('href');
-    
-
     
     // Trigger for links with specific classes or data attributes
     if (link.classList.contains('dynamic-trigger') || link.hasAttribute('data-dynamic-content')) {
@@ -317,6 +314,8 @@ class DynamicContainer {
           const rawContent = source.content || '';
           const linkifiedContent = rawContent.replace(/(?<!href=")(https?:\/\/[^\s<>"'()]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
           title = source.title || source.id || `Source [${sourceId}]`;
+          
+          // Build the content with source information
           content = `
             <div class="space-y-4" id="source-content">
               <div>
@@ -332,13 +331,85 @@ class DynamicContainer {
                   </div>
                 </div>
               ` : ''}
-            </div>
           `;
+          
+          // Add download link if parent_id exists
+          if (source.parent_id) {
+            if (window.debugLogger) {
+              window.debugLogger.log('Source has parent_id, generating download link', 'citation', {
+                sourceId: sourceId,
+                parentId: source.parent_id.substring(0, 30) + '...'
+              });
+            }
+            
+            // Check if URL decoder is available
+            if (window.urlDecoder) {
+              const downloadLinkResult = window.urlDecoder.createDownloadLink(source.parent_id, false);
+              content += downloadLinkResult.html;
+              
+              if (!downloadLinkResult.success) {
+                if (window.debugLogger) {
+                  window.debugLogger.log('Failed to create download link', 'error', {
+                    error: downloadLinkResult.error
+                  });
+                }
+              }
+            } else {
+              // Fallback if URL decoder is not available
+              if (window.debugLogger) {
+                window.debugLogger.log('URL decoder not available', 'error');
+              }
+              
+              content += `
+                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                  <p><strong>Note:</strong> URL decoder module not loaded. Cannot generate download link.</p>
+                </div>
+              `;
+            }
+          } else {
+            // No parent_id available
+            if (window.debugLogger) {
+              window.debugLogger.log('Source missing parent_id, cannot generate download link', 'warning');
+            }
+            
+            content += `
+              <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-600">
+                <p><strong>Note:</strong> No document link available for this source.</p>
+              </div>
+            `;
+          }
+          
+          content += '</div>'; // Close the space-y-4 div
         }
         
         // Show the container with the source content
         this.show(content, title);
+      } else {
+        // Source not found
+        if (window.debugLogger) {
+          window.debugLogger.log('Source not found for citation', 'error', {
+            sourceId: sourceId,
+            availableSources: window.lastSources.length
+          });
+        }
+        
+        this.show(`
+          <div class="p-4 bg-red-50 border border-red-200 rounded text-red-600">
+            <p><strong>Error:</strong> Source information not found.</p>
+          </div>
+        `, `Source [${sourceId}] - Not Found`);
       }
+    } else {
+      // No sources available
+      if (window.debugLogger) {
+        window.debugLogger.log('No sources available for citation', 'error');
+      }
+      
+      this.show(`
+        <div class="p-4 bg-red-50 border border-red-200 rounded text-red-600">
+          <p><strong>Error:</strong> No source information available.</p>
+        </div>
+      `, `Source [${sourceId}] - Not Available`);
     }
   }
 

@@ -704,6 +704,9 @@ def generate_dashboard_html(feedback_data, metrics):
         <div class="container mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
+                  <div class="flex items-center">
+<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/5.png"">
+      </div>
                     <h1 class="text-3xl font-bold">Feedback Analytics Dashboard</h1>
                     <p class="text-blue-100 mt-1">Comprehensive analysis of user feedback data</p>
                 </div>
@@ -994,6 +997,65 @@ def generate_dashboard_html(feedback_data, metrics):
 
 def main():
     """Main function to generate and display the dashboard."""
+    try:
+        print("\n" + "="*80)
+        print("FEEDBACK DASHBOARD GENERATOR - MODERN VERSION")
+        print("="*80)
+        
+        print("\nPhase 1: Connecting to database and retrieving data...")
+        feedback_data = get_all_feedback()
+        print(f"Retrieved {len(feedback_data)} feedback records.")
+        
+        print("\nPhase 2: Calculating metrics...")
+        # Basic metrics
+        total_queries = get_total_queries()
+        total_feedback = len(feedback_data)
+        positive_feedback_count = sum(1 for fb in feedback_data if determine_feedback_status(fb.get('feedback_tags', [])).get('status') == 'Positive')
+        positive_feedback_pct = (positive_feedback_count / total_feedback * 100) if total_feedback else 0.0
+        
+        # Token usage metrics
+        token_list = parse_openai_calls()
+        avg_tokens = (sum(token_list) / len(token_list)) if token_list else 0.0
+        
+        # New metrics
+        query_complexity = get_query_complexity_metrics()
+        response_time = get_feedback_response_time()
+        
+        # Combine all metrics
+        metrics = {
+            'total_queries': total_queries,
+            'total_feedback': total_feedback,
+            'positive_feedback_count': positive_feedback_count,
+            'positive_feedback_pct': positive_feedback_pct,
+            'avg_tokens': avg_tokens,
+            'query_complexity': query_complexity,
+            'response_time': response_time
+        }
+        
+        print("\nPhase 3: Generating dashboard HTML...")
+        html_content = generate_dashboard_html(feedback_data, metrics)
+        
+        output_path = Path('feedback_dashboard_modern.html')
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        
+        print(f"\nDashboard generated at: {output_path.absolute()}")
+        
+        # Open in browser
+        webbrowser.open(output_path.absolute().as_uri())
+        print("Dashboard opened in your default web browser.")
+        print("\nDashboard generation complete!")
+        
+    except Exception as e:
+        print(f"\nAn error occurred while generating the dashboard: {e}")
+        import traceback
+        traceback.print_exc()
+
+    """Main function to generate and display the dashboard."""
++    # set up Jinja2 environment for template rendering
++    from jinja2 import Environment, FileSystemLoader
++    env = Environment(loader=FileSystemLoader('templates'))
++    template = env.get_template('feedback_dashboard_modern.html')
     try:
         print("\n" + "="*80)
         print("FEEDBACK DASHBOARD GENERATOR - MODERN VERSION")
