@@ -333,6 +333,7 @@ class FlaskRAGAssistantWithHistory:
         # Create a context message
         context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
         
+        self.conversation_manager.add_user_message(query)
         # Add the user message to conversation history
         self.conversation_manager.add_user_message(context_message)
         
@@ -347,6 +348,18 @@ class FlaskRAGAssistantWithHistory:
                 logger.info(f"Content: {msg['content'][:100]}...")
         
         # Get response from OpenAI service
+        import json
+        payload = {
+            "model": self.deployment_name,
+            "messages": messages,
+            "max_tokens": self.max_tokens,
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "presence_penalty": self.presence_penalty,
+            "frequency_penalty": self.frequency_penalty
+        }
+        logger.info("========== OPENAI RAW PAYLOAD ==========")
+        logger.info(json.dumps(payload, indent=2))
         response = self.openai_service.get_chat_response(
             messages=messages,
             temperature=self.temperature,

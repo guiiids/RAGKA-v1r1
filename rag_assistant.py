@@ -318,6 +318,7 @@ class FlaskRAGAssistant:
             logger.info(f"DEBUG - Applied custom prompt to query: {custom_prompt[:100]}...")
         
         # Create a context message
+        self.conversation_manager.add_user_message(query)
         context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
         
         # Add the user message to conversation history

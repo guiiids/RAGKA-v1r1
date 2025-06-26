@@ -19,7 +19,7 @@ from rag_assistant import FlaskRAGAssistant
 from db_manager import DatabaseManager
 
 # Configure logginghttps://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 # Clear any existing handlers
 if logger.handlers:
     logger.handlers.clear()
