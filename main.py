@@ -1,7 +1,7 @@
 
 print("Running:", __file__)
 import traceback
-from flask import Flask, request, jsonify, render_template_string, Response, send_from_directory
+from flask import Flask, request, jsonify, render_template_string, Response, send_from_directory, session
 import json
 import logging
 import sys
@@ -64,6 +64,18 @@ file_executed = os.path.abspath(__file__)
 logger.info("Flask RAG application starting up")
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key-for-sessions")
+
+# Dictionary to store RAG assistant instances by session ID
+rag_assistants = {}
+
+# Function to get or create a RAG assistant for a session
+def get_rag_assistant(session_id):
+    """Get or create a RAG assistant for the given session ID"""
+    if session_id not in rag_assistants:
+        logger.info(f"Creating new RAG assistant for session {session_id}")
+        rag_assistants[session_id] = FlaskRAGAssistant()
+    return rag_assistants[session_id]
 # Serve static files from the 'assets' folder
 @app.route('/assets/<path:filename>')
 def serve_assets(filename):
@@ -921,6 +933,11 @@ HTML_TEMPLATE = """
 @app.route("/", methods=["GET"])
 def index():
     logger.info("Index page accessed")
+    # Generate a session ID if one doesn't exist
+    if 'session_id' not in session:
+        session['session_id'] = os.urandom(16).hex()
+        logger.info(f"New session created: {session['session_id']}")
+    
     return render_template_string(HTML_TEMPLATE, file_executed=file_executed, sas_token=sas_token)
 
 @app.route("/api/query", methods=["POST"])
@@ -930,19 +947,35 @@ def api_query():
     user_query = data.get("query", "")
     logger.info(f"API query received: {user_query}")
     
+    # Get the session ID
+    session_id = session.get('session_id')
+    if not session_id:
+        session_id = os.urandom(16).hex()
+        session['session_id'] = session_id
+        logger.info(f"Created new session ID: {session_id}")
+    
     # Extract any settings from the request
     settings = data.get("settings", {})
     logger.info(f"DEBUG - Request settings: {json.dumps(settings)}")
     
     try:
-        # Initialize the RAG assistant with settings if provided
-        rag_assistant = FlaskRAGAssistant(settings=settings)
+        # Get or create the RAG assistant for this session
+        rag_assistant = get_rag_assistant(session_id)
+        
+        # Update settings if provided
+        if settings:
+            for key, value in settings.items():
+                if hasattr(rag_assistant, key):
+                    setattr(rag_assistant, key, value)
+            
+            # If model is updated, update the deployment name
+            if "model" in settings:
+                rag_assistant.deployment_name = settings["model"]
+        
         logger.info(f"DEBUG - Using model: {rag_assistant.deployment_name}")
         logger.info(f"DEBUG - Temperature: {rag_assistant.temperature}")
         logger.info(f"DEBUG - Max tokens: {rag_assistant.max_tokens}")
         logger.info(f"DEBUG - Top P: {rag_assistant.top_p}")
-        logger.info(f"DEBUG - Presence penalty: {rag_assistant.presence_penalty}")
-        logger.info(f"DEBUG - Frequency penalty: {rag_assistant.frequency_penalty}")
         
         answer, cited_sources, _, evaluation, context = rag_assistant.generate_rag_response(user_query)
         logger.info(f"API query response generated for: {user_query}")
@@ -987,6 +1020,23 @@ def api_query():
             "error": str(e)
         }), 500
 
+@app.route("/api/clear_history", methods=["POST"])
+def api_clear_history():
+    """Clear the conversation history for the current session"""
+    try:
+        session_id = session.get('session_id')
+        if session_id and session_id in rag_assistants:
+            logger.info(f"Clearing conversation history for session {session_id}")
+            rag_assistants[session_id].clear_conversation_history()
+            return jsonify({"success": True})
+        else:
+            logger.warning(f"No active session found to clear history")
+            return jsonify({"success": True, "message": "No active session found"})
+    except Exception as e:
+        logger.error(f"Error clearing conversation history: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/api/stream_query", methods=["POST"])
 def api_stream_query():
     data = request.get_json()
@@ -994,21 +1044,37 @@ def api_stream_query():
     logger.info(f"Stream query received: {user_query}")
     logger.info(f"DEBUG - Full request payload: {json.dumps(data)}")
     
+    # Get the session ID
+    session_id = session.get('session_id')
+    if not session_id:
+        session_id = os.urandom(16).hex()
+        session['session_id'] = session_id
+        logger.info(f"Created new session ID for streaming: {session_id}")
+    
     # Extract any settings from the request
     settings = data.get("settings", {})
     logger.info(f"DEBUG - Request settings: {json.dumps(settings)}")
     
     def generate():
         try:
-            # Initialize the RAG assistant with settings if provided
-            rag_assistant = FlaskRAGAssistant(settings=settings)
+            # Get or create the RAG assistant for this session
+            rag_assistant = get_rag_assistant(session_id)
+            
+            # Update settings if provided
+            if settings:
+                for key, value in settings.items():
+                    if hasattr(rag_assistant, key):
+                        setattr(rag_assistant, key, value)
+                
+                # If model is updated, update the deployment name
+                if "model" in settings:
+                    rag_assistant.deployment_name = settings["model"]
+            
             logger.info(f"Starting stream response for: {user_query}")
             logger.info(f"DEBUG - Using model: {rag_assistant.deployment_name}")
             logger.info(f"DEBUG - Temperature: {rag_assistant.temperature}")
             logger.info(f"DEBUG - Max tokens: {rag_assistant.max_tokens}")
             logger.info(f"DEBUG - Top P: {rag_assistant.top_p}")
-            logger.info(f"DEBUG - Presence penalty: {rag_assistant.presence_penalty}")
-            logger.info(f"DEBUG - Frequency penalty: {rag_assistant.frequency_penalty}")
             
             # Use streaming method
             for chunk in rag_assistant.stream_rag_response(user_query):

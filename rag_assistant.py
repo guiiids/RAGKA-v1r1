@@ -14,6 +14,7 @@ import os
 import re
 from openai_logger import log_openai_call
 from db_manager import DatabaseManager
+from conversation_manager import ConversationManager
 
 # Import config but handle the case where it might import streamlit
 try:
@@ -115,6 +116,10 @@ class FlaskRAGAssistant:
             api_key=self.openai_key,
             api_version=self.openai_api_version or "2023-05-15",
         )
+        
+        # Initialize the conversation manager with the system prompt
+        self.conversation_manager = ConversationManager(self.DEFAULT_SYSTEM_PROMPT)
+        
         self.fact_checker = FactCheckerStub()
         
         # Model parameters with defaults
@@ -127,6 +132,8 @@ class FlaskRAGAssistant:
         # Load settings if provided
         self.settings = settings or {}
         self._load_settings()
+        
+        logger.info("FlaskRAGAssistant initialized with conversation history")
 
     def _init_cfg(self) -> None:
         self.openai_endpoint      = OPENAI_ENDPOINT
@@ -156,6 +163,23 @@ class FlaskRAGAssistant:
         # Update search configuration
         if "search_index" in settings:
             self.search_index = settings["search_index"]
+            
+        # Update system prompt if provided
+        if "system_prompt" in settings:
+            system_prompt = settings.get("system_prompt", "")
+            system_prompt_mode = settings.get("system_prompt_mode", "Append")
+            
+            if system_prompt_mode == "Override":
+                # Replace the default system prompt
+                self.conversation_manager.clear_history(preserve_system_message=False)
+                self.conversation_manager.chat_history = [{"role": "system", "content": system_prompt}]
+                logger.info(f"System prompt overridden with custom prompt")
+            else:  # Append
+                # Update the system message with combined prompt
+                combined_prompt = f"{system_prompt}\n\n{self.DEFAULT_SYSTEM_PROMPT}"
+                self.conversation_manager.clear_history(preserve_system_message=False)
+                self.conversation_manager.chat_history = [{"role": "system", "content": combined_prompt}]
+                logger.info(f"System prompt appended with custom prompt")
 
     # ───────────── embeddings ─────────────
     def generate_embedding(self, text: str) -> Optional[List[float]]:
@@ -281,40 +305,26 @@ class FlaskRAGAssistant:
 
 
     def _chat_answer(self, query: str, context: str, src_map: Dict) -> str:
-        # Get system prompt from settings if available
-        system_prompt = self.DEFAULT_SYSTEM_PROMPT
+        """Generate a response using the conversation history"""
+        logger.info("Generating response with conversation history")
         
-        # Check if custom system prompt is available in settings
+        # Check if custom prompt is available in settings
         settings = self.settings
         custom_prompt = settings.get("custom_prompt", "")
-        system_prompt_override = settings.get("system_prompt", "")
-        system_prompt_mode = settings.get("system_prompt_mode", "Append")
         
         # Apply custom prompt to query if available
         if custom_prompt:
             query = f"{custom_prompt}\n\n{query}"
             logger.info(f"DEBUG - Applied custom prompt to query: {custom_prompt[:100]}...")
         
-        # Apply system prompt based on mode
-        if system_prompt_override:
-            if system_prompt_mode == "Override":
-                system_prompt = system_prompt_override
-                logger.info(f"OVERRIDE MODE ACTIVE - Using override prompt: {system_prompt[:100]}...")
-            else:  # Append
-                # Prepend custom prompt to give it priority over default
-                system_prompt = f"{system_prompt_override}\n\n{self.DEFAULT_SYSTEM_PROMPT}"
-                logger.info(f"APPEND MODE ACTIVE - Prepended custom prompt: {system_prompt_override[:100]}...")
-        else:
-            logger.info("No system_prompt_override provided in settings")
-
-        # Prepare the actual content that will be sent
-        processed_system_prompt = system_prompt.strip()
-        processed_user_content = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
+        # Create a context message
+        context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
         
-        messages = [
-            {"role": "system", "content": processed_system_prompt},
-            {"role": "user", "content": processed_user_content}
-        ]
+        # Add the user message to conversation history
+        self.conversation_manager.add_user_message(context_message)
+        
+        # Get the complete conversation history
+        messages = self.conversation_manager.get_history()
         
         # Log detailed payload information
         logger.info("========== OPENAI API REQUEST DETAILS ==========")
@@ -325,24 +335,18 @@ class FlaskRAGAssistant:
         logger.info(f"Presence penalty: {self.presence_penalty}")
         logger.info(f"Frequency penalty: {self.frequency_penalty}")
         
-        # Log the complete system prompt
-        logger.info("========== SYSTEM PROMPT ==========")
-        logger.info(processed_system_prompt)
-        
-        # Log the user query with context
-        logger.info("========== USER CONTENT ==========")
-        logger.info(processed_user_content)
-        
-        # Log the complete messages array for debugging
-        logger.info("========== MESSAGES ARRAY ==========")
+        # Log the conversation history
+        logger.info(f"Conversation history has {len(messages)} messages")
         for i, msg in enumerate(messages):
-            logger.info(f"Message {i+1} - Role: {msg['role']}")
-            logger.info(f"Content: {msg['content']}")
+            logger.info(f"Message {i} - Role: {msg['role']}")
+            if i < 3 or i >= len(messages) - 2:  # Log first 3 and last 2 messages
+                logger.info(f"Content: {msg['content'][:100]}...")
+        
         # Log the exact JSON payload sent to OpenAI
         import json
         payload = {
             "model": self.deployment_name,
-            "messages÷": messages,
+            "messages": messages,
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
             "top_p": self.top_p,
@@ -351,6 +355,7 @@ class FlaskRAGAssistant:
         }
         logger.info("========== OPENAI RAW PAYLOAD ==========")
         logger.info(json.dumps(payload, indent=2))
+        
         request = {
             # Arguments for self.openai_client.chat.completions.create
             'model': self.deployment_name,
@@ -366,6 +371,10 @@ class FlaskRAGAssistant:
         
         answer = resp.choices[0].message.content
         logger.info("DEBUG - OpenAI response content: %s", answer)
+        
+        # Add the assistant's response to conversation history
+        self.conversation_manager.add_assistant_message(answer)
+        
         return answer
 
     def _filter_cited(self, answer: str, src_map: Dict) -> List[Dict]:
@@ -477,7 +486,7 @@ class FlaskRAGAssistant:
             
     def stream_rag_response(self, query: str) -> Generator[Union[str, Dict], None, None]:
         """
-        Stream the RAG response generation.
+        Stream the RAG response generation with conversation history.
         
         Args:
             query: The user query
@@ -486,7 +495,7 @@ class FlaskRAGAssistant:
             Either string chunks of the answer or a dictionary with metadata
         """
         try:
-            logger.info(f"========== STARTING STREAM RAG RESPONSE ==========")
+            logger.info(f"========== STARTING STREAM RAG RESPONSE WITH HISTORY ==========")
             logger.info(f"Original query: {query}")
             
             kb_results = self.search_knowledge_base(query)
@@ -502,40 +511,30 @@ class FlaskRAGAssistant:
             context, src_map = self._prepare_context(kb_results)
             logger.info(f"Retrieved {len(kb_results)} results from knowledge base")
             
-            # Get system prompt from settings if available
-            system_prompt = self.DEFAULT_SYSTEM_PROMPT
-            
-            # Check if custom system prompt is available in settings
+            # Check if custom prompt is available in settings
             settings = self.settings
             custom_prompt = settings.get("custom_prompt", "")
-            system_prompt_override = settings.get("system_prompt", "")
-            system_prompt_mode = settings.get("system_prompt_mode", "Append")
             
             # Apply custom prompt to query if available
             if custom_prompt:
                 query = f"{custom_prompt}\n\n{query}"
                 logger.info(f"DEBUG - Applied custom prompt to query: {custom_prompt[:100]}...")
             
-            # Apply system prompt based on mode
-            if system_prompt_override:
-                if system_prompt_mode == "Override":
-                    system_prompt = system_prompt_override
-                    logger.info(f"OVERRIDE MODE ACTIVE - Using override prompt: {system_prompt[:100]}...")
-                else:  # Append
-                    # Prepend custom prompt to give it priority over default
-                    system_prompt = f"{system_prompt_override}\n\n{self.DEFAULT_SYSTEM_PROMPT}"
-                    logger.info(f"APPEND MODE ACTIVE - Prepended custom prompt: {system_prompt_override[:100]}...")
-            else:
-                logger.info("No system_prompt_override provided in settings")
-
-            # Prepare the actual content that will be sent
-            processed_system_prompt = system_prompt.strip()
-            processed_user_content = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
+            # Create a context message
+            context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
             
-            messages = [
-                {"role": "system", "content": processed_system_prompt},
-                {"role": "user", "content": processed_user_content}
-            ]
+            # Add the user message to conversation history
+            self.conversation_manager.add_user_message(context_message)
+            
+            # Get the complete conversation history
+            messages = self.conversation_manager.get_history()
+            
+            # Log the conversation history
+            logger.info(f"Conversation history has {len(messages)} messages")
+            for i, msg in enumerate(messages):
+                logger.info(f"Message {i} - Role: {msg['role']}")
+                if i < 3 or i >= len(messages) - 2:  # Log first 3 and last 2 messages
+                    logger.info(f"Content: {msg['content'][:100]}...")
             
             # Log detailed payload information
             logger.info("========== OPENAI API STREAM REQUEST DETAILS ==========")
@@ -545,20 +544,6 @@ class FlaskRAGAssistant:
             logger.info(f"Top P: {self.top_p}")
             logger.info(f"Presence penalty: {self.presence_penalty}")
             logger.info(f"Frequency penalty: {self.frequency_penalty}")
-            
-            # Log the complete system prompt
-            logger.info("========== SYSTEM PROMPT ==========")
-            logger.info(processed_system_prompt)
-            
-            # Log the user query with context
-            logger.info("========== USER CONTENT ==========")
-            logger.info(processed_user_content)
-            
-            # Log the complete messages array for debugging
-            logger.info("========== MESSAGES ARRAY ==========")
-            for i, msg in enumerate(messages):
-                logger.info(f"Message {i+1} - Role: {msg['role']}")
-                logger.info(f"Content: {msg['content']}")
             
             # Stream the response
             request = {
@@ -587,6 +572,9 @@ class FlaskRAGAssistant:
                     yield content
             
             logger.info("DEBUG - Collected answer: %s", collected_answer[:100])
+            
+            # Add the assistant's response to conversation history
+            self.conversation_manager.add_assistant_message(collected_answer)
             
             # Filter cited sources
             cited_raw = self._filter_cited(collected_answer, src_map)
@@ -651,3 +639,13 @@ class FlaskRAGAssistant:
                 "evaluation": {},
                 "error": str(exc)
             }
+            
+    def clear_conversation_history(self, preserve_system_message: bool = True) -> None:
+        """
+        Clear the conversation history.
+        
+        Args:
+            preserve_system_message: Whether to preserve the initial system message
+        """
+        self.conversation_manager.clear_history(preserve_system_message)
+        logger.info(f"Conversation history cleared (preserve_system_message={preserve_system_message})")
