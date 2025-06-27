@@ -227,15 +227,14 @@ HTML_TEMPLATE = """
       border-radius: 1rem;
     }
     .user-bubble {
-      background-color: #3b82f6;
-      color: white;
+      
       border-bottom-right-radius: 0.25rem;
       margin-left: 1rem;
       align-self: flex-end;
     }
     .bot-bubble {
-      background-color: #f3f4f6;
-      color: #1f2937;
+  
+   f3f4f6      color: white;
       border-bottom-left-radius: 0.25rem;
     }
     .avatar {
@@ -308,7 +307,7 @@ HTML_TEMPLATE = """
     }
   </style>
 </head>
-<body class="bg-white">
+<body class="bg-white dark:bg-black">
   <!-- Passcode Overlay -->
  <!--
  <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
@@ -329,23 +328,23 @@ HTML_TEMPLATE = """
   </div>  -->
   <div class="chat-container w-[60%] mx-auto">
     <!-- Header -->
-    <div class="bg-white border-b-2 border-gray-100 px-4 py-3 flex items-center justify-between">
+    <div class="bg-white dark:bg-black text-white border-b-2 border-gray-100 dark: border-white/30 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center">
-<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover md:h-4" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/5.png"">
+<img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover max-h-6" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/5.png"">
       </div>
       <div class=" inline-flex rounded-md shadow-xs ">
-        <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
+        <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white dark:bg-black text-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
           Chat
         </a>
-        <a href="#" id="toggle-settings-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
+        <a href="#" id="toggle-settings-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white dark:bg-black text-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
           Settings
         </a>
-        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
+        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white dark:bg-black text-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
           Analytics
         </a>
         <!-- Mode buttons will be dynamically added here by unifiedDevEval.js -->
         <div id="mode-buttons-container" class="ml-4 flex space-x-2" style="display:none;">
-          <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400" type="button">
+          <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white dark:bg-black text-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400" type="button">
            eVal Mode
           </button>
           <!-- Batch and Compare mode buttons will be added here -->
@@ -380,26 +379,25 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
             <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 dark:text-white/80 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">AI Agent</span></span>
           </div>
-          <div class="text-sm font-normal py-2 text-gray-900 dark:text-white">
+          <div class="text-sm font-normal py-2 text-gray-900 ">
             Hi there! I'm an AI assistant trained on your knowledge base. What would you like to know?
           </div>
-          <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
         </div>
       </div>
       <!-- Messages will be added here dynamically -->
     </div>
     
     <!-- Chat Input Area -->
-     <div class="chat-input">
-    <div class="relative rounded-3xl border border-gray-300 p-4 bg-white max-w-3xl mx-auto mt-10 shadow-md">
+     <div class="chat-input bg-white dark:bg-black text-gray-900 dark:text-white">
+    <div class="relative rounded-3xl border border-gray-300 p-4 bg-white dark:bg-black text-gray-900 dark:text-white max-w-3xl mx-auto mt-10 shadow-md">
   <!-- Dynamic textarea -->
   <textarea
     id="query-input"
     rows="1"
     placeholder="Type here..."
-    class="w-full resize-none overflow-hidden text-sm leading-relaxed outline-none bg-transparent"
+    class="w-full resize-none overflow-hidden text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 leading-relaxed outline-none bg-transparent"
     oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
     style="min-height: 34px;"
   ></textarea>
@@ -410,7 +408,7 @@ HTML_TEMPLATE = """
 </div>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
-      <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
+      <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white dark:bg-black text-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
         Console Logs
         <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4 text-gray-800" viewBox="0 0 20 20" fill="buttoncurrentColor">
           <path fill-rule="evenodd" d="M18 10c0 4.418-3.582 8-8 8-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8zm-9 4a1 1 0 112 0 1 1 0 01-2 0zm.75-7.001a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z" clip-rule="evenodd"/>
@@ -424,7 +422,7 @@ HTML_TEMPLATE = """
 
     <!-- Settings Drawer Backdrop & Panel -->
     <div id="settings-backdrop" class="fixed inset-0 bg-black/50 hidden z-40"></div>
-    <div id="settings-drawer" class="fixed inset-y-0 right-0 w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
+    <div id="settings-drawer" class="fixed inset-y-0 right-0 w-96 bg-white dark:bg-black text-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
       <div class="p-4 border-b flex items-center justify-between">
         <h2 class="text-lg font-semibold">Settings</h2>
         <button id="close-settings-btn" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded">&times;</button>
@@ -492,7 +490,7 @@ HTML_TEMPLATE = """
     </div>
     <!-- Console Drawer Backdrop & Panel -->
     <div id="console-backdrop" class="fixed inset-0 bg-black/50 hidden z-40"></div>
-    <div id="console-drawer" class="fixed inset-y-0 right-0 w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
+    <div id="console-drawer" class="fixed inset-y-0 right-0 w-80 bg-white dark:bg-black text-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
       <div class="p-4 border-b flex items-center justify-between">
         <h2 class="text-lg font-semibold">Console Logs</h2>
         <div class="flex items-center">
@@ -592,12 +590,11 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
           <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
             <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
-              <span class="text-xs font-semibold text-gray-900 dark:text-white "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 hover:underline">ME</span></span>
+              <span class="text-xs font-semibold text-gray-900 dark:text-white/80  "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">ME</span></span>
             </div>
-            <div class="text-sm font-normal py-2 text-white message-bubble user-bubble">
+            <div class="text-sm font-normal py-2 text-gray-900 message-bubble user-bubble">
                ${formatMessage(message)}
             </div>
-            <span class="text-xs font-normal text-gray-500 dark:text-gray-400">Delivered</span>
           </div>
         `;
       
@@ -621,12 +618,12 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 hover:underline"> AI Agent</span></span>
+            <span class="text-xs font-semibold text-gray-900 dark:text-white ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 dark:text-white/80 hover:underline"> AI Agent</span></span>
           </div>
-          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
+          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white/80 message-bubble bot-bubble">
              ${formatMessage(message)}
           </div>
-          <span class="text-xs font-normal text-gray-500 dark:text-gray-400 text-right pt-1">Was this helpful?</span>
+          <span class="text-xs font-normal text-gray-500 dark:text-white/60 text-right pt-33">Was this helpful?</span>
         </div>
       `;
       
