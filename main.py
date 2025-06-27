@@ -590,9 +590,9 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
           <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
             <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
-              <span class="text-xs font-semibold text-gray-900 dark:text-white/80  "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">ME</span></span>
+              <span class="text-xs font-semibold text-gray-900 dark:text-white/80"><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">ME</span></span>
             </div>
-            <div class="text-sm font-normal py-2 text-gray-900 message-bubble user-bubble">
+            <div class="text-sm font-normal py-2 text-gray-900 dark:text-white/80 message-bubble user-bubble">
                ${formatMessage(message)}
             </div>
           </div>
