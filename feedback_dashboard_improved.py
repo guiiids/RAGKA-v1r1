@@ -110,7 +110,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <p class="text-sm text-gray-500 mt-2">Displaying all feedback data from PostgreSQL database</p>
         </header>
         
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-black text-white shadow-md rounded-lg overflow-hidden">
             <div class="p-4 border-b border-gray-200 flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-700">All Feedback</h2>
@@ -145,7 +145,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="feedback-table-body">
+                    <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200" id="feedback-table-body">
                         __TABLE_ROWS__
                     </tbody>
                 </table>

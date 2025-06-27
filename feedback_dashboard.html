@@ -48,7 +48,7 @@
         <!-- Metrics Summary Section -->
         <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white dark:bg-black text-white p-6">
   <div>
     <p class="text-sm text-gray-500">Total Queries</p>
     <p class="text-2xl font-medium text-gray-900">28</p>
@@ -60,7 +60,7 @@
 </article>
 
 
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white dark:bg-black text-white p-6">
   <div>
     <p class="text-sm text-gray-500">Total Feedback Entries</p>
     <p class="text-2xl font-medium text-gray-900">34</p>
@@ -72,7 +72,7 @@
 </article>
 
 
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white dark:bg-black text-white p-6">
   <div>
     <p class="text-sm text-gray-500">Positive Feedback</p>
     <p class="text-2xl font-medium text-gray-900">11 (32.4%)</p>
@@ -84,7 +84,7 @@
 </article>
 
 
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white dark:bg-black text-white p-6">
   <div>
     <p class="text-sm text-gray-500">Avg. Tokens per Call</p>
     <p class="text-2xl font-medium text-gray-900">0.0</p>
@@ -98,16 +98,16 @@
         </div>
 
         <!-- Charts Section -->
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
+        <div class="my-8 bg-white dark:bg-black text-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold mb-4">Requests Per Hour (Last 6 Hours)</h2>
           <canvas id="requestsPerHourChart" class="w-full h-64"></canvas>
         </div>
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
+        <div class="my-8 bg-white dark:bg-black text-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold mb-4">Word Cloud of Queries and Tags</h2>
           <canvas id="wordCloudCanvas" width="600" height="400"></canvas>
         </div>
         
-        <div class="relative isolate overflow-hidden bg-white py-24 sm:py-32">
+        <div class="relative isolate overflow-hidden bg-white dark:bg-black text-white py-24 sm:py-32">
           <!-- Decorative background gradient element -->
           <div class="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56" aria-hidden="true">
             <div class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)"></div>
@@ -144,7 +144,7 @@
           </div>
         </div>
   
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-black text-white shadow-md rounded-lg overflow-hidden">
             <div class="p-4 border-b border-gray-200">
                 <div class="flex justify-between items-center mb-4">
                     <div>
@@ -169,7 +169,7 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="feedback-table-body">
+                    <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200" id="feedback-table-body">
                         
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-23 12:41:19</td>

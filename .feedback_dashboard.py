@@ -7,7 +7,7 @@ from db_manager import DatabaseManager
 def make_filter_bar(sel):
     return f"""
     <div class="max-w-5xl min-w-[800px] mx-auto flex justify-end mb-4">
-      <select class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+      <select class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white dark:bg-black text-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
         <option {"selected" if sel=="All Votes" else ""}>All Votes</option>
         <option {"selected" if sel=="Positive Votes" else ""}>Positive Votes</option>
         <option {"selected" if sel=="Negative Votes" else ""}>Negative Votes</option>
@@ -21,11 +21,11 @@ def make_pager(page, total):
     next_disabled = page >= total
     return f"""
     <div class="max-w-5xl min-w-[800px] mx-auto flex items-center justify-center space-x-6 my-8">
-      <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {'opacity-50 cursor-not-allowed' if prev_disabled else 'hover:bg-gray-100'}" {'disabled' if prev_disabled else ''}>
+      <button class="px-4 py-2 bg-white dark:bg-black text-white border border-gray-300 rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {'opacity-50 cursor-not-allowed' if prev_disabled else 'hover:bg-gray-100'}" {'disabled' if prev_disabled else ''}>
         ← Previous
       </button>
       <span class="text-sm font-medium text-gray-700">Page {page} of {total}</span>
-      <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {'opacity-50 cursor-not-allowed' if next_disabled else 'hover:bg-gray-100'}" {'disabled' if next_disabled else ''}>
+      <button class="px-4 py-2 bg-white dark:bg-black text-white border border-gray-300 rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 {'opacity-50 cursor-not-allowed' if next_disabled else 'hover:bg-gray-100'}" {'disabled' if next_disabled else ''}>
         Next →
       </button>
     </div>
@@ -56,7 +56,7 @@ def make_table(rows):
           </td>
           <td class="px-4 py-3">{item['timestamp']}</td>
           <td class="px-4 py-3">
-            <button class="px-3 py-1.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+            <button class="px-3 py-1.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white dark:bg-black text-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
               Details
             </button>
           </td>
@@ -77,7 +77,7 @@ def make_table(rows):
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200">
           {cells}
         </tbody>
       </table>
@@ -87,7 +87,7 @@ def make_table(rows):
 
 def make_card(title, value, extra=""):
     return f"""
-    <div class="px-6 py-6 bg-white shadow-lg rounded-xl text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+    <div class="px-6 py-6 bg-white dark:bg-black text-white shadow-lg rounded-xl text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
       <dt class="text-sm font-medium text-gray-500 truncate">{title}</dt>
       <dd class="mt-2 text-3xl font-bold text-gray-900">{value}</dd>
       {f'<dd class="mt-2 text-sm font-medium text-gray-500">{extra}</dd>' if extra else ""}
@@ -206,7 +206,7 @@ def display_feedback_table(feedback_data):
           <td class="px-4 py-3">{'; '.join(item['feedback_tags'])[:30]}{"…" if len(item['feedback_tags'])>3 else ""}</td>
           <td class="px-4 py-3">{item['timestamp']}</td>
           <td class="px-4 py-3">
-            <button class="px-3 py-1.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+            <button class="px-3 py-1.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white dark:bg-black text-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
               Details
             </button>
           </td>
@@ -227,7 +227,7 @@ def display_feedback_table(feedback_data):
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200">
           {rows}
         </tbody>
       </table>

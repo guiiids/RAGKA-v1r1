@@ -46,12 +46,12 @@
                         title="Not helpful"></i>
                     </div>
                     <div class="feedback-details" style="display: none; margin-top: 5px; text-align: left; width: 250px;">
-                        <fieldset style="border:1px solid #ddd; padding:8px; border-radius:4px; margin-bottom:8px;">
+                        <fieldset class="dark:text-white/60;" style="border:1px solid #ddd; padding:8px; border-radius:4px; margin-bottom:8px;">
                             <legend style="font-size:12px; margin-bottom:4px;">Select issues:</legend>
                             <div class="reasons-container">${reasonsHTML}</div>
                         </fieldset>
                         <div class="comment-container" style="display:none; margin-bottom:8px;">
-                            <textarea class="feedback-comment"
+                            <textarea class="feedback-comment dark:bg-black text-white"
                                     placeholder="Additional comments..."
                                     style="width:100%; box-sizing: border-box; height:60px; padding:4px; font-size:12px;border:1px solid #ddd;"></textarea>
                         </div>
@@ -157,7 +157,7 @@
         
         function showFeedbackConfirmation(messageId, msg) {
             const container = document.querySelector(`[data-message-id="${messageId}"]`);
-            container.innerHTML = `<span style="color:#22c55e; font-size:12px;font-weight:bold;">${msg}</span>`;
+            container.innerHTML = `<span style="color:#626362; font-size:12px;font-weight:bold;">${msg}</span>`;
         }
         
         function getCitations(messageId) {

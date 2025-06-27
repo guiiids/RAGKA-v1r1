@@ -294,7 +294,7 @@ function setupExportButton() {
             
             // Create dropdown menu for export options
             const dropdown = document.createElement('div');
-            dropdown.className = 'absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 export-dropdown';
+            dropdown.className = 'absolute right-0 mt-2 w-48 bg-white dark:bg-black text-white rounded-md shadow-lg py-1 z-10 export-dropdown';
             dropdown.innerHTML = `
                 <a href="${exportUrlBase}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-file-code mr-2"></i>Export as JSON
@@ -341,7 +341,7 @@ function showExportLoadingState() {
     const loadingOverlay = document.createElement('div');
     loadingOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 export-loading-overlay';
     loadingOverlay.innerHTML = `
-        <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+        <div class="bg-white dark:bg-black text-white p-6 rounded-lg shadow-xl flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
             <p class="text-lg font-semibold">Preparing Export...</p>
             <p class="text-sm text-gray-500 mt-2">This may take a moment for large datasets.</p>

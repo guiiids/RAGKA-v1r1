@@ -27,7 +27,7 @@ function showLoadingState() {
     // Add loading overlay to each card
     document.querySelectorAll('.dashboard-card').forEach(card => {
         const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center loading-overlay';
+        loadingOverlay.className = 'absolute inset-0 bg-white dark:bg-black text-white bg-opacity-75 flex items-center justify-center loading-overlay';
         loadingOverlay.innerHTML = `
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         `;
@@ -39,7 +39,7 @@ function showLoadingState() {
     const tableContainer = document.querySelector('.data-table');
     if (tableContainer) {
         const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center loading-overlay';
+        loadingOverlay.className = 'absolute inset-0 bg-white dark:bg-black text-white bg-opacity-75 flex items-center justify-center loading-overlay';
         loadingOverlay.innerHTML = `
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         `;
@@ -528,7 +528,7 @@ function populateRecentInteractions(interactions) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.tokens}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${interaction.timestamp}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <button class="px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <button class="px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white dark:bg-black text-white hover:bg-gray-50">
                     View
                 </button>
             </td>
@@ -567,7 +567,7 @@ function setupExportButton() {
             
             // Create dropdown menu for export options
             const dropdown = document.createElement('div');
-            dropdown.className = 'absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10';
+            dropdown.className = 'absolute right-0 mt-2 w-48 bg-white dark:bg-black text-white rounded-md shadow-lg py-1 z-10';
             dropdown.innerHTML = `
                 <a href="${exportUrl}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as JSON</a>
                 <a href="${exportUrl.replace('/export', '/export/csv')}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as CSV</a>

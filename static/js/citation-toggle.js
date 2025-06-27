@@ -21,7 +21,7 @@
     
     const toggleButton = document.createElement('button');
     toggleButton.id = 'toggle-dynamic-citations';
-    toggleButton.className = 'mode-button px-4 py-2 text-xs font-medium text-black bg-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400';
+    toggleButton.className = 'mode-button px-4 py-2 text-xs font-medium text-black bg-white dark:bg-black text-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400';
     toggleButton.textContent = `Dynamic Citations: ${useDynamicCitations ? 'On' : 'Off'}`;
     
     modeButtonsContainer.appendChild(toggleButton);

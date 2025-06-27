@@ -210,14 +210,14 @@ HTML_TEMPLATE = """
         <span class="ml-2 text-sm font-semibold text-blue-700">With Conversation History</span>
       </div>
       <div class="inline-flex rounded-md shadow-xs">
-        <button id="clear-history-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
+        <button id="clear-history-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white  border border-gray-200 rounded hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
           Clear History
         </button>
-        <a href="#" id="toggle-settings-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
+        <a href="#" id="toggle-settings-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white  border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 hidden">
           Settings
         </a>
         <div id="mode-buttons-container" class="ml-4 flex space-x-2" style="display:none;">
-          <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400" type="button">
+          <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white  border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:underline focus:ring-red-400" type="button">
            eVal Mode
           </button>
         </div>
@@ -247,9 +247,9 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
           </div>
-          <div class="text-sm font-normal py-2 text-gray-900 dark:text-white">
+          <div class="text-sm font-normal py-2 text-gray-900 ">
             Hi there! I'm an AI assistant trained on your knowledge base. I can remember our conversation history. What would you like to know?
           </div>
           <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
@@ -260,7 +260,7 @@ HTML_TEMPLATE = """
     
     <!-- Chat Input Area -->
     <div class="chat-input">
-      <div class="relative rounded-3xl border border-gray-300 p-4 bg-white max-w-3xl mx-auto mt-10 shadow-md">
+      <div class="relative rounded-3xl border border-gray-300 p-4 bg-white  max-w-3xl mx-auto mt-10 shadow-md">
         <textarea
           id="query-input"
           rows="1"
@@ -339,7 +339,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
         <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 hover:underline">ME</span></span>
+            <span class="text-xs font-semibold text-gray-900  "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 hover:underline">ME</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-white message-bubble user-bubble">
              ${formatMessage(message)}
@@ -368,9 +368,9 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 hover:underline"> AI Agent</span></span>
+            <span class="text-xs font-semibold text-gray-900 ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 hover:underline"> AI Agent</span></span>
           </div>
-          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white message-bubble bot-bubble">
+          <div class="text-sm leading-6 font-normal py-2 text-gray-900  message-bubble bot-bubble">
              ${formatMessage(message)}
           </div>
           <span class="text-xs font-normal text-gray-500 dark:text-gray-400 text-right pt-1">Was this helpful?</span>
@@ -569,10 +569,75 @@ HTML_TEMPLATE = """
     window.escapeHtml = escapeHtml;
     window.formatMessage = formatMessage;
     window.addSourcesUtilizedSection = addSourcesUtilizedSection;
+  // Old DOMContentLoaded listener for sources panel removed.
   </script>
-  <script src="/static/js/dynamic-container.js"></script>
-  <script src="/static/js/citation-toggle.js"></script>
-</body>
+
+  <!-- Load the unified developer evaluation module -->
+  
+<!-- <script src="/static/js/unifiedEval.js"></script> -->
+<script src="/static/js/custom.js"></script> <!-- This file is empty/deprecated -->
+<script src="/static/js/debug-logger.js"></script>
+<script>
+  window.APP_CONFIG = { sasToken: "{{ sas_token }}" };
+</script>
+<script src="/static/js/url-decoder.js"></script> <!-- URL decoder for source document links -->
+<script src="/static/js/dynamic-container.js"></script>
+<!-- <script src="/static/js/citation-toggle.js"></script> --> <!-- Removed -->
+<script src="/static/js/feedback-integration.js"></script>
+<script src="/static/js/feedback_thumbs.js"></script>
+<!-- Placeholder citation click handler and its listener removed -->
+
+<!-- <script>
+
+(function() {
+  const overlay = document.getElementById('passcode-overlay');
+  const passcodeInput = document.getElementById('passcode-input');
+  const accessBtn = document.getElementById('access-btn');
+  
+  // Check if already authenticated
+  if (localStorage.getItem('stagingAuth') === 'true') {
+    overlay.classList.add('hidden');
+  }
+  
+  // Simple hash function for basic obfuscation
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash;
+  }
+  
+  // The passcode hash (can be changed to any value)
+  const correctPasscodeHash = -1633765023; // This would be the hash of your actual passcode "rosebud"
+  
+
+  // Validate passcode
+  function validatePasscode() {
+    const enteredPasscode = passcodeInput.value.trim();
+    if (simpleHash(enteredPasscode) === correctPasscodeHash || enteredPasscode === "rosebud") {
+      overlay.classList.add('hidden');
+      localStorage.setItem('stagingAuth', 'true');
+    } else {
+      passcodeInput.classList.add('border-red-500');
+      setTimeout(() => {
+        passcodeInput.classList.remove('border-red-500');
+      }, 1000);
+    }
+  }
+  
+  // Event listeners
+  accessBtn.addEventListener('click', validatePasscode);
+  passcodeInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      validatePasscode();
+    }
+  });
+})();
+</script> -->
+  </body>
 </html>
 """
 

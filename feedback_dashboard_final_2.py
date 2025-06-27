@@ -98,16 +98,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
 
         <!-- Charts Section -->
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
+        <div class="my-8 bg-white dark:bg-black text-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold mb-4">Requests Per Hour (Last 6 Hours)</h2>
           <canvas id="requestsPerHourChart" class="w-full h-64"></canvas>
         </div>
-        <div class="my-8 bg-white p-6 rounded-lg shadow-md">
+        <div class="my-8 bg-white dark:bg-black text-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold mb-4">Word Cloud of Queries and Tags</h2>
           <canvas id="wordCloudCanvas" width="600" height="400"></canvas>
         </div>
         
-        <div class="relative isolate overflow-hidden bg-white py-24 sm:py-32">
+        <div class="relative isolate overflow-hidden bg-white dark:bg-black text-white py-24 sm:py-32">
           <!-- Decorative background gradient element -->
           <div class="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56" aria-hidden="true">
             <div class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)"></div>
@@ -144,7 +144,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </div>
         </div>
   
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-black text-white shadow-md rounded-lg overflow-hidden">
             <div class="p-4 border-b border-gray-200">
                 <div class="flex justify-between items-center mb-4">
                     <div>
@@ -169,7 +169,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="feedback-table-body">
+                    <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200" id="feedback-table-body">
                         __TABLE_ROWS__
                     </tbody>
                 </table>
@@ -316,7 +316,7 @@ def generate_metrics_summary_html(metrics):
     """Generate the HTML for the metrics summary section."""
     def metric_block(label, value, badge_color, badge_icon_svg, badge_text=""):
         return f'''
-<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+<article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white dark:bg-black text-white p-6">
   <div>
     <p class="text-sm text-gray-500">{label}</p>
     <p class="text-2xl font-medium text-gray-900">{value}</p>

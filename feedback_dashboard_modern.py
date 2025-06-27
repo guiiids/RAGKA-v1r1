@@ -457,7 +457,7 @@ def generate_metrics_summary_html(metrics):
     <!-- Main metrics row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Total Queries Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-blue-500 rounded-md p-3 text-white">
@@ -477,7 +477,7 @@ def generate_metrics_summary_html(metrics):
         </div>
         
         <!-- Total Feedback Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3 text-white">
@@ -497,7 +497,7 @@ def generate_metrics_summary_html(metrics):
         </div>
         
         <!-- Positive Feedback Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-green-500 rounded-md p-3 text-white">
@@ -517,7 +517,7 @@ def generate_metrics_summary_html(metrics):
         </div>
         
         <!-- Avg Tokens Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-purple-500 rounded-md p-3 text-white">
@@ -540,7 +540,7 @@ def generate_metrics_summary_html(metrics):
     <!-- Additional metrics row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <!-- Response Time Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-amber-500 rounded-md p-3 text-white">
@@ -567,7 +567,7 @@ def generate_metrics_summary_html(metrics):
         </div>
         
         <!-- Query Complexity Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+        <div class="bg-white dark:bg-black text-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
             <div class="p-5 flex-grow">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-teal-500 rounded-md p-3 text-white">
@@ -730,13 +730,13 @@ def generate_dashboard_html(feedback_data, metrics):
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
+            <div class="bg-white dark:bg-black text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800">Requests Per Hour (Last 6 Hours)</h2>
                 <div style="height: 300px; max-height: 300px;">
                     <canvas id="requestsPerHourChart" class="w-full h-full"></canvas>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
+            <div class="bg-white dark:bg-black text-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all fade-in">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800">Word Cloud of Queries and Tags</h2>
                 <div style="height: 300px; max-height: 300px;">
                     <canvas id="wordCloudCanvas" class="w-full h-full"></canvas>
@@ -745,7 +745,7 @@ def generate_dashboard_html(feedback_data, metrics):
         </div>
         
         <!-- Analytics Overview Section -->
-        <div class="relative isolate overflow-hidden bg-white rounded-xl shadow-md mb-8 fade-in">
+        <div class="relative isolate overflow-hidden bg-white dark:bg-black text-white rounded-xl shadow-md mb-8 fade-in">
             <!-- Decorative background gradient element -->
             <div class="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56" aria-hidden="true">
                 <div class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30" style="clip-path: polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)"></div>
@@ -783,7 +783,7 @@ def generate_dashboard_html(feedback_data, metrics):
         </div>
   
         <!-- Feedback Data Table Section -->
-        <div class="bg-white shadow-md rounded-xl overflow-hidden mb-8 fade-in">
+        <div class="bg-white dark:bg-black text-white shadow-md rounded-xl overflow-hidden mb-8 fade-in">
             <div class="p-6 border-b border-gray-200">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
@@ -815,7 +815,7 @@ def generate_dashboard_html(feedback_data, metrics):
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="feedback-table-body">
+                    <tbody class="bg-white dark:bg-black text-white dark:bg-black divide-y divide-gray-200" id="feedback-table-body">
                         {table_rows}
                     </tbody>
                 </table>

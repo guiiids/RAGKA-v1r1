@@ -515,7 +515,7 @@ const DevEvalChat = {
               
               // Add styled markdown to console
               const mdContainer = document.createElement('div');
-              mdContainer.className = 'p-4 bg-white rounded shadow';
+              mdContainer.className = 'p-4 bg-white dark:bg-black text-white rounded shadow';
               mdContainer.style.fontFamily = 'monospace';
               mdContainer.style.whiteSpace = 'pre-wrap';
               mdContainer.style.fontSize = '14px';

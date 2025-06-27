@@ -834,7 +834,7 @@
                       
                       const logsContainer = window.logsContainer || document.getElementById('console-logs-content');
                       if (logsContainer && result.markdown_report) {
-                        logsContainer.innerHTML = `<div class="p-4 bg-white rounded shadow" style="font-family: monospace; white-space: pre-wrap; font-size: 14px; line-height: 1.5;">${result.markdown_report}</div>`;
+                        logsContainer.innerHTML = `<div class="p-4 bg-white dark:bg-black text-white rounded shadow" style="font-family: monospace; white-space: pre-wrap; font-size: 14px; line-height: 1.5;">${result.markdown_report}</div>`;
                       }
                     });
                   }
@@ -937,7 +937,7 @@
         if (!compareModeBtn) {
           compareModeBtn = document.createElement('button');
           compareModeBtn.id = 'toggle-compare-mode-btn';
-          compareModeBtn.className = 'mode-button ml-2 px-4 py-2 text-xs font-medium text-black underline border bg-white rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-teal-500';
+          compareModeBtn.className = 'mode-button ml-2 px-4 py-2 text-xs font-medium text-black underline border bg-white dark:bg-black text-white rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-teal-500';
           compareModeBtn.textContent = 'sMash Mode';
           compareModeBtn.setAttribute('data-created-by', 'unified-dev-eval');
           modeButtonsContainer.appendChild(compareModeBtn);
