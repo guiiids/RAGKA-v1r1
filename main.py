@@ -15,7 +15,7 @@ sas_token = os.getenv("SAS_TOKEN", "")
 
 
 # Import directly from the current directory
-from rag_assistant_gpt import FlaskRAGAssistantGPT
+from rag_assistant import FlaskRAGAssistantGPT
 from db_manager import DatabaseManager
 from openai import AzureOpenAI
 from config import get_cost_rates
@@ -336,8 +336,18 @@ HTML_TEMPLATE = """
       align-self: flex-end;
     }
     .bot-bubble {
-  
-   f3f4f6      color: white;
+      background-color: #fffff;
+      color: black;
+    }
+    .bot-bubble ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+    }
+    .bot-bubble a {
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
       border-bottom-left-radius: 0.25rem;
     }
     .avatar {

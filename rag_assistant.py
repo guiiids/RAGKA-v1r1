@@ -1,5 +1,5 @@
 """
-Flask-compatible version of the RAG assistant without Streamlit dependencies
+Flask-compatible version of the RAG assistant with in-memory conversation history
 """
 import logging
 from typing import List, Dict, Tuple, Optional, Any, Generator, Union
@@ -14,7 +14,8 @@ import os
 import re
 from openai_logger import log_openai_call
 from db_manager import DatabaseManager
-from conversation_manager import ConversationManager
+from conversation_manager_copy import ConversationManager
+from openai_service import OpenAIService
 
 # Import config but handle the case where it might import streamlit
 try:
@@ -55,7 +56,6 @@ class FactCheckerStub:
         return {}
 
 
-
 def format_context_text(text: str) -> str:
     # Add line breaks after long sentences
     sentences = re.split(r'(?<=[.!?])\s+', text.strip())
@@ -66,59 +66,74 @@ def format_context_text(text: str) -> str:
     
     return formatted
 
-class FlaskRAGAssistant:
-    """Retrieval-Augmented Generation assistant for Azure OpenAI + Search."""
+class FlaskRAGAssistantGPT:
+    """Retrieval-Augmented Generation assistant with in-memory conversation history."""
 
     # Default system prompt
     DEFAULT_SYSTEM_PROMPT = """
-    ### Task:
+   ### Task
 
-    Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id="1">).
-    
-    ### Guidelines:
+Respond to the user's query using only the provided context. Your primary goal is to provide accurate, helpful answers that are strictly based on the supplied source documents. Use only Markdown for formatting. Provide inline citations in the format [id] when the <source> tag includes an id attribute (e.g., <source id="1">).
 
-    - If you don't know the answer, clearly state that.
-    - If uncertain, ask the user for clarification.
-    - Respond in the same language as the user's query.
-    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
-    - If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
-    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**
-    - Do not cite if the <source> tag does not contain an id attribute.
-    - Do not use XML tags in your response.
-    - Ensure citations are concise and directly related to the information provided.
-    
-    ### Example of Citation:
+### Understanding the Query
+- Before answering, briefly rephrase the user's query to confirm your understanding. Strive for a natural and conversational tone.
+- If the query is ambiguous because it could apply to multiple systems or topics in the context (e.g., "how to add a user" when methods for multiple systems are present), your **only action** must be to ask the user for clarification.
+- **Do not, under any circumstances, list all possible answers or summarize the different options.** Your sole purpose at this step is to resolve the ambiguity.
+- **Example Clarification:** If the query is "how to add user" and context exists for OpenLAB and Linux, you must respond with something like: "I can help with that. To which system are you trying to add a user? Please specify either 'OpenLAB' or 'Red Hat Enterprise Linux'."
+- Respond in the same language as the user's query.
 
-    If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:
+### Use of Sources and Citations
+- Your answer must be **directly and entirely supported** by the provided context.
+- You should **synthesize information** from the context to form a coherent and direct answer to the user's question. **Do not use verbatim extracts** unless the source text is already a perfect, concise answer (e.g., a specific error message).
+- After providing a piece of information, cite the source(s) it came from (e.g., [1] or [1][2]).
+- For each answer, mention the **document title and relevant section** where the information was found to ensure transparency.
 
-    * "According to the study, the proposed method increases efficiency by 20% [1]."
-    
-    ### Output:
+### Providing Further Information
+- You may suggest further reading from the Knowledge Base if:
+    a) it is highly relevant to the user's question,
+    b) the URL provided in the context is valid,
+    c) it is not a duplicate of a document you have already cited as a primary source.
+- Hyperlink the resource title using Markdown format: `**[Resource Title](URL)**`.
 
-    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context.
-    
-    <context>
+### Answer Format and Style
+- Be concise, focused, and helpful. Your tone should be professional and clear.
+- For instructional or troubleshooting queries, **create clear, step-by-step instructions** based on the information in the context.
+- If the answer is not available in the provided context, you must state this clearly. **Do not use external knowledge or make assumptions.** Your response should be: "I could not find an answer to your question in the provided knowledge base."
+- If the provided context is unreadable or appears incomplete, inform the user of this limitation and provide the best possible answer based on the available information.
+- Reference earlier parts of the conversation if it is necessary for providing a clear and continuous experience.
 
-    {{CONTEXT}}
-    </context>
-    
-    <user_query>
+### Output Structure
 
-    {{QUERY}}
-    </user_query>
+<context>
+{{CONTEXT}}
+</context>
+
+<user_query>
+{{QUERY}}
+</user_query>
     """
 
     # ───────────────────────── setup ─────────────────────────
     def __init__(self, settings=None) -> None:
         self._init_cfg()
+        
+        # Initialize the OpenAI service
+        self.openai_service = OpenAIService(
+            azure_endpoint=self.openai_endpoint,
+            api_key=self.openai_key,
+            api_version=self.openai_api_version or "2023-05-15",
+            deployment_name=self.deployment_name
+        )
+        
+        # Initialize the conversation manager with the system prompt
+        self.conversation_manager = ConversationManager(self.DEFAULT_SYSTEM_PROMPT)
+        
+        # For backward compatibility
         self.openai_client = AzureOpenAI(
             azure_endpoint=self.openai_endpoint,
             api_key=self.openai_key,
             api_version=self.openai_api_version or "2023-05-15",
         )
-        
-        # Initialize the conversation manager with the system prompt
-        self.conversation_manager = ConversationManager(self.DEFAULT_SYSTEM_PROMPT)
         
         self.fact_checker = FactCheckerStub()
         
@@ -129,11 +144,17 @@ class FlaskRAGAssistant:
         self.presence_penalty = 0.6
         self.frequency_penalty = 0.6
         
+        # Conversation history window size (in turns)
+        self.max_history_turns = 5
+        
+        # Flag to track if history was trimmed in the most recent request
+        self._history_trimmed = False
+        
         # Load settings if provided
         self.settings = settings or {}
         self._load_settings()
         
-        logger.info("FlaskRAGAssistant initialized with conversation history")
+        logger.info("FlaskRAGAssistantGPT initialized with conversation history")
 
     def _init_cfg(self) -> None:
         self.openai_endpoint      = OPENAI_ENDPOINT
@@ -153,6 +174,9 @@ class FlaskRAGAssistant:
         # Update model parameters
         if "model" in settings:
             self.deployment_name = settings["model"]
+            # Update the OpenAI service deployment name
+            self.openai_service.deployment_name = self.deployment_name
+            
         if "temperature" in settings:
             self.temperature = settings["temperature"]
         if "top_p" in settings:
@@ -163,6 +187,11 @@ class FlaskRAGAssistant:
         # Update search configuration
         if "search_index" in settings:
             self.search_index = settings["search_index"]
+            
+        # Update conversation history window size
+        if "max_history_turns" in settings:
+            self.max_history_turns = settings["max_history_turns"]
+            logger.info(f"Setting max_history_turns to {self.max_history_turns}")
             
         # Update system prompt if provided
         if "system_prompt" in settings:
@@ -265,6 +294,41 @@ class FlaskRAGAssistant:
             return []
 
     # ───────── context & citations ────────
+    def _trim_history(self, messages: List[Dict]) -> Tuple[List[Dict], bool]:
+        """
+        Trim conversation history to the last N turns while preserving the system message.
+        
+        Args:
+            messages: List of message dictionaries
+            
+        Returns:
+            Tuple of (trimmed_messages, was_trimmed)
+        """
+        logger.info(
+        f"TRIM_DEBUG: Called with {len(messages)} messages. Cap is {self.max_history_turns*2+1}"
+    )   
+        dropped = False
+        if len(messages) > self.max_history_turns*2+1:  # +1 for system message
+            dropped = True
+            # Log before trimming
+            logger.info(f"History size ({len(messages)}) exceeds limit ({self.max_history_turns*2+1}), trimming...")
+            logger.info(f"Before trimming: {len(messages)} messages")
+            
+            # Keep system message + last N pairs
+            messages = [messages[0]] + messages[-self.max_history_turns*2:]
+            
+            # Log after trimming
+            logger.info(f"After trimming: {len(messages)} messages")
+            logger.info(f"Trimmed conversation history to last {self.max_history_turns} turns")
+            
+            # Store trimming status for API to access
+            self._history_trimmed = True
+        else:
+            self._history_trimmed = False
+            logger.info(f"No trimming needed. History size: {len(messages)}, limit: {self.max_history_turns*2+1}")
+            
+        return messages, dropped
+        
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
         logger.info(f"Preparing context from {len(results)} search results")
         entries, src_map = [], {}
@@ -303,8 +367,7 @@ class FlaskRAGAssistant:
         logger.info(f"Prepared context with {valid_chunks} valid chunks and {len(src_map)} sources")
         return context_str, src_map
 
-
-    def _chat_answer(self, query: str, context: str, src_map: Dict) -> str:
+    def _chat_answer_with_history(self, query: str, context: str, src_map: Dict) -> str:
         """Generate a response using the conversation history"""
         logger.info("Generating response with conversation history")
         
@@ -315,35 +378,32 @@ class FlaskRAGAssistant:
         # Apply custom prompt to query if available
         if custom_prompt:
             query = f"{custom_prompt}\n\n{query}"
-            logger.info(f"DEBUG - Applied custom prompt to query: {custom_prompt[:100]}...")
+            logger.info(f"Applied custom prompt to query: {custom_prompt[:100]}...")
         
         # Create a context message
-        self.conversation_manager.add_user_message(query)
         context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
         
-        # Add the user message to conversation history
+        # Add the user message to conversation history (only once)
+        logger.info(f"Adding user message to conversation history")
         self.conversation_manager.add_user_message(context_message)
         
         # Get the complete conversation history
-        messages = self.conversation_manager.get_history()
+        raw_messages = self.conversation_manager.get_history()
         
-        # Log detailed payload information
-        logger.info("========== OPENAI API REQUEST DETAILS ==========")
-        logger.info(f"Model deployment: {self.deployment_name}")
-        logger.info(f"Temperature: {self.temperature}")
-        logger.info(f"Max tokens: {self.max_tokens}")
-        logger.info(f"Top P: {self.top_p}")
-        logger.info(f"Presence penalty: {self.presence_penalty}")
-        logger.info(f"Frequency penalty: {self.frequency_penalty}")
+        # Trim history if needed
+        messages, trimmed = self._trim_history(raw_messages)
+        if trimmed:
+            # Add a system notification at the end of history
+            messages.append({"role": "system", "content": f"[History trimmed to last {self.max_history_turns} turns]"})
         
         # Log the conversation history
-        logger.info(f"Conversation history has {len(messages)} messages")
+        logger.info(f"Conversation history has {len(messages)} messages (trimmed: {trimmed})")
         for i, msg in enumerate(messages):
             logger.info(f"Message {i} - Role: {msg['role']}")
             if i < 3 or i >= len(messages) - 2:  # Log first 3 and last 2 messages
                 logger.info(f"Content: {msg['content'][:100]}...")
         
-        # Log the exact JSON payload sent to OpenAI
+        # Get response from OpenAI service
         import json
         payload = {
             "model": self.deployment_name,
@@ -352,31 +412,21 @@ class FlaskRAGAssistant:
             "temperature": self.temperature,
             "top_p": self.top_p,
             "presence_penalty": self.presence_penalty,
-            "frequency_penalty": self.frequency_penalty,
+            "frequency_penalty": self.frequency_penalty
         }
         logger.info("========== OPENAI RAW PAYLOAD ==========")
         logger.info(json.dumps(payload, indent=2))
-        
-        request = {
-            # Arguments for self.openai_client.chat.completions.create
-            'model': self.deployment_name,
-            'messages': messages,
-            'max_tokens': self.max_tokens,
-            'temperature': self.temperature,
-            'top_p': self.top_p,
-            'presence_penalty': self.presence_penalty,
-            'frequency_penalty': self.frequency_penalty
-        }
-        resp = self.openai_client.chat.completions.create(**request)
-        log_openai_call(request, resp)
-        
-        answer = resp.choices[0].message.content
-        logger.info("DEBUG - OpenAI response content: %s", answer)
+        response = self.openai_service.get_chat_response(
+            messages=messages,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
+            top_p=self.top_p
+        )
         
         # Add the assistant's response to conversation history
-        self.conversation_manager.add_assistant_message(answer)
+        self.conversation_manager.add_assistant_message(response)
         
-        return answer
+        return response
 
     def _filter_cited(self, answer: str, src_map: Dict) -> List[Dict]:
         logger.info("Filtering cited sources from answer")
@@ -410,6 +460,11 @@ class FlaskRAGAssistant:
         self, query: str
     ) -> Tuple[str, List[Dict], List[Dict], Dict[str, Any], str]:
         """
+        Generate a response using RAG with conversation history.
+        
+        Args:
+            query: The user query
+            
         Returns:
             answer, cited_sources, [], evaluation, context
         """
@@ -425,12 +480,14 @@ class FlaskRAGAssistant:
                 )
 
             context, src_map = self._prepare_context(kb_results)
-            answer = self._chat_answer(query, context, src_map)
+            
+            # Use the conversation history to generate the answer
+            answer = self._chat_answer_with_history(query, context, src_map)
 
-            # collect only the sources actually cited
+            # Collect only the sources actually cited
             cited_raw = self._filter_cited(answer, src_map)
 
-            # renumber in cited order: 1, 2, 3…
+            # Renumber in cited order: 1, 2, 3…
             renumber_map = {}
             cited_sources = []
             for new_id, src in enumerate(cited_raw, 1):
@@ -519,7 +576,7 @@ class FlaskRAGAssistant:
             # Apply custom prompt to query if available
             if custom_prompt:
                 query = f"{custom_prompt}\n\n{query}"
-                logger.info(f"DEBUG - Applied custom prompt to query: {custom_prompt[:100]}...")
+                logger.info(f"Applied custom prompt to query: {custom_prompt[:100]}...")
             
             # Create a context message
             context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
@@ -528,25 +585,26 @@ class FlaskRAGAssistant:
             self.conversation_manager.add_user_message(context_message)
             
             # Get the complete conversation history
-            messages = self.conversation_manager.get_history()
+            raw_messages = self.conversation_manager.get_history()
+            
+            # Trim history if needed
+            messages, trimmed = self._trim_history(raw_messages)
+            if trimmed:
+                # Yield a notification about trimming
+                yield {"trimmed": True, "dropped": len(raw_messages) - len(messages)}
             
             # Log the conversation history
-            logger.info(f"Conversation history has {len(messages)} messages")
+            logger.info(f"Conversation history has {len(messages)} messages (trimmed: {trimmed})")
             for i, msg in enumerate(messages):
                 logger.info(f"Message {i} - Role: {msg['role']}")
                 if i < 3 or i >= len(messages) - 2:  # Log first 3 and last 2 messages
                     logger.info(f"Content: {msg['content'][:100]}...")
             
-            # Log detailed payload information
-            logger.info("========== OPENAI API STREAM REQUEST DETAILS ==========")
-            logger.info(f"Model deployment: {self.deployment_name}")
-            logger.info(f"Temperature: {self.temperature}")
-            logger.info(f"Max tokens: {self.max_tokens}")
-            logger.info(f"Top P: {self.top_p}")
-            logger.info(f"Presence penalty: {self.presence_penalty}")
-            logger.info(f"Frequency penalty: {self.frequency_penalty}")
-            
             # Stream the response
+            collected_chunks = []
+            collected_answer = ""
+            
+            # Use the OpenAI client directly for streaming since our OpenAIService doesn't support streaming yet
             request = {
                 # Arguments for self.openai_client.chat.completions.create
                 'model': self.deployment_name,
@@ -560,9 +618,6 @@ class FlaskRAGAssistant:
             }
             log_openai_call(request, {"type": "stream_started"})
             stream = self.openai_client.chat.completions.create(**request)
-            
-            collected_chunks = []
-            collected_answer = ""
             
             # Process the streaming response
             for chunk in stream:
@@ -634,7 +689,7 @@ class FlaskRAGAssistant:
             
         except Exception as exc:
             logger.error("RAG streaming error: %s", exc)
-            yield "[RAG3] I encountered an error while generating the response."
+            yield "I encountered an error while generating the response."
             yield {
                 "sources": [],
                 "evaluation": {},
