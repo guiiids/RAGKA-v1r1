@@ -197,3 +197,52 @@ Key test files:
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+# Database Migration Instructions
+
+To initialize the `helpee_logs` table and add the `model` column in your production database, please run the following SQL commands in your production database environment:
+
+```sql
+-- Create helpee_logs table if it does not exist
+CREATE TABLE IF NOT EXISTS helpee_logs (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
+    user_query TEXT NOT NULL,
+    response_text TEXT NOT NULL,
+    prompt_tokens INT,
+    completion_tokens INT,
+    total_tokens INT
+);
+
+-- Add model column to helpee_logs table
+ALTER TABLE helpee_logs
+  ADD COLUMN IF NOT EXISTS model TEXT NOT NULL DEFAULT '';
+
+-- Create helpee_costs table if it does not exist
+CREATE TABLE IF NOT EXISTS helpee_costs (
+  id SERIAL PRIMARY KEY,
+  helpee_log_id INTEGER NOT NULL REFERENCES helpee_logs(id),
+  model TEXT NOT NULL,
+  prompt_tokens INT,
+  completion_tokens INT,
+  total_tokens INT,
+  prompt_cost NUMERIC,
+  completion_cost NUMERIC,
+  total_cost NUMERIC,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+Make sure to back up your database before running these commands.
+
+---
+
+# Summary of Fixes
+
+- Updated `main.py` to import and instantiate `FlaskRAGAssistantWithHistory` instead of `FlaskRAGAssistantGPT` to fix the `NameError`.
+- Provided SQL commands to initialize the required database tables and columns to resolve database errors.
+- The new double wand icon feature is integrated in the current codebase and should work once the above fixes are applied.
+
+Please apply the database migrations and redeploy your application. This should resolve the 504 Gateway Timeout and related errors.
+
+If you need assistance running these migrations or further help, please let me know.

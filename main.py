@@ -15,7 +15,7 @@ sas_token = os.getenv("SAS_TOKEN", "")
 
 
 # Import directly from the current directory
-from rag_assistant import FlaskRAGAssistantGPT
+from rag_assistant_with_history_copy import FlaskRAGAssistantWithHistory
 from db_manager import DatabaseManager
 from openai import AzureOpenAI
 from config import get_cost_rates
@@ -77,7 +77,7 @@ def get_rag_assistant(session_id):
     """Get or create a RAG assistant for the given session ID"""
     if session_id not in rag_assistants:
         logger.info(f"Creating new RAG assistant for session {session_id}")
-        rag_assistants[session_id] = FlaskRAGAssistantGPT()
+        rag_assistants[session_id] = FlaskRAGAssistantWithHistory()
     return rag_assistants[session_id]
 
 # LLM helpee helpers
