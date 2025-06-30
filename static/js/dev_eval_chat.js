@@ -205,6 +205,14 @@ const DevEvalChat = {
         console.log('Current state:', DevEvalChat.currentState);
       });
       console.log('Added event listener to eVal mode button');
+      // Magic wand click handler inside DevEvalChat.init
+      this.magicBtn = document.getElementById('magic-btn');
+      if (this.magicBtn) {
+        this.magicBtn.addEventListener('click', () => {
+          const grabbedInputTxt = this.queryInput.value;
+          console.log('Magic button clicked, grabbedInputTxt:', grabbedInputTxt);
+        });
+      }
     }
     
     // Check if we're already in eVal mode
@@ -217,6 +225,15 @@ const DevEvalChat = {
     }
     
     this.initialized = true;
+
+    // Attach magic-wand click handler once initialized
+    const magicBtn = document.getElementById('magic-btn');
+    if (magicBtn && this.queryInput) {
+      magicBtn.addEventListener('click', () => {
+        const grabbedInputTxt = this.queryInput.value;
+        console.log('Magic button clicked, grabbedInputTxt:', grabbedInputTxt);
+      });
+    }
   },
   
   // Handle form submission
@@ -554,8 +571,41 @@ const DevEvalChat = {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM content loaded, initializing DevEvalChat');
   DevEvalChat.init();
+  // Magic button click handler after init
+  document.getElementById('magic-btn')?.addEventListener('click', function() {
+    const btn = this;
+    btn.disabled = true;
+    const origIcon = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    const input = document.getElementById('query-input');
+    const inputText = input.value;
+    fetch('/api/magic_query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input_text: inputText })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        console.error('Magic query error:', data.error);
+        ChatHelpers.addBotMessage('Error: ' + data.error);
+      } else {
+        input.value = data.output;
+      }
+    })
+    .catch(error => {
+      console.error('Network error during magic query:', error);
+      ChatHelpers.addBotMessage('Network error: ' + error.message);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = origIcon;
+    });
+  });
 });
 
+  // Magic button click handler (duplicate removed)
+  // Initialization of magic button handled above with full functionality.
 // Also try to initialize after a short delay in case the DOM is already loaded
 setTimeout(function() {
   console.log('Delayed initialization of DevEvalChat');

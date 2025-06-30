@@ -17,7 +17,7 @@ load_dotenv()
 sas_token = os.getenv("SAS_TOKEN", "")
 
 # Import the RAG assistant with history
-from rag_assistant_with_history import FlaskRAGAssistantWithHistory
+from rag_assistant_with_history_copy import FlaskRAGAssistantWithHistory
 from db_manager import DatabaseManager
 
 # Configure logging
@@ -83,7 +83,7 @@ HTML_TEMPLATE = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAGKA Knowledge Navigator (with Conversation History)</title>
+  <title>SAGE Knowledge Navigator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style id="custom-styles">

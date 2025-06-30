@@ -129,9 +129,15 @@
       try {
         // Decode the Base64 URL
         const { raw, cleaned } = this.decodeAndCleanUrl(base64Url);
+        if (window.debugLogger) {
+          window.debugLogger.log('Decoded Base64 URL', 'system', { base64Url, raw, cleaned });
+        }
 
         // If we couldn't clean the URL, return an error
         if (!cleaned) {
+          if (window.debugLogger) {
+            window.debugLogger.log('Failed to extract valid PDF URL from Base64 string', 'warning', { base64Url, raw });
+          }
           return {
             html: `
               <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
@@ -148,9 +154,15 @@
         // The SAS token to append to the URL
         // SECURITY WARNING: In a production environment, this should be generated dynamically by a secure backend
         const SAS_TOKEN = window.APP_CONFIG.sasToken;
+        if (window.debugLogger) {
+          window.debugLogger.log('Using SAS token', 'system', { SAS_TOKEN });
+        }
         
         // Create the download link with the SAS token
         const downloadLink = cleaned + SAS_TOKEN;
+        if (window.debugLogger) {
+          window.debugLogger.log('Created download link', 'system', { downloadLink });
+        }
 
         // Return the HTML for the download link
         return {
@@ -176,6 +188,9 @@
           error: null
         };
       } catch (error) {
+        if (window.debugLogger) {
+          window.debugLogger.log('Error in createDownloadLink', 'error', { message: error.message, stack: error.stack });
+        }
         // If there was an error, return an error message
         return {
           html: `

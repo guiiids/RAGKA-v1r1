@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAGE Knowledge Navigator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style id="custom-styles">
+  /*  p, li, a {
+      font-size: 14px !important;
+    } */
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .chat-input {
+      padding: 1rem;
+      background-color: white;
+    }
+    .user-message {
+      display: flex;
+      justify-content: flex-end;
+      flex-direction: row-reverse;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+    .bot-message {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+    .message-bubble {
+      display: inline-block;
+      width: auto;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+    }
+    .user-bubble {
+      border-bottom-right-radius: 0.25rem;
+      margin-left: 1rem;
+      align-self: flex-end;
+    }
+    .bot-bubble {
+      display: inline-block;
+      background-color: #f3f4f6;
+      color: white;
+      border-bottom-left-radius: 0.25rem;
+    }
+    .avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      margin: 0 0.5rem;
+    }
+    .typing-indicator {
+      display: inline-block;
+      padding: 0.75rem 1rem;
+      background-color: #f3f4f6;
+      border-radius: 1rem;
+      border-bottom-left-radius: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .typing-indicator span {
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      background-color: #9ca3af;
+      border-radius: 50%;
+      margin-right: 0.25rem;
+      animation: typing 1.4s infinite both;
+    }
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+      margin-right: 0;
+    }
+    @keyframes typing {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-0.5rem); }
+      100% { transform: translateY(0); }
+    }
+    /* Added to ensure hidden class works as expected */
+    .hidden {
+      display: none !important;
+    }
+    /* Styles for mode buttons */
+    .mode-button {
+      transition: all 0.3s ease;
+    }
+    .mode-button.active {
+      transform: scale(1.05);
+    }
+    /* Emergency disable button */
+    #emergency-disable-unified-dev-eval {
+      display: none;
+    }
+    /* Feedback system styles */
+    .feedback-container {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 8px;
+    }
+    .feedback-thumb {
+      transition: color 0.2s ease;
+    }
+    .feedback-thumb:hover {
+      transform: scale(1.1);
+    }
+    .feedback-submit-btn {
+      transition: background-color 0.2s ease;
+    }
+    .feedback-submit-btn:hover {
+      background-color: #2563eb !important;
+    }
+  </style>
+</head>
+<body class="bg-white dark:bg-black">
+  <!-- Passcode Overlay -->
+ <!--
+ <div id="passcode-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-35 z-50 flex flex-col items-center justify-center" style="background-image: url('/assets/overlay_2.jpeg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-blend-mode: darken;">
+    <div class="text-center max-w-md mx-auto p-8">
+      <h2 class="text-xl font-bold mb-8 text-white">Restricted Area</h2>
+      <div class="relative mb-6">
+        <input type="password" id="passcode-input" class="w-full bg-gray-100 rounded-full py-3 px-4 pl-12 pr-20 text-lg" placeholder="Passcode">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-lock text-gray-500"></i>
+        </div>
+        <button id="access-btn" class="absolute inset-y-0 right-0 flex items-center bg-gray-800 text-white rounded-full py-2 px-4 mr-1 text-lg">
+          <i class="fas fa-unlock mr-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>  -->
+  <div class="chat-container w-[60%] mx-auto">
+    <!-- Header -->
+    <div class="bg-white dark:bg-black text-white border-b-2 border-gray-100 dark:border-white/30 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <img id="nav-logo" class="h-auto max-w-sm w-auto inline-block object-cover max-h-6" alt="Logo" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/5.png">
+      </div>
+      <div class="inline-flex rounded-md shadow-xs">
+        <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-blue-700 bg-white dark:bg-black text-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 hidden">Chat</a>
+        <a href="#" id="toggle-settings-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white dark:bg-black text-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 hidden">Settings</a>
+        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white dark:bg-black text-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700 hidden">Analytics</a>
+        <div id="mode-buttons-container" class="ml-4 flex space-x-2" style="display:none;">
+          <button id="toggle-developer-mode-btn" class="mode-button px-4 py-2 text-xs font-medium text-black bg-white dark:bg-black text-white border rounded hover:bg-blue-200 hover:underline focus:outline-none focus:ring-red-400" type="button">
+           eVal Mode
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Messages Area -->
+    <div id="chat-messages" class="chat-messages">
+      <div id="center-logo" class="flex flex-col items-center justify-center h-full">
+        <img id="random-logo" class="h-160 w-auto inline-block object-cover md:h-80" alt="Logo" src="/assets/">
+      </div>
+      <script>  
+      (function() {
+        const logos = ['https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/06/sage_icon_logo.png'];
+        const chosen = logos[Math.floor(Math.random() * logos.length)];
+        document.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('random-logo').src = chosen;
+        });
+      })();
+      </script>
+      <div id="welcome-message" class="flex items-start gap-2.5 mb-4 hidden">
+        <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
+        <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
+          <div class="flex items-center space-x-2 rtl:space-x-reverse"><span class="text-sm font-semibold text-gray-900 dark:text-white/80">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">AI Agent</span></span></div>
+          <div class="text-sm font-normal py-2 text-gray-900">Hi there! I'm an AI assistant trained on your knowledge base. What would you like to know?</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Input Area -->
+    <div class="chat-input bg-white dark:bg-black text-gray-900 dark:text-white">
+      <div class="relative rounded-3xl border border-gray-300 p-4 bg-white dark:bg-black text-gray-900 dark:text-white max-w-3xl mx-auto mt-10 shadow-md">
+        <div class="flex items-center space-x-2">
+          <textarea id="query-input" rows="1" placeholder="Type here..." class="flex-grow resize-none overflow-hidden text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 leading-relaxed outline-none bg-transparent"></textarea>
+          <button id="magic-btn" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition" type="button">
+            <i class="fa-solid fa-wand-magic"></i>
+          </button>
+          <button id="submit-btn" class="rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- <span class="text-xs font-semibold text-green-500 text-center ml-2">{{ file_executed }}</span> -->
+    
+  </div>
+
+  <!-- Configuration for unified developer evaluation module -->
+  <script>
+    window.unifiedDevEvalConfig = {
+      enabled: true,
+      apiEndpoints: {
+        developer: '/api/dev_eval',
+        batch: '/api/dev_eval_batch',
+        compare: '/api/dev_eval_compare'
+      },
+      defaultParams: {
+        temperature: 0.3,
+        top_p: 1.0,
+        max_tokens: 1000,
+        runs: 1
+      },
+      uiOptions: {
+        showModeButtons: true,
+        persistSettings: true,
+        animateTransitions: true
+      }
+    };
+  </script>
+
+  <!-- Utility functions and base chat functionality -->
+  <script>
+    // --- Utility Functions ---
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&")
+        .replace(/</g, "<")
+        .replace(/>/g, ">")
+        .replace(/"/g, '"')
+        .replace(/'/g, "&#039;");
+    }
+    
+    function formatMessage(message) {
+      message = message.replace(
+        /(https?:\/\/[^\s]+)/g, 
+        '<a href="$1" target="_blank" class="text-blue-600 hover:underline">$1</a>'
+      );
+      message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      message = message.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      message = message.replace(/\n/g, '<br>');
+      message = message.replace(
+        /\[(\d+)\]/g,
+        '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
+      );
+      return message;
+    }
+
+    // --- DOM elements ---
+    const chatMessages = document.getElementById('chat-messages');
+    const queryInput = document.getElementById('query-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const magicBtn = document.getElementById('magic-btn');
+    if (magicBtn) {
+      magicBtn.addEventListener('click', function() {
+        const text = queryInput.value.trim();
+        if (!text) return;
+        magicBtn.disabled = true;
+        fetch('/api/magic_query', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({input_text: text})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.output) {
+            queryInput.value = data.output;
+          }
+        })
+        .catch(console.error)
+        .finally(() => { magicBtn.disabled = false; });
+      });
+    }
+    // Auto-resize textarea up to 6 lines
+    const maxLines = 6;
+    const lineHeight = parseInt(window.getComputedStyle(queryInput).lineHeight);
+    queryInput.addEventListener('input', () => {
+      queryInput.style.height = 'auto';
+      const boundedHeight = Math.min(queryInput.scrollHeight, lineHeight * maxLines);
+      queryInput.style.height = boundedHeight + 'px';
+      queryInput.style.overflowY = queryInput.scrollHeight > lineHeight * maxLines ? 'auto' : 'hidden';
+    });
+    
+    // --- Chat functionality ---
+    // Add user message to chat
+    function addUserMessage(message) {
+      const centerLogo = document.getElementById('center-logo');
+      if (centerLogo && !centerLogo.classList.contains('hidden')) {
+        centerLogo.classList.add('hidden');
+      }
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'user-message';
+      messageDiv.innerHTML = `
+        <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
+        <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
+          <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
+            <span class="text-xs font-semibold text-gray-900 dark:text-white/80"><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">ME</span></span>
+          </div>
+          <div class="text-sm font-normal py-2 text-gray-900 dark:text-white/80 message-bubble user-bubble">
+             ${formatMessage(message)}
+          </div>
+        </div>
+      `;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Add bot message to chat
+    function addBotMessage(message) {
+      const centerLogo = document.getElementById('center-logo');
+      if (centerLogo && !centerLogo.classList.contains('hidden')) {
+        centerLogo.classList.add('hidden');
+      }
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'bot-message';
+      messageDiv.innerHTML = `
+        <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
+        <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
+          <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
+            <span class="text-xs font-semibold text-gray-900 dark:text-white ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 dark:text-white/80 hover:underline"> AI Agent</span></span>
+          </div>
+          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white/80 message-bubble bot-bubble">
+             ${formatMessage(message)}
+          </div>
+          <span class="text-xs font-normal text-gray-500 dark:text-white/60 text-right pt-33">Was this helpful?</span>
+        </div>
+      `;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Add typing indicator
+    function addTypingIndicator() {
+      const indicatorDiv = document.createElement('div');
+      indicatorDiv.className = 'bot-message';
+      indicatorDiv.innerHTML = `
+        <img class="avatar" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI">
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+      chatMessages.appendChild(indicatorDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return indicatorDiv;
+    }
+
+    // Basic input handling and submit
+    queryInput.addEventListener('keydown', function(e) {
+      submitBtn.disabled = false;
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
+    submitBtn.addEventListener('click', submitQuery);
+
+    function submitQuery() {
+      const query = queryInput.value.trim();
+      if (!query) return;
+      addUserMessage(query);
+      queryInput.value = '';
+      const typingIndicator = addTypingIndicator();
+      fetch('/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (typingIndicator) typingIndicator.remove();
+        if (data.error) {
+          addBotMessage('Error: ' + data.error);
+        } else {
+          addBotMessage(data.answer);
+          if (data.sources && data.sources.length > 0) {
+            window.lastSources = data.sources;
+            addSourcesUtilizedSection();
+          }
+        }
+      })
+      .catch(error => {
+        if (typingIndicator) typingIndicator.remove();
+        addBotMessage('Error: Could not connect to server. Please try again later.');
+        console.error('Error:', error);
+      });
+    }
+
+    // Add sources utilized section function
+    function addSourcesUtilizedSection() {
+      if (window.lastSources && window.lastSources.length > 0) {
+        let sourcesHtml = '<div class="sources-section mt-4 pt-3 border-t border-gray-200">';
+        sourcesHtml += '<h4 class="text-sm font-semibold text-gray-700 mb-2">Sources Utilized</h4>';
+        sourcesHtml += '<ol class="text-sm text-gray-600 space-y-1 pl-4">';
+        
+        window.lastSources.forEach((source, index) => {
+          let sourceTitle = 'Untitled Source';
+          
+          if (typeof source === 'string') {
+            // If source is just a string, use it as the title (truncated)
+            sourceTitle = source.length > 80 ? source.substring(0, 80) + '...' : source;
+          } else if (typeof source === 'object' && source !== null) {
+            // If source is an object, try to get title, otherwise use content or fallback
+            sourceTitle = source.title || 
+                         (source.content ? (source.content.length > 80 ? source.content.substring(0, 80) + '...' : source.content) : 
+                         `Source ${index + 1}`);
+          }
+          
+          // Escape HTML in the title to prevent XSS
+          sourceTitle = escapeHtml(sourceTitle);
+          
+          // Make the source title clickable with the same functionality as inline citations
+          sourcesHtml += `<li>${index + 1}. <a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
+        });
+        
+        sourcesHtml += '</ol>';
+        sourcesHtml += '</div>';
+        
+        // Append to the last bot message
+        const lastBotMessage = document.querySelector('.bot-message:last-child .message-bubble');
+        if (lastBotMessage) {
+          lastBotMessage.innerHTML += sourcesHtml;
+          
+          // Add click event listeners for the new citation links
+          setTimeout(() => {
+            const newCitationLinks = lastBotMessage.querySelectorAll('.citation-link');
+            newCitationLinks.forEach(link => {
+              link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sourceId = this.getAttribute('data-source-id');
+                
+                // Trigger the same behavior as inline citations
+                // This will scroll to and highlight the source in the sidebar
+                if (window.handleCitationClick) {
+                  window.handleCitationClick(sourceId);
+                } else {
+                  // Fallback: try to find and scroll to the source element
+                  const sourceElement = document.getElementById(`source-${sourceId}`);
+                  if (sourceElement) {
+                    sourceElement.scrollIntoView({ behavior: 'smooth' });
+                    sourceElement.classList.add('bg-yellow-100');
+                    setTimeout(() => {
+                      sourceElement.classList.remove('bg-yellow-100');
+                    }, 2000);
+                  }
+                }
+              });
+            });
+          }, 100);
+        }
+      }
+    }
+  </script>
+
+  <!-- Load unifiedDevEval module and external scripts -->
+  <script src="/static/js/custom.js"></script>
+  <script src="/static/js/debug-logger.js"></script>
+  <script>
+    window.APP_CONFIG = { sasToken: "{{ sas_token }}" };
+  </script>
+  <script src="/static/js/url-decoder.js"></script>
+  <script src="/static/js/dynamic-container.js"></script>
+  <script src="/static/js/feedback-integration.js"></script>
+  <script src="/static/js/feedback_thumbs.js"></script>
+  <script src="/static/js/dev_eval_chat.js"></script>
+</body>
+</html>

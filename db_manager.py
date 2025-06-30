@@ -124,13 +124,13 @@ class DatabaseManager:
                 positive_feedback = cursor.fetchone()["positive_feedback"]
                 
                 # Get recent feedback (last 5 entries) with optional date filter
-                recent_query = f"""
-                    SELECT vote_id, user_query, feedback_tags, comment, timestamp
-                    FROM votes
-                    {date_filter}
-                    ORDER BY timestamp DESC
-                    LIMIT 5
-                    """
+                recent_query = (
+                    "SELECT vote_id, user_query, feedback_tags, comment, timestamp "
+                    "FROM votes "
+                    f"{date_filter} "
+                    "ORDER BY timestamp DESC "
+                    "LIMIT 5"
+                )
                 cursor.execute(recent_query, params)
                 recent_feedback = cursor.fetchall()
                 
@@ -178,11 +178,11 @@ class DatabaseManager:
                 # Count total unique queries
                 cursor.execute(f"SELECT COUNT(DISTINCT user_query) as total_queries FROM votes {date_filter}", params)
                 total_queries = cursor.fetchone()["total_queries"]
-                
+
                 # Count total feedback entries
                 cursor.execute(f"SELECT COUNT(*) as queries_with_feedback FROM votes {date_filter}", params)
                 queries_with_feedback = cursor.fetchone()["queries_with_feedback"]
-                
+
                 # Count successful queries (with "Looks Good" tag)
                 if date_filter:
                     cursor.execute(
@@ -194,25 +194,25 @@ class DatabaseManager:
                         "SELECT COUNT(*) as successful_queries FROM votes WHERE 'Looks Good / Accurate & Clear' = ANY(feedback_tags)"
                     )
                 successful_queries = cursor.fetchone()["successful_queries"]
-                
+
                 # Get recent queries
-                recent_query = f"""
-                    SELECT user_query, timestamp
-                    FROM votes
-                    {date_filter}
-                    ORDER BY timestamp DESC
-                    LIMIT 5
-                    """
+                recent_query = (
+                    "SELECT user_query, timestamp "
+                    "FROM votes "
+                    f"{date_filter} "
+                    "ORDER BY timestamp DESC "
+                    "LIMIT 5"
+                )
                 cursor.execute(recent_query, params)
                 recent_queries = cursor.fetchall()
-                
+
                 analytics = {
                     'total_queries': total_queries,
                     'queries_with_feedback': queries_with_feedback,
                     'successful_queries': successful_queries,
                     'recent_queries': recent_queries
                 }
-                
+
                 return analytics
         except Exception as e:
             logging.error(f"Error generating query analytics: {e}")
@@ -227,12 +227,92 @@ class DatabaseManager:
                 conn.close()
     
     @staticmethod
-    def get_tag_distribution(start_date=None, end_date=None):
-        """Get distribution of feedback tags, optionally filtered by date range."""
-        import logging
+    def log_helpee_activity(user_query: str, response_text: str, prompt_tokens: int = None, completion_tokens: int = None, total_tokens: int = None, model: str = None):
+        """
+        Log LLM helpee activity into helpee_logs table, including model.
+        Returns the inserted helpee_log ID.
+        """
+        conn = DatabaseManager.get_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO helpee_logs
+                      (user_query, response_text, prompt_tokens, completion_tokens, total_tokens, model)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (user_query, response_text, prompt_tokens, completion_tokens, total_tokens, model)
+                )
+                log_id = cursor.fetchone()[0]
+                conn.commit()
+                logger.info(f"Helpee activity logged successfully with ID: {log_id}")
+                return log_id
+        except Exception as e:
+            logger.error(f"Error logging helpee activity: {e}")
+            raise
+        finally:
+            conn.close()
+    @staticmethod
+    def save_helpee_log(log_data):
+        """Save helpee log entry to the PostgreSQL database."""
         conn = None
         try:
-            logging.info(f"get_tag_distribution called with start_date={start_date}, end_date={end_date}")
+            logger.debug(f"Saving helpee log data: {log_data}")
+
+            user_query = log_data.get("user_query", "")
+            response_text = log_data.get("response_text", "")
+            prompt_tokens = log_data.get("prompt_tokens")
+            completion_tokens = log_data.get("completion_tokens")
+            total_tokens = log_data.get("total_tokens")
+
+            conn = DatabaseManager.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO helpee_logs 
+                    (user_query, response_text, prompt_tokens, completion_tokens, total_tokens)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (user_query, response_text, prompt_tokens, completion_tokens, total_tokens)
+                )
+                log_id = cursor.fetchone()[0]
+                conn.commit()
+                logger.info(f"Helpee log saved successfully with ID: {log_id}")
+                return log_id
+        except Exception as e:
+            logger.error(f"Error logging helpee activity: {e}")
+            raise
+        finally:
+            conn.close()
+    @staticmethod
+    def log_helpee_cost(helpee_log_id: int, model: str, prompt_tokens: int, completion_tokens: int, total_tokens: int, prompt_cost: float, completion_cost: float, total_cost: float):
+        """Log cost breakdown for a helpee_logs entry into helpee_costs table."""
+        conn = DatabaseManager.get_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO helpee_costs
+                      (helpee_log_id, model, prompt_tokens, completion_tokens, total_tokens, prompt_cost, completion_cost, total_cost)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (helpee_log_id, model, prompt_tokens, completion_tokens, total_tokens, prompt_cost, completion_cost, total_cost)
+                )
+                conn.commit()
+                logger.info(f"Helpee cost logged for log_id {helpee_log_id}: total_cost={total_cost}")
+        except Exception as e:
+            logger.error(f"Error logging helpee cost: {e}")
+            raise
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_helpee_costs(start_date=None, end_date=None):
+        """Retrieve helpee cost entries optionally filtered by timestamp."""
+        conn = None
+        try:
             conn = DatabaseManager.get_connection()
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 date_filter = ""
@@ -246,24 +326,59 @@ class DatabaseManager:
                 elif end_date:
                     date_filter = "WHERE timestamp <= %s"
                     params = [end_date]
-
                 query = f"""
-                    SELECT unnest(feedback_tags) as tag, COUNT(*) as count
-                    FROM votes
+                    SELECT helpee_log_id, model, prompt_tokens, completion_tokens, total_tokens, prompt_cost, completion_cost, total_cost, timestamp
+                    FROM helpee_costs
                     {date_filter}
-                    GROUP BY tag
-                    ORDER BY count DESC
-                    """
+                    ORDER BY timestamp DESC
+                """
                 cursor.execute(query, params)
-                tag_distribution = cursor.fetchall()
-                return tag_distribution
+                return cursor.fetchall()
         except Exception as e:
-            logging.error(f"Error getting tag distribution: {e}")
+            logger.error(f"Error fetching helpee costs: {e}")
             return []
         finally:
-            if conn is not None:
+            if conn:
                 conn.close()
+        
+        @staticmethod
+        def get_tag_distribution(start_date=None, end_date=None):
+            """Get distribution of feedback tags, optionally filtered by date range."""
+            import logging
+            conn = None
+            try:
+                logging.info(f"get_tag_distribution called with start_date={start_date}, end_date={end_date}")
+                conn = DatabaseManager.get_connection()
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    date_filter = ""
+                    params = []
+                    if start_date and end_date:
+                        date_filter = "WHERE timestamp BETWEEN %s AND %s"
+                        params = [start_date, end_date]
+                    elif start_date:
+                        date_filter = "WHERE timestamp >= %s"
+                        params = [start_date]
+                    elif end_date:
+                        date_filter = "WHERE timestamp <= %s"
+                        params = [end_date]
 
+                    query = (
+                        "SELECT unnest(feedback_tags) as tag, COUNT(*) as count "
+                        "FROM votes "
+                        f"{date_filter} "
+                        "GROUP BY tag "
+                        "ORDER BY count DESC"
+                    )
+                    cursor.execute(query, params)
+                    tag_distribution = cursor.fetchall()
+                    return tag_distribution
+            except Exception as e:
+                logging.error(f"Error getting tag distribution: {e}")
+                return []
+            finally:
+                if conn is not None:
+                    conn.close()
+    
     @staticmethod
     def get_time_metrics(start_date=None, end_date=None):
         """Calculate response time metrics, optionally filtered by date range."""

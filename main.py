@@ -1,7 +1,7 @@
 
 print("Running:", __file__)
 import traceback
-from flask import Flask, request, jsonify, render_template_string, Response, send_from_directory, session
+from flask import Flask, request, jsonify, render_template, Response, send_from_directory, session
 import json
 import logging
 import sys
@@ -15,8 +15,11 @@ sas_token = os.getenv("SAS_TOKEN", "")
 
 
 # Import directly from the current directory
-from rag_assistant import FlaskRAGAssistant
+from rag_assistant_gpt import FlaskRAGAssistantGPT
 from db_manager import DatabaseManager
+from openai import AzureOpenAI
+from config import get_cost_rates
+from openai_service import OpenAIService
 
 # Configure logginghttps://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png
 logger = logging.getLogger()
@@ -74,9 +77,106 @@ def get_rag_assistant(session_id):
     """Get or create a RAG assistant for the given session ID"""
     if session_id not in rag_assistants:
         logger.info(f"Creating new RAG assistant for session {session_id}")
-        rag_assistants[session_id] = FlaskRAGAssistant()
+        rag_assistants[session_id] = FlaskRAGAssistantGPT()
     return rag_assistants[session_id]
-# Serve static files from the 'assets' folder
+
+# LLM helpee helper
+PROMPT_ENHANCER_SYSTEM_MESSAGE = QUERY_ENHANCER_SYSTEM_PROMPT = """
+You enhance raw end‑user questions before they go to a Retrieval‑Augmented Generation
+search over an enterprise tech‑support knowledge base.
+
+Rewrite the user’s input into one concise, information‑dense query that maximises recall
+while preserving intent.
+
+Guidelines
+• Keep all meaningful keywords; expand abbreviations (e.g. “OLS” → “OpenLab Software”),
+  spell out error codes, add product codenames, versions, OS names, and known synonyms.
+• Remove greetings, filler, personal data, profanity, or mention of the assistant.
+• Infer implicit context (platform, language, API, UI area) when strongly suggested and
+  state it explicitly.
+• Never ask follow‑up questions. Even if the prompt is vague, make a best‑effort guess
+  using typical support context.
+
+Output format
+Return exactly one line of plain text—no markdown, no extra keys:
+"<your reformulated query>"
+
+Examples
+###
+User: Why won’t ilab let me log in?
+→ iLab Operations Software login failure Azure AD SSO authentication error troubleshooting
+###
+User: Printer firmware bug?
+→ printer firmware bug troubleshooting latest firmware update failure printhead model unspecified
+###
+"""
+
+def llm_helpee(input_text: str) -> str:
+    """
+    Sends PROMPT_ENHANCER_SYSTEM_MESSAGE to the Azure OpenAI model, logs usage into helpee_logs, and returns the AI output.
+    """
+    # Prepare Azure OpenAI client
+    client = AzureOpenAI(
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01")
+    )
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_MODEL"),
+    messages= [
+        { "role": "system", "content": PROMPT_ENHANCER_SYSTEM_MESSAGE },
+        { "role": "user",   "content": input_text }
+    ]
+    )
+    answer = response.choices[0].message.content
+    usage = getattr(response, "usage", {})
+    prompt_tokens = usage.prompt_tokens
+    completion_tokens = usage.completion_tokens
+    total_tokens = usage.total_tokens
+    # Log to database
+    log_id = DatabaseManager.log_helpee_activity(
+        user_query=PROMPT_ENHANCER_SYSTEM_MESSAGE,
+        response_text=answer,
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
+        total_tokens=total_tokens,
+        model=os.getenv("AZURE_OPENAI_MODEL")
+    )
+    model = os.getenv("AZURE_OPENAI_MODEL")
+    rates = get_cost_rates(model)
+    prompt_cost = (prompt_tokens / 1000) * rates["prompt"]
+    completion_cost = (completion_tokens / 1000) * rates["completion"]
+    total_cost = prompt_cost + completion_cost
+    DatabaseManager.log_helpee_cost(
+        helpee_log_id=log_id,
+        model=model,
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
+        total_tokens=total_tokens,
+        prompt_cost=prompt_cost,
+        completion_cost=completion_cost,
+        total_cost=total_cost
+    )
+    # Instead of using a variable like grabbedInputTxt (which is undefined in this scope),
+    # you should pass the input text as a function argument to llm_helpee.
+    # The value from dev_eval_chat.js should be sent to the backend via an API call.
+
+    # For now, just return the answer as before.
+    return answer
+
+# API endpoint for magic button query enhancement
+@app.route('/api/magic_query', methods=['POST'])
+def api_magic_query():
+    """Accepts raw user input, sends it to llm_helpee, and returns the enhanced output."""
+    data = request.get_json() or {}
+    input_text = data.get('input_text', '')
+    try:
+        output = llm_helpee(input_text)
+        return jsonify({'output': output})
+    except Exception as e:
+        logger.error(f"Error in api_magic_query: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+    # Serve static files from the 'assets' folder
 @app.route('/assets/<path:filename>')
 def serve_assets(filename):
     return send_from_directory('assets', filename)
@@ -173,15 +273,18 @@ def analytics():
     return jsonify(response_data)
 
 # HTML template with Tailwind CSS
+MARKED_JS_CDN = "https://cdn.jsdelivr.net/npm/marked/marked.min.js"
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAGKA Knowledge Navigator</title>
+  <title>SAGE Knowledge Navigator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="{marked_js_cdn}"></script>
+  <script src="/static/js/marked-renderer.js"></script>
   <style id="custom-styles">
   /*  p, li, a {
       font-size: 14px !important;
@@ -392,20 +495,33 @@ HTML_TEMPLATE = """
     <!-- Chat Input Area -->
      <div class="chat-input bg-white dark:bg-black text-gray-900 dark:text-white">
     <div class="relative rounded-3xl border border-gray-300 p-4 bg-white dark:bg-black text-gray-900 dark:text-white max-w-3xl mx-auto mt-10 shadow-md">
-  <!-- Dynamic textarea -->
-  <textarea
-    id="query-input"
-    rows="1"
-    placeholder="Type here..."
-    class="w-full resize-none overflow-hidden text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 leading-relaxed outline-none bg-transparent"
-    oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
-    style="min-height: 34px;"
-  ></textarea>
-  
-<button id="submit-btn" class="absolute right-2 bottom-2 rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+      <div class="flex items-center space-x-2">
+        <!-- Dynamic textarea -->
+        <textarea
+          id="query-input"
+          rows="1"
+          placeholder="Type here..."
+          class="flex-grow resize-none overflow-hidden text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 leading-relaxed outline-none bg-transparent"
+          oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
+          style="min-height: 34px;"
+        ></textarea>
+        <button
+          id="magic-btn"
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          type="button"
+          aria-label="Magic Wand"
+        >
+          <i class="fa-solid fa-wand-magic"></i>
+        </button>
+        <button
+          id="submit-btn"
+          class="rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+          type="button"
+        >
           Send
         </button>
-</div>
+      </div>
+    </div>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
       <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white dark:bg-black text-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
@@ -859,7 +975,7 @@ HTML_TEMPLATE = """
 
   <!-- Load the unified developer evaluation module -->
   
-<!-- <script src="/static/js/unifiedEval.js"></script> -->
+<script src="/static/js/unifiedEval.js"></script> 
 <script src="/static/js/custom.js"></script> <!-- This file is empty/deprecated -->
 <script src="/static/js/debug-logger.js"></script>
 <script>
@@ -870,6 +986,7 @@ HTML_TEMPLATE = """
 <!-- <script src="/static/js/citation-toggle.js"></script> --> <!-- Removed -->
 <script src="/static/js/feedback-integration.js"></script>
 <script src="/static/js/feedback_thumbs.js"></script>
+<script src="/static/js/dev_eval_chat.js"></script>
 <!-- Placeholder citation click handler and its listener removed -->
 
 <!-- <script>
@@ -935,7 +1052,7 @@ def index():
         session['session_id'] = os.urandom(16).hex()
         logger.info(f"New session created: {session['session_id']}")
     
-    return render_template_string(HTML_TEMPLATE, file_executed=file_executed, sas_token=sas_token)
+    return render_template("index.html", file_executed=file_executed, sas_token=sas_token)
 
 @app.route("/api/query", methods=["POST"])
 def api_query():
@@ -1569,4 +1686,5 @@ if __name__ == "__main__":
     
     port = args.port
     logger.info(f"Starting Flask app on port {port}")
+
     app.run(host="0.0.0.0", port=port, debug=True)
