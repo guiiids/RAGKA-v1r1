@@ -196,6 +196,9 @@
           <button id="magic-btn" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition" type="button">
             <i class="fa-solid fa-wand-magic"></i>
           </button>
+          <button id="magic-btn-2xl" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition" type="button">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </button>
           <button id="submit-btn" class="rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
             Send
           </button>
@@ -396,6 +399,34 @@
       });
     }
 
+    // Magic button 2XL click handler
+    const magicBtn2xl = document.getElementById('magic-btn-2xl');
+    if (magicBtn2xl) {
+      magicBtn2xl.addEventListener('click', function() {
+        const text = queryInput.value.trim();
+        if (!text) return;
+        magicBtn2xl.disabled = true;
+        const origIcon = magicBtn2xl.innerHTML;
+        magicBtn2xl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        fetch('/api/magic_query_2xl', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({input_text: text})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.output) {
+            queryInput.value = data.output;
+          }
+        })
+        .catch(console.error)
+        .finally(() => { 
+          magicBtn2xl.disabled = false; 
+          magicBtn2xl.innerHTML = origIcon;
+        });
+      });
+    }
+    
     // Add sources utilized section function
     function addSourcesUtilizedSection() {
       if (window.lastSources && window.lastSources.length > 0) {
