@@ -387,6 +387,12 @@ HTML_TEMPLATE = """
   <script src="{marked_js_cdn}"></script>
   <script src="/static/js/marked-renderer.js"></script>
   <style id="custom-styles">
+  .avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
   /*  p, li, a {
       font-size: 14px !important;
     } */

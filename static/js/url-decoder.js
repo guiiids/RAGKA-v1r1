@@ -53,7 +53,11 @@
      */
     decodeAndCleanUrl: function(b64) {
       if (!b64) return { raw: null, cleaned: null };
-
+  
+      if (window.debugLogger) {
+        window.debugLogger.log('decodeAndCleanUrl input', 'debug', { base64Input: b64 });
+      }
+  
       // Special case handling for known problematic Base64 strings
       if (b64 === 'aHR0cHM6Ly9jYXBvenpvbDAyc3RvcmFnZS5ibG9iLmNvcmUud2luZG93cy5uZXQvYmlnb2xwb3RvZmRhdGVyL2ZpZWxkcG9ydGFsL2ZwMS9HYXMlMjBDaHJvbWF0b2dyYXBoeSUyMChQTCUyMEFaKS9Qcm9jZWR1cmUvR0MlMjBUcm91Ymxlc2hvb3RpbmclMjBHdWlkZSUyMC0lMjBGSUQucGRm0') {
         return {
@@ -61,18 +65,24 @@
           cleaned: 'https://capozzol02storage.blob.core.windows.net/bigolpotofdater/fieldportal/fp1/Gas%20Chromatography%20(PL%20AZ)/Procedure/GC%20Troubleshooting%20Guide%20-%20FID.pdf'
         };
       }
-
+  
       // Try to decode the Base64 string
       let raw;
       try {
         // First try our custom decoder
         raw = this.customBase64Decode(b64.trim());
+        if (window.debugLogger) {
+          window.debugLogger.log('Raw decoded string', 'debug', { raw });
+        }
         
         // If the result doesn't look like a URL, try removing the last character and decode again
         if (!raw.includes('http') && b64.length > 1) {
           // This handles cases where there's an extra character at the end (like '0' or '5')
           const truncated = b64.trim().slice(0, -1);
           const retryResult = this.customBase64Decode(truncated);
+          if (window.debugLogger) {
+            window.debugLogger.log('Retry decoded string after truncation', 'debug', { retryResult });
+          }
           if (retryResult.includes('http')) {
             raw = retryResult;
           }
@@ -80,27 +90,45 @@
       } catch (e) {
         // If all else fails, just use the original string
         raw = b64.trim();
+        if (window.debugLogger) {
+          window.debugLogger.log('Error decoding Base64, using original string', 'error', { error: e.message, raw });
+        }
       }
-
+  
       // Try URI-decoding if needed
       let decoded = raw;
       try {
         decoded = decodeURIComponent(escape(raw));
-      } catch (_) {
+        if (window.debugLogger) {
+          window.debugLogger.log('URI-decoded string', 'debug', { decoded });
+        }
+      } catch (e) {
+        if (window.debugLogger) {
+          window.debugLogger.log('Error in URI decoding', 'error', { error: e.message, raw });
+        }
         /* leave decoded = raw */
       }
-
+  
       // Look for a URL pattern ending with .pdf
-      const m = decoded.match(/https?:\/\/.*?\\.(pdf|txt|csv)(?:.*)?/i);
+      const m = decoded.match(/https?:\/\/.*?\.(pdf|txt|csv)(?:.*)?/i);
+      if (window.debugLogger) {
+        window.debugLogger.log('URL regex result', 'debug', { decoded, match: m });
+      }
       
       // If we found a match, clean it to ensure it ends with .pdf
       let cleaned = null;
       if (m) {
         cleaned = m[0];
+        if (window.debugLogger) {
+          window.debugLogger.log('Cleaned URL before trimming', 'debug', { cleaned });
+        }
         // If the URL contains characters after .pdf, trim to just .pdf
         const pdfIndex = cleaned.toLowerCase().indexOf('.pdf');
         if (pdfIndex !== -1) {
           cleaned = cleaned.substring(0, pdfIndex + 4);
+          if (window.debugLogger) {
+            window.debugLogger.log('Cleaned URL after trimming', 'debug', { cleaned });
+          }
         }
       }
       
