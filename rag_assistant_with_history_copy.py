@@ -488,6 +488,16 @@ class FlaskRAGAssistantWithHistory:
         # Create a context message
         context_message = f"<context>\n{context}\n</context>\n<user_query>\n{query}\n</user_query>"
         
+        # Check if the system message is still present in the conversation history
+        # This ensures that even if the magic wand enhanced the query, we still have our citation instructions
+        raw_messages = self.conversation_manager.get_history()
+        if not raw_messages or raw_messages[0]["role"] != "system":
+            logger.warning("System message not found in conversation history, restoring default")
+            # Restore the system message with citation instructions
+            self.conversation_manager.clear_history(preserve_system_message=False)
+            self.conversation_manager.chat_history = [{"role": "system", "content": self.DEFAULT_SYSTEM_PROMPT}]
+            logger.info("Restored default system prompt with citation instructions")
+        
         # Add the user message to conversation history (only once)
         logger.info(f"Adding user message to conversation history")
         self.conversation_manager.add_user_message(context_message)

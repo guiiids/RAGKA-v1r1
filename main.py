@@ -263,7 +263,11 @@ def api_magic_query():
     input_text = data.get('input_text', '')
     try:
         output = llm_helpee(input_text)
-        return jsonify({'output': output})
+        # Add a flag to indicate this is an enhanced query
+        return jsonify({
+            'output': output,
+            'is_enhanced': True
+        })
     except Exception as e:
         logger.error(f"Error in api_magic_query: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
@@ -275,7 +279,11 @@ def api_magic_query_2xl():
     input_text = data.get('input_text', '')
     try:
         output = llm_helpee_2xl(input_text)
-        return jsonify({'output': output})
+        # Add a flag to indicate this is an enhanced query
+        return jsonify({
+            'output': output,
+            'is_enhanced': True
+        })
     except Exception as e:
         logger.error(f"Error in api_magic_query_2xl: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500

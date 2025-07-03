@@ -591,6 +591,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ChatHelpers.addBotMessage('Error: ' + data.error);
       } else {
         input.value = data.output;
+        // Store the enhanced flag as a data attribute on the input element
+        if (data.is_enhanced) {
+          input.dataset.enhanced = 'true';
+          console.log('Query enhanced with magic wand');
+        }
       }
     })
     .catch(error => {
@@ -602,10 +607,50 @@ document.addEventListener('DOMContentLoaded', function() {
       btn.innerHTML = origIcon;
     });
   });
+
+  // Magic button 2XL click handler
+  const magicBtn2xl = document.getElementById('magic-btn-2xl');
+  if (magicBtn2xl) {
+    magicBtn2xl.addEventListener('click', function() {
+      const text = document.getElementById('query-input').value.trim();
+      if (!text) return;
+      
+      magicBtn2xl.disabled = true;
+      const origIcon = magicBtn2xl.innerHTML;
+      magicBtn2xl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      
+      fetch('/api/magic_query_2xl', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({input_text: text})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Magic query 2XL error:', data.error);
+          ChatHelpers.addBotMessage('Error: ' + data.error);
+        } else {
+          const input = document.getElementById('query-input');
+          input.value = data.output;
+          // Store the enhanced flag as a data attribute on the input element
+          if (data.is_enhanced) {
+            input.dataset.enhanced = 'true';
+            console.log('Query enhanced with magic wand 2XL');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Network error during magic query 2XL:', error);
+        ChatHelpers.addBotMessage('Network error: ' + error.message);
+      })
+      .finally(() => { 
+        magicBtn2xl.disabled = false; 
+        magicBtn2xl.innerHTML = origIcon;
+      });
+    });
+  }
 });
 
-  // Magic button click handler (duplicate removed)
-  // Initialization of magic button handled above with full functionality.
 // Also try to initialize after a short delay in case the DOM is already loaded
 setTimeout(function() {
   console.log('Delayed initialization of DevEvalChat');
