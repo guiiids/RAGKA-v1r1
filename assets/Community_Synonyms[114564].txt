@@ -1,0 +1,200 @@
+10 ml,10ml
+10 mm,10mm
+1100 Micro Well Plate Sampler,1200 Series Micro Well Plate Autosampler,1260 Infinity High Performance Micro Autosampler,G1377A
+1100 Series Standard Autosampler,G1313A
+1100 Series Thermostatted Autosampler,1200 Series Standard Autosampler,G1329A
+1100 Series Well Plate Sampler,G1367A,Well Plate Sampler
+1100 Well Plate Sampler,1200 Series High Performance Autosampler,G1367B,High Performance Autosampler,Well Plate Sampler
+1200 Series High Performance Autosampler SL,G1367C,High Performance Sampler
+1200 Series High Performance Autosampler SL+,G1367D,High Performance Sampler
+1200 Series Standard Autosampler SL,1260 Infinity Standard Autosampler,G1329B
+1260 Infinity High Performance Autosampler,G1367E,High Performance Sampler
+1260 Infinity High Performance Bio-inert Autosampler,G5667A
+1260 Infinity II Multisampler,G7167A
+1260 Infinity II Vialsampler,G7129A
+1260 Infinity II Vialsampler,G7129C
+1290 Infinity High Performance Autosampler,G4226A
+1290 Infinity II Bio Multisampler,G7137A
+1290 Infinity II Multisampler,G7167B
+1290 Infinity II Vialsampler,G7129B
+2,ii
+2 ml,2ml
+2-deoxy-glucose,2-Deoxyglucose,2dg,2-dg
+20 mm,20mm
+2100,2100 Bioanalyzer,bioA,bioanalyzer
+2200,2200 tape station,2200 tapestation
+232711,AriaMx
+4 ml,4ml
+400 MR,400MR,400-MR,MR 400,MR400,MR-400
+4150,4150 tape station,4150 tapestation
+4200,4200 tape station,4200 tapestation
+5200,5200 FA,5200 Fragment analyzer
+5300,5300 FA,5300 Fragment analyzer
+5400,5400 FA,5400 Fragment analyzer
+5991-9072,5991-9072en
+6 ml,6ml
+74-fs,74FS
+776093,CRISPR
+7890,7890a,7890b
+8 ml,8ml
+9000,Intuvo
+AATI,parallel capillary electrophoresis,Parallel CE,parallel electrophoresis,PCE
+ALS,Automatic Liquid Sampler,autosampler,sample changer
+AdvanceBio SEC columns,protein aggregation
+Agilent microplate,Agilent microplates
+C13 signal to noise,C13 SN,C13SN,C13-SN,carbon sensitivity,carbon signal to noise
+CCC,cryo bay,cryobay,cryo-bay
+CDS 2,CDS 2.X,CDS2,CDS2x,OLCDS,open lab 2,OpenLab 2,OpenLab CDS,OpenLab CDS 2
+CFC's,chlorofluorocarbons,coolants,freons,halons
+Capillary Flow Technology,cft
+Certificate of Analysis,COA,cofa
+Certificate of Conformance,certificateofconformance,COC,Declaration of Conformity,DOC
+Chem Elut,Chem Elute,ChemElut
+ChemStation,OLCDS ChemStation,OpenLab CDS ChemStation,OpenLab CDS ChemStation Edition,OpenLab ChemStation
+DAD,DAD detector,diode array detector,PDA
+DIN,DNA integrity number
+DV 200,DV200
+EIC,Extracted Ion Chromatogram,extracted signal
+ELSD,Evaporative Light Scattering Detector
+EMR,Enhanced Matrix Removal
+EasyChrom,EZChrom,EZChrome,EZCrom,OLEZChrom,OpenLab CDS EZChrom,OpenLab CDS EZChrom Edition,OpenLab EZChrom
+Environmental,surroundings
+Evaporating,Evaporative
+FA,Fragment Analyzer
+FAQ,FAQs,frequently asked question,frequently asked questions
+FID,flame ionization detector
+FLD,fluorescence detector
+Femto Pulse,FP
+Flame Photometric Detector,FPD,FPD+
+G2923 B,G2923B,G2938
+G2938 C,G2938C
+G2939,G2939 A,G2939 AA,G2939A,G2939AA
+G2964 AA,G2964A
+G2965 AA,G2965A
+G2991,G2991 A,G2991 AA,G2991A,G2991AA
+G2991 B,G2991 BA,G2991B,G2991BA
+GC MS,GCMS,GC-MS,gcmsd
+H1 signal to noise,H1 SN,H1SN,H1-SN,proton sensitivity,proton signal to noise
+HCL,Hollow Cathode Lamps
+HPLC,LC,liquid chromatograph,liquid chromatography
+IDP3,IDP-3
+LC MS,LCMS,LC-MS,lcmsd,LC-MSD
+MCG,MCGV,Multi Channel Gradient Valve,Multichannel Gradient Valve,Multi-channel Gradient Valve
+Manganese,mn
+Mass Hunter,MassHunter,MassHunter Software
+NCD,Nitrogen Chemiluminescence Detector
+Nitrogen phosphorus detector,Nitrogen-phosporus detector,NPD
+Oligo Pro 2,Oligo Pro II,Oligo ProII,OligoPro,OligoPro II,OligoProII,OP II,OPII
+Operating Guide,Operation instructions
+PDI,Polydispersity Index
+PPR,proton production rate
+Peptide Mapping,Peptide Plus,Peptide Standards
+Prep,Preparation
+Q-TOF,Quadrupole Time of flight,Quadrupole time-of-flight
+QQQ,Triple Q,Triple Quad,Triple Quarupole,TripleQ
+RIN,RNA Integrity number
+RINe,RNA Integrity number equivalent
+SCD,Sulfur Chemiluminescence Detector
+SDK,software development kit
+SEC,Size exclusion chromatography
+Security Pack,SP
+Single Quad,Single Quadrupole,SQ
+Software Release Bulletin,Software Release Notes,SRB
+Software Status Bulletin,SSB
+Split Splitless,Split-Splitless,SSL,S-SL
+TIC,Total Ion Chromatogram
+Time of flight,time-of-flight,TOF
+UHPLC,UPLC
+User Info,User Information,User manual,User's Guide
+ZAG,ZAG Analyzer,ZAG DNA Analyzer
+ampoule,ampule
+analyser,analyzer
+app note,application note
+artefact,artifact
+auto tune,autotune
+bar code reader,barcode reader,BCR
+base line,Baseline
+bio column,biocolumn,bio-column
+biopharma,bio-pharma,biopharmaceutic,biopharmaceutical
+caffeine,caffene
+cap,closure
+catalog,catalogs,catalogue,catalogues
+chem,chemical
+classes,courses,education,training
+cold probe,cryo probe,cryoprobe,cryo-probe
+consumables,supplies
+copper,cu
+cpo,pre-owned,refurb,refurbished,used
+cqa,critical quality attributes
+cryo driver,cryodriver,cryo-driver
+data sheet,datasheet,spec,specifications,specs
+e cartridge,EP cartridge,pin-set,Pinset
+early maintenance feedback,EMF
+efc,Electronic Flow Control
+electronic pressure controller,epc
+eseminar,e-seminar,webinar
+fao,fatty acid oxidation
+fe,iron
+firmware,fw
+flow meter,flowmeter,flow-meter
+gDNA,genomic DNA,genomicDNA
+gas chromatograph,gas chromatography,GC
+gas filters,gas purifiers,gas traps
+h2,hydrogen
+hardware,HW
+he,helium
+helium leak detector,HLD
+hexafluoroisopropanol,HFIP
+high pressure,over pressure,overpressure
+iLab,Lab Operations Management
+icp mini,ipcmini
+icpms,icp-ms
+icpoes,icp-oes
+inert flow path,ultra inert,ultra inert column
+injection,injector
+injection port,inlet
+ked,kinetic energy discrimination
+lan,local area network
+ldhe,low dispersion heat exchanger
+limits of detection,lod
+limits of quantification,loq
+lk,lock
+log book,log file,logbook,logfile,logs
+manual pneumatic control,manual pressure control,mpc
+mass spec,Mass Spectrometry,ms
+micro plate,microplate,micro-plate,microtiter plate,microwell plate,MTP
+micro volume,microvolume
+n2,nitrogen
+open lab,openlab,openlabs
+p&t,purge and trap
+pa,pulse analog
+peak elution time,retention time,RT
+pfu turbo,pfuturbo,pfu-turbo
+pharma,pharmaceutical
+prep HPLC,prep LC,preparative HPLC,preparative LC,preparative liquid chromatography,prepHPLC
+pro Size,prosize,PS
+quad,quadrupole
+qual,qualitative
+quant,quantitative
+raman,ramen
+refractive index,ri
+refractive index detector,rid
+safety data sheets,sds
+scanning electron microscope,sem
+septa,septum
+sgRNAs,SureGuide
+single stranded DNA,ssDNA
+site prep,site prep checklist,site prep guide,site preparation,Site Preparation Checklist,siteprep
+software,SW
+synth,synthesiser,synthesizer
+tcd,thermal conductivity detector
+td,thermal desorber,thermal desorption
+transfer line,transferline
+update,upgrade
+uv vis,uvvis,uv-vis
+variable wavelength detector,vwd
+voc,VOC's,volatile organic contaminants
+win,windows
+µECD,ECD,electron capture detector,micro ECD,uECD
+µL,microliter,uL
+µm,micron,um

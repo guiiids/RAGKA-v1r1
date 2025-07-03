@@ -1,0 +1,11 @@
+column_name,data_type,is_nullable
+timestamp,timestamp without time zone,YES
+helpee_log_id,integer,YES
+id,integer,NO
+prompt_tokens,integer,YES
+completion_tokens,integer,YES
+total_tokens,integer,YES
+prompt_cost,double precision,YES
+completion_cost,double precision,YES
+total_cost,double precision,YES
+model,text,YES

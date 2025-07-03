@@ -655,7 +655,17 @@ def get_rag_assistant(session_id):
     """Get or create a RAG assistant for the given session ID"""
     if session_id not in rag_assistants:
         logger.info(f"Creating new RAG assistant for session {session_id}")
-        rag_assistants[session_id] = FlaskRAGAssistantWithHistory()
+        # Initialize with smart context summarization settings
+        rag_assistants[session_id] = FlaskRAGAssistantWithHistory(settings={
+            "max_history_turns": 5,  # Default value, can be adjusted
+            "summarization_settings": {
+                "enabled": True,
+                "max_summary_tokens": 800,
+                "summary_temperature": 0.3
+            }
+        })
+        logger.info(f"RAG assistant created with smart context summarization")
+        logger.info(f"Summarization settings: {rag_assistants[session_id].summarization_settings}")
     return rag_assistants[session_id]
 
 @app.route("/api/query", methods=["POST"])
@@ -706,11 +716,18 @@ def api_query():
         # Check if history was trimmed
         history_trimmed = getattr(rag_assistant, "_history_trimmed", False)
         
+        # Add summarization info to the response
+        summarization_info = {
+            "enabled": rag_assistant.summarization_settings.get("enabled", True),
+            "max_summary_tokens": rag_assistant.summarization_settings.get("max_summary_tokens", 800)
+        }
+        
         return jsonify({
             "answer": answer,
             "sources": cited_sources,
             "evaluation": evaluation,
-            "history_trimmed": history_trimmed
+            "history_trimmed": history_trimmed,
+            "summarization_info": summarization_info
         })
     except Exception as e:
         logger.error(f"Error in api_query: {str(e)}")

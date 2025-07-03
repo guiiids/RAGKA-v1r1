@@ -91,7 +91,7 @@
       }
 
       // Look for a URL pattern ending with .pdf
-      const m = decoded.match(/https?:\/\/.*?\.pdf(?:.*)?/i);
+      const m = decoded.match(/https?:\/\/.*?\\.(pdf|txt|csv)(?:.*)?/i);
       
       // If we found a match, clean it to ensure it ends with .pdf
       let cleaned = null;

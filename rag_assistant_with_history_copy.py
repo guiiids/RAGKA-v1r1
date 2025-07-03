@@ -12,6 +12,7 @@ import re
 import sys
 import os
 import re
+import json
 from openai_logger import log_openai_call
 from db_manager import DatabaseManager
 from conversation_manager_copy import ConversationManager
@@ -146,6 +147,13 @@ class FlaskRAGAssistantWithHistory:
         # Flag to track if history was trimmed in the most recent request
         self._history_trimmed = False
         
+        # Summarization settings
+        self.summarization_settings = {
+            "enabled": True,                # Whether to use summarization (vs. simple truncation)
+            "max_summary_tokens": 800,      # Maximum length of summaries
+            "summary_temperature": 0.3,     # Temperature for summary generation
+        }
+        
         # Load settings if provided
         self.settings = settings or {}
         self._load_settings()
@@ -188,6 +196,11 @@ class FlaskRAGAssistantWithHistory:
         if "max_history_turns" in settings:
             self.max_history_turns = settings["max_history_turns"]
             logger.info(f"Setting max_history_turns to {self.max_history_turns}")
+            
+        # Update summarization settings
+        if "summarization_settings" in settings:
+            self.summarization_settings.update(settings.get("summarization_settings", {}))
+            logger.info(f"Updated summarization settings: {self.summarization_settings}")
             
         # Update system prompt if provided
         if "system_prompt" in settings:
@@ -290,9 +303,63 @@ class FlaskRAGAssistantWithHistory:
             return []
 
     # ───────── context & citations ────────
+    def summarize_history(self, messages_to_summarize: List[Dict]) -> Dict:
+        """
+        Summarize a portion of conversation history while preserving key information.
+        
+        Args:
+            messages_to_summarize: List of message dictionaries to summarize
+            
+        Returns:
+            A single system message containing the summary
+        """
+        logger.info(f"Summarizing {len(messages_to_summarize)} messages")
+        
+        # Extract all citation references from the messages
+        citation_pattern = r'\[(\d+)\]'
+        all_citations = []
+        for msg in messages_to_summarize:
+            if msg['role'] == 'assistant':
+                citations = re.findall(citation_pattern, msg['content'])
+                all_citations.extend(citations)
+        
+        # Create a prompt that emphasizes preserving citations and product information
+        prompt = """
+        Summarize the following conversation while:
+        1. Preserving ALL mentions of specific products, models, and technical details
+        2. Maintaining ALL citation references [X] in their original form
+        3. Keeping the key questions and answers
+        4. Focusing on technical information rather than conversational elements
+        
+        Conversation to summarize:
+        """
+        
+        for msg in messages_to_summarize:
+            prompt += f"\n\n{msg['role'].upper()}: {msg['content']}"
+        
+        # If there are citations, add special instructions
+        if all_citations:
+            prompt += f"\n\nIMPORTANT: Make sure to preserve these citation references in your summary: {', '.join(['['+c+']' for c in all_citations])}"
+        
+        # Get summary from OpenAI with specific instructions
+        summary_messages = [
+            {"role": "system", "content": "You create concise summaries that preserve technical details, product information, and citation references exactly as they appear in the original text."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        # Use the existing OpenAI service
+        summary_response = self.openai_service.get_chat_response(
+            messages=summary_messages,
+            temperature=self.summarization_settings.get("summary_temperature", 0.3),
+            max_tokens=self.summarization_settings.get("max_summary_tokens", 800)
+        )
+        
+        logger.info(f"Generated summary of length {len(summary_response)}")
+        return {"role": "system", "content": f"Previous conversation summary: {summary_response}"}
+    
     def _trim_history(self, messages: List[Dict]) -> Tuple[List[Dict], bool]:
         """
-        Trim conversation history to the last N turns while preserving the system message.
+        Trim conversation history to the last N turns while preserving key information through summarization.
         
         Args:
             messages: List of message dictionaries
@@ -301,29 +368,58 @@ class FlaskRAGAssistantWithHistory:
             Tuple of (trimmed_messages, was_trimmed)
         """
         logger.info(
-        f"TRIM_DEBUG: Called with {len(messages)} messages. Cap is {self.max_history_turns*2+1}"
-    )   
+            f"TRIM_DEBUG: Called with {len(messages)} messages. Cap is {self.max_history_turns*2+1}"
+        )
+        
         dropped = False
-        if len(messages) > self.max_history_turns*2+1:  # +1 for system message
-            dropped = True
-            # Log before trimming
-            logger.info(f"History size ({len(messages)}) exceeds limit ({self.max_history_turns*2+1}), trimming...")
-            logger.info(f"Before trimming: {len(messages)} messages")
-            
-            # Keep system message + last N pairs
-            messages = [messages[0]] + messages[-self.max_history_turns*2:]
-            
-            # Log after trimming
-            logger.info(f"After trimming: {len(messages)} messages")
-            logger.info(f"Trimmed conversation history to last {self.max_history_turns} turns")
-            
-            # Store trimming status for API to access
-            self._history_trimmed = True
-        else:
+        
+        # If we're under the limit, no trimming needed
+        if len(messages) <= self.max_history_turns*2+1:  # +1 for system message
             self._history_trimmed = False
             logger.info(f"No trimming needed. History size: {len(messages)}, limit: {self.max_history_turns*2+1}")
+            return messages, dropped
+        
+        # Check if summarization is enabled
+        if not self.summarization_settings.get("enabled", True):
+            # Fall back to original trimming behavior
+            dropped = True
+            logger.info(f"Summarization disabled, using simple truncation")
             
-        return messages, dropped
+            # Keep system message + last N pairs
+            trimmed_messages = [messages[0]] + messages[-self.max_history_turns*2:]
+            
+            # Log after trimming
+            logger.info(f"After simple truncation: {len(trimmed_messages)} messages")
+            self._history_trimmed = True
+            
+            return trimmed_messages, dropped
+        
+        # We need to trim with summarization
+        dropped = True
+        logger.info(f"History size ({len(messages)}) exceeds limit ({self.max_history_turns*2+1}), trimming with summarization...")
+        
+        # Extract the system message (first message)
+        system_message = messages[0]
+        
+        # Determine which messages to keep and which to summarize
+        messages_to_keep = messages[-self.max_history_turns*2:]  # Keep the most recent N turns
+        messages_to_summarize = messages[1:-self.max_history_turns*2]  # Summarize older messages (excluding system)
+        
+        # If there are messages to summarize, generate a summary
+        if messages_to_summarize:
+            logger.info(f"Summarizing {len(messages_to_summarize)} messages")
+            summary_message = self.summarize_history(messages_to_summarize)
+            
+            # Construct the new message list: system message + summary + recent messages
+            trimmed_messages = [system_message, summary_message] + messages_to_keep
+        else:
+            # If no messages to summarize, just keep system + recent
+            trimmed_messages = [system_message] + messages_to_keep
+        
+        logger.info(f"After trimming with summarization: {len(trimmed_messages)} messages")
+        self._history_trimmed = True
+        
+        return trimmed_messages, dropped
         
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
         logger.info(f"Preparing context from {len(results)} search results")

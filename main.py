@@ -10,6 +10,8 @@ from logging.handlers import RotatingFileHandler
 from pythonjsonlogger import jsonlogger
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
+from flask import Flask, request, jsonify, render_template_string, Response, send_from_directory, session
+
 load_dotenv() 
 sas_token = os.getenv("SAS_TOKEN", "")
 
@@ -1197,7 +1199,7 @@ def index():
         session['session_id'] = os.urandom(16).hex()
         logger.info(f"New session created: {session['session_id']}")
     
-    return render_template("index.html", file_executed=file_executed, sas_token=sas_token)
+    return render_template_string(HTML_TEMPLATE, file_executed=file_executed, sas_token=sas_token)
 
 @app.route("/api/query", methods=["POST"])
 def api_query():
