@@ -330,6 +330,7 @@ Respond to the user's query using only the provided context. Your primary goal i
         return messages, dropped
         
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
+        logger.debug(f"_prepare_context input results: {results[:3]}... total {len(results)}")
         logger.info(f"Preparing context from {len(results)} search results")
         entries, src_map = [], {}
         sid = 1
@@ -389,6 +390,14 @@ Respond to the user's query using only the provided context. Your primary goal i
         
         # Get the complete conversation history
         raw_messages = self.conversation_manager.get_history()
+        # Enforce inline citation instructions in generation
+        raw_messages.insert(0, {
+            "role": "system",
+            "content": (
+                "When composing your response, include inline citations in the format [id] "
+                "only for sources with <source id=\"...\"> in the context."
+            )
+        })
         
         # Trim history if needed
         messages, trimmed = self._trim_history(raw_messages)
@@ -429,6 +438,8 @@ Respond to the user's query using only the provided context. Your primary goal i
         return response
 
     def _filter_cited(self, answer: str, src_map: Dict) -> List[Dict]:
+        logger.debug(f"_filter_cited received answer: {answer[:500]}...")
+        logger.debug(f"src_map keys: {list(src_map.keys())}")
         logger.info("Filtering cited sources from answer")
         cited_sources = []
         

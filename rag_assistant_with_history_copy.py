@@ -88,6 +88,8 @@ class FlaskRAGAssistantWithHistory:
     - Do not use XML tags in your response.
     - Ensure citations are concise and directly related to the information provided.
     - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.
+    - **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses.**
+    - **Always cite your sources in every response, including follow-up questions.**
     
     ### Example of Citation:
 
@@ -95,9 +97,19 @@ class FlaskRAGAssistantWithHistory:
 
     * "According to the study, the proposed method increases efficiency by 20% [1]."
     
+    ### Follow-up Questions:
+    
+    For follow-up questions, you must continue to cite sources. For example:
+    
+    User: "What are the key features of Product X?"
+    Assistant: "Product X has three main features: cloud integration [1], advanced analytics [2], and mobile support [3]."
+    
+    User: "Tell me more about the mobile support."
+    Assistant: "The mobile support feature of Product X includes cross-platform compatibility, offline mode, and push notifications [3]."
+    
     ### Output:
 
-    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context.
+    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context. Remember to include citations in ALL responses, including follow-up questions.
     
     <context>
 
@@ -422,6 +434,7 @@ class FlaskRAGAssistantWithHistory:
         return trimmed_messages, dropped
         
     def _prepare_context(self, results: List[Dict]) -> Tuple[str, Dict]:
+        logger.debug(f"_prepare_context input results count: {len(results)} snippet: {results[:3]}")
         logger.info(f"Preparing context from {len(results)} search results")
         entries, src_map = [], {}
         sid = 1
@@ -521,30 +534,74 @@ class FlaskRAGAssistantWithHistory:
         return response
 
     def _filter_cited(self, answer: str, src_map: Dict) -> List[Dict]:
+        logger.debug(f"_filter_cited received answer snippet: {answer[:300]}")
+        logger.debug(f"_filter_cited src_map keys: {list(src_map.keys())}")
         logger.info("Filtering cited sources from answer")
         cited_sources = []
         
-        for sid, sinfo in src_map.items():
-            if f"[{sid}]" in answer:
-                logger.info(f"Source {sid} is cited in the answer")
-                
-                # Check if parent_id exists
-                parent_id = sinfo.get("parent_id", "")
-                if parent_id:
-                    logger.info(f"Source {sid} has parent_id: {parent_id[:30]}..." if len(parent_id) > 30 else parent_id)
-                else:
-                    logger.warning(f"Cited source {sid} missing parent_id")
-                
-                # Add source to cited sources
-                cited_source = {
-                    "id": sid,
-                    "title": sinfo["title"],
-                    "content": sinfo["content"],
-                    "parent_id": parent_id  # Include parent_id
-                }
-                cited_sources.append(cited_source)
+        # First, check for explicit citations in the format [id]
+        explicit_citations = set()
+        citation_pattern = r'\[(\d+)\]'
+        for match in re.finditer(citation_pattern, answer):
+            sid = match.group(1)
+            if sid in src_map:
+                explicit_citations.add(sid)
+                logger.info(f"Source {sid} is explicitly cited in the answer")
         
-        logger.info(f"Found {len(cited_sources)} cited sources")
+        # Add explicitly cited sources
+        for sid in explicit_citations:
+            sinfo = src_map[sid]
+            parent_id = sinfo.get("parent_id", "")
+            if parent_id:
+                logger.info(f"Source {sid} has parent_id: {parent_id[:30]}..." if len(parent_id) > 30 else parent_id)
+            else:
+                logger.warning(f"Cited source {sid} missing parent_id")
+            
+            cited_source = {
+                "id": sid,
+                "title": sinfo["title"],
+                "content": sinfo["content"],
+                "parent_id": parent_id
+            }
+            cited_sources.append(cited_source)
+        
+        # If no explicit citations found, check for content similarity
+        # This helps with follow-up questions where the model might not include citation markers
+        if not cited_sources and len(src_map) > 0:
+            logger.info("No explicit citations found, checking for content similarity")
+            
+            # For follow-up questions, include the most relevant sources
+            # This is a simple approach - in a production system, you might want to use
+            # more sophisticated text similarity measures
+            for sid, sinfo in src_map.items():
+                # Check if significant content from the source appears in the answer
+                source_content = sinfo["content"].lower()
+                answer_lower = answer.lower()
+                
+                # Extract key sentences or phrases from the source
+                source_sentences = re.split(r'(?<=[.!?])\s+', source_content)
+                significant_content_found = False
+                
+                # Check if any significant sentences from the source appear in the answer
+                for sentence in source_sentences:
+                    # Only check sentences that are substantial enough to be meaningful
+                    if len(sentence) > 30 and sentence in answer_lower:
+                        significant_content_found = True
+                        logger.info(f"Source {sid} content found in answer without explicit citation")
+                        break
+                
+                # If significant content found, add this source
+                if significant_content_found:
+                    parent_id = sinfo.get("parent_id", "")
+                    cited_source = {
+                        "id": sid,
+                        "title": sinfo["title"],
+                        "content": sinfo["content"],
+                        "parent_id": parent_id
+                    }
+                    cited_sources.append(cited_source)
+        
+        logger.info(f"Found {len(cited_sources)} cited sources (explicit and implicit)")
         return cited_sources
 
     # ─────────── public API ───────────────

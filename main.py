@@ -25,16 +25,19 @@ from openai_service import OpenAIService
 
 # Configure logginghttps://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/logo-spark-1.png
 logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 # Clear any existing handlers
 if logger.handlers:
     logger.handlers.clear()
 # Add file handler with absolute path
 file_handler = logging.FileHandler('app.log')
+file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 # Stream logs to stdout for visibility
 stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.DEBUG)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
