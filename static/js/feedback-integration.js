@@ -46,7 +46,7 @@
                         title="Not helpful"></i>
                     </div>
                     <div class="feedback-details" style="display: none; margin-top: 5px; text-align: left; width: 250px;">
-                        <fieldset class="dark:text-white/60;" style="border:1px solid #ddd; padding:8px; border-radius:4px; margin-bottom:8px;">
+                        <fieldset class="dark:text-white/70" style="border:1px solid #ddd; padding:8px; border-radius:4px; margin-bottom:8px;">
                             <legend style="font-size:12px; margin-bottom:4px;">Select issues:</legend>
                             <div class="reasons-container">${reasonsHTML}</div>
                         </fieldset>
