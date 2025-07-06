@@ -97,7 +97,7 @@
           categoryColor = 'text-purple-500';
           break;
         case 'ui-state':
-          categoryColor = 'text-indigo-500';
+          categoryColor = 'text-blue-700';
           break;
         case 'user-preference':
           categoryColor = 'text-pink-500';

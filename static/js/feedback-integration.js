@@ -51,7 +51,7 @@
                             <div class="reasons-container">${reasonsHTML}</div>
                         </fieldset>
                         <div class="comment-container" style="display:none; margin-bottom:8px;">
-                            <textarea class="feedback-comment dark:bg-black text-white"
+                            <textarea class="feedback-comment text-gray-800 dark:bg-black text-white"
                                     placeholder="Additional comments..."
                                     style="width:100%; box-sizing: border-box; height:60px; padding:4px; font-size:12px;border:1px solid #ddd;"></textarea>
                         </div>

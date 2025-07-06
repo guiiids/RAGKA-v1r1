@@ -81,3 +81,4 @@ proxy.js
 # Ignore temporary decoder files
 new_decoder.html
 testing_url_decoder.html
+log_sample.log

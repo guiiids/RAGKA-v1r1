@@ -160,21 +160,31 @@ def llm_helpee(input_text: str) -> str:
         api_key=os.getenv("AZURE_OPENAI_KEY"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01")
     )
+    # Debug: log full helpee payload before sending to Azure OpenAI
+    logger.debug("Helpee payload: %s", {
+        "model": os.getenv("AZURE_OPENAI_MODEL"),
+        "messages": [
+            { "role": "system", "content": PROMPT_ENHANCER_SYSTEM_MESSAGE },
+            { "role": "user",   "content": input_text }
+        ]
+    })
     response = client.chat.completions.create(
         model=os.getenv("AZURE_OPENAI_MODEL"),
-    messages= [
-        { "role": "system", "content": PROMPT_ENHANCER_SYSTEM_MESSAGE },
-        { "role": "user",   "content": input_text }
-    ]
+        messages=[
+            { "role": "system", "content": PROMPT_ENHANCER_SYSTEM_MESSAGE },
+            { "role": "user",   "content": input_text }
+        ]
     )
     answer = response.choices[0].message.content
     usage = getattr(response, "usage", {})
     prompt_tokens = usage.prompt_tokens
     completion_tokens = usage.completion_tokens
     total_tokens = usage.total_tokens
+    logger.debug(f"User query: {input_text}")
+    logger.debug(f"Enhanced query: {answer}")
     # Log to database
     log_id = DatabaseManager.log_helpee_activity(
-        user_query=PROMPT_ENHANCER_SYSTEM_MESSAGE,
+        user_query=input_text,  # Store the original user query
         response_text=answer,
         prompt_tokens=prompt_tokens,
         completion_tokens=completion_tokens,
@@ -183,9 +193,17 @@ def llm_helpee(input_text: str) -> str:
     )
     model = os.getenv("AZURE_OPENAI_MODEL")
     rates = get_cost_rates(model)
-    prompt_cost = (prompt_tokens / 1000) * rates["prompt"]
-    completion_cost = (completion_tokens / 1000) * rates["completion"]
+    # The rates from get_cost_rates are already per 1M tokens (after being multiplied by 1000)
+    # So we need to divide tokens by 1M to get the correct cost
+    prompt_cost = prompt_tokens * rates["prompt"] / 1000000
+    completion_cost = completion_tokens * rates["completion"] / 1000000
     total_cost = prompt_cost + completion_cost
+    logger.debug(
+        f"Cost calculation details: model={model}, "
+        f"prompt_tokens={prompt_tokens}, prompt_rate={rates['prompt']}, prompt_cost={prompt_cost}, "
+        f"completion_tokens={completion_tokens}, completion_rate={rates['completion']}, completion_cost={completion_cost}, "
+        f"total_cost={total_cost}"
+    )
     DatabaseManager.log_helpee_cost(
         helpee_log_id=log_id,
         model=model,
@@ -222,13 +240,17 @@ def llm_helpee_2xl(input_text: str) -> str:
     )
     answer = response.choices[0].message.content
     usage = getattr(response, "usage", {})
+    latency = getattr(response, "latency", {})
+    logger.debug(f"Latency: {latency}")
+
+    usage = getattr(response, "usage", {})
     prompt_tokens = usage.prompt_tokens
     completion_tokens = usage.completion_tokens
     total_tokens = usage.total_tokens
     
     # Log to database
     log_id = DatabaseManager.log_helpee_activity(
-        user_query=PROMPT_ENHANCER_SYSTEM_MESSAGE_2XL,
+        user_query=input_text,  # Store the original user query
         response_text=answer,
         prompt_tokens=prompt_tokens,
         completion_tokens=completion_tokens,
@@ -238,8 +260,10 @@ def llm_helpee_2xl(input_text: str) -> str:
     
     model = os.getenv("AZURE_OPENAI_MODEL")
     rates = get_cost_rates(model)
-    prompt_cost = (prompt_tokens / 1000) * rates["prompt"]
-    completion_cost = (completion_tokens / 1000) * rates["completion"]
+    # The rates from get_cost_rates are already per 1M tokens (after being multiplied by 1000)
+    # So we need to divide tokens by 1M to get the correct cost
+    prompt_cost = prompt_tokens * rates["prompt"] / 1000000
+    completion_cost = completion_tokens * rates["completion"] / 1000000
     total_cost = prompt_cost + completion_cost
     
     DatabaseManager.log_helpee_cost(
@@ -395,7 +419,39 @@ HTML_TEMPLATE = """
   <title>SAGE Knowledge Navigator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="{marked_js_cdn}"></script>
+  <script src="{{ marked_js_cdn }}" defer></script>
+<script>
+  // Ensure marked is available globally
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof marked === 'undefined') {
+      console.error('marked library not loaded, loading from CDN');
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+      script.onload = function() {
+        console.log('marked library loaded successfully');
+        // Configure marked.js
+        marked.setOptions({
+          gfm: true,          // GitHub Flavored Markdown
+          breaks: true,       // Convert to br
+          sanitize: false,    // Don't sanitize HTML (we handle this elsewhere)
+          smartLists: true,   // Use smarter list behavior
+          smartypants: true   // Use "smart" typographic punctuation
+        });
+      };
+      document.head.appendChild(script);
+    } else {
+      console.log('marked library already loaded');
+      // Configure marked.js
+      marked.setOptions({
+        gfm: true,          // GitHub Flavored Markdown
+        breaks: true,       // Convert to br
+        sanitize: false,    // Don't sanitize HTML (we handle this elsewhere)
+        smartLists: true,   // Use smarter list behavior
+        smartypants: true   // Use "smart" typographic punctuation
+      });
+    }
+  });
+</script>
   <script src="/static/js/marked-renderer.js"></script>
   <style id="custom-styles">
   .avatar {
@@ -461,6 +517,20 @@ HTML_TEMPLATE = """
       list-style-type: disc;
       padding-left: 1.5rem;
     }
+    /* Hide empty list items */
+    .bot-bubble ul li:empty,
+    .bot-bubble ol li:empty {
+      display: none;
+    }
+    .bot-bubble ol {
+      list-style-type: decimal;
+      padding-left: 1.5rem;
+    }
+    .bot-bubble ol li,
+    .bot-bubble ul li {
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
     .bot-bubble a {
       color: blue;
       text-decoration: underline;
@@ -477,15 +547,15 @@ HTML_TEMPLATE = """
     .typing-indicator {
       display: inline-block;
       padding: 0.75rem 1rem;
-      background-color: #f3f4f6;
+      background-color: #fffff;
       border-radius: 1rem;
       border-bottom-left-radius: 0.25rem;
       margin-bottom: 1rem;
     }
     .typing-indicator span {
       display: inline-block;
-      width: 0.5rem;
-      height: 0.5rem;
+      width: 0.2rem;
+      height: 0.2rem;
       background-color: #9ca3af;
       border-radius: 50%;
       margin-right: 0.25rem;
@@ -610,7 +680,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
             <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 dark:text-white/80 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 dark:text-white/80 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-blue-700 dark:text-white/80">AI Agent</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-gray-900 ">
             Hi there! I'm an AI assistant trained on your knowledge base. What would you like to know?
@@ -633,22 +703,32 @@ HTML_TEMPLATE = """
           oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
           style="min-height: 34px;"
         ></textarea>
-        <button
-          id="magic-btn"
-          class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-          type="button"
-          aria-label="Magic Wand"
-        >
-          <i class="fa-solid fa-wand-magic"></i>
-        </button>
-        <button
-          id="magic-btn-2xl"
-          class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-          type="button"
-          aria-label="Magic Wand Enhanced"
-        >
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-        </button>
+        <div class="relative inline-block group">
+          <button
+            id="magic-btn"
+            class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            type="button"
+            aria-label="Magic Wand"
+          >
+            <i class="fa-solid fa-wand-magic"></i>
+          </button>
+          <span class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 whitespace-nowrap">
+            Enhance query with concise, context-rich keywords.
+          </span>
+        </div>
+        <div class="relative inline-block group">
+          <button
+            id="magic-btn-2xl"
+            class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            type="button"
+            aria-label="Magic Wand Enhanced"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </button>
+          <span class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 whitespace-nowrap">
+            Transform query into a detailed, structured AI prompt.
+          </span>
+        </div>
         <button
           id="submit-btn"
           class="rounded-2xl bg-gradient-to-r from-blue-800 to-blue-400 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:opacity-90 focus:opacity-95 focus:shadow-none active:opacity-95 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -658,6 +738,7 @@ HTML_TEMPLATE = """
         </button>
       </div>
     </div>
+    <span>SAGE may occasionally be wrong. Verify critical info.</span>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
       <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white dark:bg-black text-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">
@@ -791,23 +872,45 @@ HTML_TEMPLATE = """
     }
     
     function formatMessage(message) {
-      // Convert URLs to links
-      message = message.replace(
-        /(https?:\/\/[^\s]+)/g, 
-        '<a href="$1" target="_blank" class="text-blue-600 hover:underline">$1</a>'
-      );
-      // Convert **bold** to <strong>
-      message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      // Convert *italic* to <em>
-      message = message.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      // Convert newlines to <br>
-      message = message.replace(/\\n/g, '<br>');
-      // Convert citation references [n] to clickable links
-      message = message.replace(
-        /\[(\d+)\]/g,
-        '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
-      );
-      return message;
+      try {
+        // Pre-process special cases before passing to marked.js
+        // Handle citation references [n] to make them clickable
+        let processedMessage = message.replace(
+          /\[(\d+)\]/g,
+          '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
+        );
+        
+        // Use marked.js for standard markdown rendering
+        let html = marked.parse(processedMessage, {
+          gfm: true,          // GitHub Flavored Markdown
+          breaks: true,       // Convert to <br>
+          sanitize: false,    // Don't sanitize HTML (we handle this elsewhere)
+          smartLists: true,   // Use smarter list behavior
+          smartypants: true   // Use "smart" typographic punctuation
+        });
+        
+        return html;
+      } catch (error) {
+        console.error('Error rendering markdown with marked.js:', error);
+        
+        // Fallback to basic formatting if marked.js fails
+        message = message.replace(
+          /(https?:\/\/[^\s]+)/g, 
+          '<a href="$1" target="_blank" class="text-blue-600 hover:underline">$1</a>'
+        );
+        // Convert **bold** to <strong>
+        message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Convert *italic* to <em>
+        message = message.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        // Convert newlines to <br>
+        message = message.replace(/\\n/g, '<br>');
+        // Convert citation references [n] to clickable links
+        message = message.replace(
+          /\[(\d+)\]/g,
+          '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
+        );
+        return message;
+      }
     }
 
   
@@ -842,9 +945,9 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
           <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
             <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
-              <span class="text-xs font-semibold text-gray-900 dark:text-white/80"><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 dark:text-white/80 hover:underline">ME</span></span>
+              <span class="text-xs font-semibold text-gray-900 dark:text-white/80"><span class="mt-1 text-xs leading-tight font-medium text-blue-700 dark:text-white/80">ME</span></span>
             </div>
-            <div class="text-sm font-normal py-2 text-gray-900 dark:text-white/80 message-bubble user-bubble">
+            <div class="text-sm font-normal py-2 text-gray-900 dark:text-white/80 space-y-4 message-bubble user-bubble">
                ${formatMessage(message)}
             </div>
           </div>
@@ -870,9 +973,9 @@ HTML_TEMPLATE = """
           <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 dark:text-white ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 dark:text-white/80 hover:underline"> AI Agent</span></span>
+            <span class="text-xs font-semibold text-gray-900 dark:text-white ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-blue-700 dark:text-white/80"> AI Agent</span></span>
           </div>
-          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white/80 message-bubble bot-bubble">
+          <div class="text-sm leading-6 font-normal py-2 text-gray-900 dark:text-white/80 space-y-4 message-bubble bot-bubble">
              ${formatMessage(message)}
           </div>
           <span class="text-xs font-normal text-gray-500 dark:text-white/60 text-right pt-33">Was this helpful?</span>
@@ -927,6 +1030,10 @@ HTML_TEMPLATE = """
       
       addUserMessage(query);
       queryInput.value = '';
+      
+       // Reset textarea height to 1 line after sending
+      queryInput.style.height = 'auto';
+      queryInput.style.height = (lineHeight) 
       
       // Show typing indicator
       const typingIndicator = addTypingIndicator();
@@ -1055,7 +1162,7 @@ HTML_TEMPLATE = """
           sourceTitle = escapeHtml(sourceTitle);
           
           // Make the source title clickable with the same functionality as inline citations
-          sourcesHtml += `<li>${index + 1}. <a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
+          sourcesHtml += `<li><a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
         });
         
         sourcesHtml += '</ol>';
@@ -1064,6 +1171,11 @@ HTML_TEMPLATE = """
         // Append to the last bot message
         const lastBotMessage = document.querySelector('.bot-message:last-child .message-bubble');
         if (lastBotMessage) {
+          // Remove existing sources section to prevent duplicates
+          const existingSection = lastBotMessage.querySelector('.sources-section');
+          if (existingSection) {
+            existingSection.remove();
+          }
           lastBotMessage.innerHTML += sourcesHtml;
           
           // Add click event listeners for the new citation links
@@ -1115,6 +1227,15 @@ HTML_TEMPLATE = """
         .then(data => {
           if (data.output) {
             queryInput.value = data.output;
+            // Manually trigger height adjustment with max height constraint
+            queryInput.style.height = 'auto';
+            const boundedHeight = Math.min(queryInput.scrollHeight, lineHeight * maxLines);
+            queryInput.style.height = boundedHeight + 'px';
+            queryInput.style.overflowY = queryInput.scrollHeight > lineHeight * maxLines ? 'auto' : 'hidden';
+            // Scroll to the end of the textarea to show there's more content
+            if (queryInput.scrollHeight > boundedHeight) {
+              queryInput.scrollTop = queryInput.scrollHeight;
+            }
           }
         })
         .catch(console.error)
@@ -1216,13 +1337,17 @@ def index():
         session['session_id'] = os.urandom(16).hex()
         logger.info(f"New session created: {session['session_id']}")
     
-    return render_template_string(HTML_TEMPLATE, file_executed=file_executed, sas_token=sas_token)
+    return render_template_string(HTML_TEMPLATE, 
+                                 file_executed=file_executed, 
+                                 sas_token=sas_token,
+                                 marked_js_cdn=MARKED_JS_CDN)
 
 @app.route("/api/query", methods=["POST"])
 def api_query():
     data = request.get_json()
     logger.info("DEBUG - Incoming /api/query payload: %s", json.dumps(data))
     user_query = data.get("query", "")
+    is_enhanced = data.get("is_enhanced", False)
     logger.info(f"API query received: {user_query}")
     
     # Get the session ID
@@ -1255,7 +1380,7 @@ def api_query():
         logger.info(f"DEBUG - Max tokens: {rag_assistant.max_tokens}")
         logger.info(f"DEBUG - Top P: {rag_assistant.top_p}")
         
-        answer, cited_sources, _, evaluation, context = rag_assistant.generate_rag_response(user_query)
+        answer, cited_sources, _, evaluation, context = rag_assistant.generate_rag_response(user_query, is_enhanced=is_enhanced)
         logger.info(f"API query response generated for: {user_query}")
         logger.info(f"DEBUG - Response length: {len(answer)}")
         logger.info(f"DEBUG - Number of cited sources: {len(cited_sources)}")
@@ -1375,6 +1500,12 @@ def api_stream_query():
 
 @app.route("/api/feedback", methods=["POST"])
 def api_feedback():
+    import os
+    import json
+    import uuid
+    import traceback
+    import config
+
     data = request.get_json()
     logger.debug(f"Received feedback data: {json.dumps(data)}")
     
@@ -1390,6 +1521,21 @@ def api_feedback():
     # Log the processed feedback data to help diagnose issues
     logger.debug(f"Processed feedback data: {json.dumps(feedback_data)}")
     
+    # Save feedback to file for persistence
+    try:
+        feedback_dir = config.FEEDBACK_DIR
+        if not os.path.exists(feedback_dir):
+            os.makedirs(feedback_dir)
+        # Use UUID for unique filename
+        filename = f"{uuid.uuid4()}.json"
+        filepath = os.path.join(feedback_dir, filename)
+        with open(filepath, "w") as f:
+            json.dump(feedback_data, f, indent=2)
+        logger.info(f"Feedback saved to file: {filepath}")
+    except Exception as e:
+        logger.error(f"Error saving feedback to file: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+
     try:
         vote_id = DatabaseManager.save_feedback(feedback_data)
         logger.info(f"Feedback saved to DB with ID: {vote_id}")
@@ -1398,7 +1544,6 @@ def api_feedback():
         logger.error(f"Error saving feedback to database: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({"success": False, "error": str(e)}), 500
-
 # Serve static files from both static/ and reask_dashboard/static/
 @app.route("/static/<path:filename>")
 def serve_static(filename):
@@ -1844,8 +1989,8 @@ if __name__ == "__main__":
     
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Run the Flask RAG application')
-    parser.add_argument('--port', type=int, default=int(os.environ.get("PORT", 5002)),
-                        help='Port to run the server on (default: 5002)')
+    parser.add_argument('--port', type=int, default=int(os.environ.get("PORT", 5003)),
+                        help='Port to run the server on (default: 5003)')
     args = parser.parse_args()
     
     port = args.port

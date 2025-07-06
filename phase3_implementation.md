@@ -1,178 +1,139 @@
-# Phase 3: Dashboard Route and Integration Implementation
+# Phase 3 Implementation: System Prompt Improvements
 
-This document provides the detailed implementation for Phase 3 of the PostgreSQL integration with the Analytics Dashboard. It includes specific code examples for creating a dedicated route for the analytics dashboard and ensuring the API returns complete data.
+## Overview
 
-## Step 3.1: Create Analytics Dashboard Route
+Phase 3 of the RAG improvement plan focused on enhancing the system prompts and query type detection to better handle procedural content. This phase builds upon the improvements made in Phases 1 and 2, which implemented semantic chunking and context preparation enhancements.
 
-Add the following route to `main.py` to serve the analytics dashboard HTML:
+## Implementation Details
 
-```python
-@app.route("/analytics", methods=["GET"])
-def analytics_dashboard():
-    """
-    Route to serve the analytics dashboard HTML page.
-    """
-    try:
-        logger.info("Analytics dashboard accessed")
-        return send_from_directory('.', 'analytics_dashboard.html')
-    except Exception as e:
-        logger.error(f"Error serving analytics dashboard: {e}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return "Error loading analytics dashboard", 500
-```
+### 1. Enhanced Query Type Detection
 
-This route will serve the `analytics_dashboard.html` file directly from the root directory. If you prefer to keep it in a different location (like a templates folder), you can adjust the path accordingly:
+We improved the `detect_query_type` function to more accurately identify procedural queries:
+
+- Added comprehensive pattern matching for various procedural query formats
+- Implemented special case detection for phrases like "guide me through" and "show me how"
+- Added context-aware detection for follow-up questions in procedural conversations
+- Improved detection of short follow-up queries that continue a procedural conversation
 
 ```python
-@app.route("/analytics", methods=["GET"])
-def analytics_dashboard():
+def detect_query_type(self, query: str, conversation_history: List[Dict] = None) -> str:
     """
-    Route to serve the analytics dashboard HTML page from templates folder.
+    Detect if the query is asking for procedural information.
+    
+    Args:
+        query: The user query
+        conversation_history: Optional conversation history for context
+        
+    Returns:
+        "procedural" or "informational"
     """
-    try:
-        logger.info("Analytics dashboard accessed")
-        return render_template_string(open('templates/analytics_dashboard.html').read())
-    except Exception as e:
-        logger.error(f"Error serving analytics dashboard: {e}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return "Error loading analytics dashboard", 500
+    # Enhanced procedural patterns
+    procedural_patterns = [
+        # How-to patterns
+        r'how (to|do|can|would|should) (i|we|you|one)?\s',
+        r'what (is|are) the (steps|procedure|process|way|method) (to|for|of)',
+        # ... additional patterns ...
+    ]
+    
+    # Special case for "guide me through" and similar phrases
+    if re.search(r'(guide|walk|take) me through', query_lower) or re.search(r'(show|tell) me how', query_lower):
+        return "procedural"
+        
+    # Check conversation context for follow-up questions
+    if conversation_history:
+        # ... context-aware detection logic ...
+    
+    return "informational"  # Default to informational
 ```
 
-## Step 3.2: Update API to Return Complete Data
+### 2. Refined Procedural System Prompt
 
-The `get_analytics_data` function was already updated in Phase 2 to include all the necessary data. Let's add an export endpoint to allow downloading the analytics data as a JSON file:
+We enhanced the procedural system prompt to provide better guidance for formatting procedural content:
+
+- Added clear hierarchical organization guidelines using markdown headings
+- Provided detailed instructions for step-by-step content formatting
+- Added guidelines for ensuring completeness of procedural responses
+- Included an improved example format for procedures with clear sections
+- Preserved all important rules from the existing system prompts (citations, uncertainty handling, etc.)
+
+```
+### Guidelines for Procedural Content:
+
+- Structure your response with clear hierarchical organization:
+  * Use markdown headings (## for main sections, ### for subsections)
+  * Group related steps under appropriate headings
+  * Maintain a logical flow from prerequisites to completion
+
+- For step-by-step instructions:
+  * Preserve the original sequence and numbering from the source material
+  * Present steps in a clear, logical order from start to finish
+  * Number each step explicitly (1, 2, 3, etc.)
+  * Include all necessary details for each step
+  * Use bullet points for sub-steps or additional details within a step
+
+- Ensure completeness:
+  * Include all necessary prerequisites before listing steps
+  * Specify where to start the procedure (e.g., which menu, screen, or interface)
+  * Include any required materials, permissions, or preconditions
+  * Conclude with verification steps or expected outcomes
+  * Mention any common issues or troubleshooting tips if available
+```
+
+### 3. Prompt Selection Logic
+
+We implemented logic to select the appropriate system prompt based on the query type:
+
+- Procedural queries use the enhanced PROCEDURAL_SYSTEM_PROMPT
+- Informational queries use the DEFAULT_SYSTEM_PROMPT
+- The system maintains conversation context for follow-up questions
 
 ```python
-@app.route("/api/analytics/export", methods=["GET"])
-def export_analytics():
-    """
-    API endpoint to export analytics data as a JSON file.
-    Accepts optional date range parameters.
-    """
-    try:
-        # Get date range parameters from request
-        start_date = request.args.get("start_date")
-        end_date = request.args.get("end_date")
-        
-        logger.info(f"Analytics data export requested with date range: {start_date} to {end_date}")
-        
-        # Get analytics data from database
-        analytics_data = get_analytics_data(start_date, end_date)
-        
-        # Set headers for file download
-        response = Response(
-            json.dumps(analytics_data, indent=2, default=str),
-            mimetype="application/json",
-            headers={"Content-Disposition": f"attachment;filename=analytics_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"}
-        )
-        
-        return response
-    except Exception as e:
-        logger.error(f"Error exporting analytics data: {e}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({"error": str(e)}), 500
+# Select appropriate system prompt based on query type
+if query_type == "procedural":
+    system_prompt = self.PROCEDURAL_SYSTEM_PROMPT
+    logger.info("Using procedural system prompt")
+else:
+    system_prompt = self.DEFAULT_SYSTEM_PROMPT
+    logger.info("Using default system prompt")
+
+# Update the system message with the appropriate prompt
+self.conversation_manager.clear_history(preserve_system_message=False)
+self.conversation_manager.chat_history = [{"role": "system", "content": system_prompt}]
 ```
 
-Let's also add a CSV export option for users who prefer that format:
+## Testing
 
-```python
-@app.route("/api/analytics/export/csv", methods=["GET"])
-def export_analytics_csv():
-    """
-    API endpoint to export analytics data as a CSV file.
-    Exports recent interactions in CSV format.
-    """
-    try:
-        # Get date range parameters from request
-        start_date = request.args.get("start_date")
-        end_date = request.args.get("end_date")
-        
-        logger.info(f"Analytics CSV export requested with date range: {start_date} to {end_date}")
-        
-        # Get recent interactions from database
-        recent_interactions = DatabaseManager.get_recent_interactions(limit=1000)  # Larger limit for export
-        
-        # Create CSV content
-        csv_content = "vote_id,user_query,feedback_status,response_time,tokens,timestamp\n"
-        for interaction in recent_interactions:
-            # Escape quotes in user query
-            user_query = interaction['user_query'].replace('"', '""')
-            
-            csv_content += f"{interaction['vote_id']},\"{user_query}\",{interaction['feedback_status']},{interaction['response_time']},{interaction['tokens']},{interaction['timestamp']}\n"
-        
-        # Set headers for file download
-        response = Response(
-            csv_content,
-            mimetype="text/csv",
-            headers={"Content-Disposition": f"attachment;filename=interactions_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
-        )
-        
-        return response
-    except Exception as e:
-        logger.error(f"Error exporting analytics CSV data: {e}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({"error": str(e)}), 500
-```
+We implemented comprehensive tests to verify the Phase 3 implementation:
 
-## Add Necessary Imports
+1. **Query Type Detection Tests**:
+   - Tests for various procedural query patterns
+   - Tests for informational queries
+   - Tests for follow-up questions with conversation context
 
-Make sure to add the following imports to `main.py` if they're not already there:
+2. **Prompt Selection Tests**:
+   - Tests to verify the correct prompt is selected based on query type
+   - Tests to ensure procedural content is handled with the procedural prompt
+   - Tests to ensure informational content is handled with the default prompt
 
-```python
-from flask import send_from_directory, Response
-from datetime import datetime
-import json
-import traceback
-```
+## Results
 
-## Testing Phase 3
+The implementation successfully addresses the key objectives of Phase 3:
 
-After implementing these changes, you can test the new routes by:
-
-1. Starting the Flask application:
-   ```
-   python main.py
-   ```
-
-2. Accessing the analytics dashboard in a browser:
-   ```
-   http://localhost:5002/analytics
-   ```
-
-3. Testing the export endpoints:
-   ```
-   http://localhost:5002/api/analytics/export
-   http://localhost:5002/api/analytics/export/csv
-   ```
-
-4. Testing with date range parameters:
-   ```
-   http://localhost:5002/api/analytics/export?start_date=2025-01-01&end_date=2025-06-18
-   ```
-
-## Handling Cross-Origin Requests (Optional)
-
-If you need to access the API from a different domain or port, you may need to add CORS support:
-
-```python
-from flask_cors import CORS
-
-# Initialize Flask app
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-```
-
-Or for specific routes only:
-
-```python
-from flask_cors import cross_origin
-
-@app.route("/api/analytics", methods=["GET"])
-@cross_origin()  # Enable CORS for this route only
-def api_analytics():
-    # ... existing code ...
-```
+1. ✅ Accurately detects when a query is asking for procedural information
+2. ✅ Uses specialized prompts for procedural vs. informational queries
+3. ✅ Maintains context awareness for follow-up questions
+4. ✅ Preserves all important rules from existing system prompts
 
 ## Next Steps
 
-After successfully implementing and testing Phase 3, proceed to Phase 4: Frontend JavaScript Implementation to update the analytics dashboard HTML to fetch and display real data from the API.
+With Phase 3 complete, the next steps are:
+
+1. Implement Phase 4: Response Validation and Post-Processing
+   - Validate that procedural responses include all necessary steps
+   - Enhance formatting of procedural responses
+   - Implement post-processing to ensure consistent structure
+
+2. Implement Phase 5: Metadata-Enhanced Retrieval
+   - Use extracted metadata to improve search relevance
+   - Implement metadata-based ranking of results
+   - Add weighting for procedural content in relevant queries

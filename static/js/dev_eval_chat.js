@@ -34,8 +34,16 @@ const ChatHelpers = {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot-message';
         messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+        
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Inject mt-4 class to list items after message is added
+        messageDiv.querySelectorAll('ol, ul').forEach(list => {
+          list.querySelectorAll('li + li').forEach(li => {
+            li.classList.add('mt-4');
+          });
+        });
       }
     }
   },
@@ -51,12 +59,36 @@ const ChatHelpers = {
     }
   },
   
-  // Format message with proper line breaks
+  // Format message with markdown rendering
   formatMessage: function(text) {
     if (typeof window.formatMessage === 'function') {
       return window.formatMessage(text);
     } else {
-      return text.replace(/\n/g, '<br>');
+      try {
+        // Try to use marked.js if available
+        if (typeof marked !== 'undefined') {
+          // Pre-process special cases before passing to marked.js
+          let processedText = text.replace(
+            /\[(\d+)\]/g,
+            '<a href="#source-$1" class="citation-link text-xs text-blue-600 hover:underline" data-source-id="$1">[$1]</a>'
+          );
+          
+          return marked.parse(processedText, {
+            gfm: true,
+            breaks: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true
+          });
+        } else {
+          // Fallback to basic formatting
+          return text.replace(/\n/g, '<br>');
+        }
+      } catch (error) {
+        console.error('Error rendering markdown:', error);
+        // Fallback to basic formatting
+        return text.replace(/\n/g, '<br>');
+      }
     }
   },
   
@@ -615,17 +647,28 @@ document.addEventListener('DOMContentLoaded', function() {
       const text = document.getElementById('query-input').value.trim();
       if (!text) return;
       
-      magicBtn2xl.disabled = true;
-      const origIcon = magicBtn2xl.innerHTML;
-      magicBtn2xl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      // Store references to button and original icon to ensure they're accessible in all callbacks
+      const btn = this;
+      const origIcon = btn.innerHTML;
+      
+      // Log the start of the process
+      console.log('Magic 2XL enhancement started');
+      
+      // Disable button and show spinner
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
       
       fetch('/api/magic_query_2xl', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({input_text: text})
       })
-      .then(res => res.json())
+      .then(res => {
+        console.log('Magic 2XL API response received');
+        return res.json();
+      })
       .then(data => {
+        console.log('Magic 2XL API data processed');
         if (data.error) {
           console.error('Magic query 2XL error:', data.error);
           ChatHelpers.addBotMessage('Error: ' + data.error);
@@ -644,8 +687,15 @@ document.addEventListener('DOMContentLoaded', function() {
         ChatHelpers.addBotMessage('Network error: ' + error.message);
       })
       .finally(() => { 
-        magicBtn2xl.disabled = false; 
-        magicBtn2xl.innerHTML = origIcon;
+        // Ensure button state is restored regardless of success or failure
+        console.log('Magic 2XL enhancement completed, restoring button state');
+        
+        // Use setTimeout to ensure this runs after all other callbacks
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = origIcon;
+          console.log('Button state restored');
+        }, 0);
       });
     });
   }

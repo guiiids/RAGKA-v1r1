@@ -247,7 +247,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse">
-            <span class="text-sm font-semibold text-gray-900 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-indigo-500 hover:underline">AI Agent</span></span>
+            <span class="text-sm font-semibold text-gray-900 ">SAGE<span class="mt-1 text-sm leading-tight font-medium text-blue-700 hover:underline">AI Agent</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-gray-900 ">
             Hi there! I'm an AI assistant trained on your knowledge base. I can remember our conversation history. What would you like to know?
@@ -339,7 +339,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/Untitled-design-3.png" alt="AI Agent">
         <div class="flex flex-col items-end w-full max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pr-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900  "><span class="mt-1 text-xs leading-tight font-medium text-indigo-500 hover:underline">ME</span></span>
+            <span class="text-xs font-semibold text-gray-900  "><span class="mt-1 text-xs leading-tight font-medium text-blue-700 hover:underline">ME</span></span>
           </div>
           <div class="text-sm font-normal py-2 text-white message-bubble user-bubble">
              ${formatMessage(message)}
@@ -368,7 +368,7 @@ HTML_TEMPLATE = """
         <img class="w-8 h-8 rounded-full" src="https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/05/dalle.png" alt="AI Agent">
         <div class="flex flex-col w-auto max-w-[90%] leading-1.5">
           <div class="flex items-center space-x-2 rtl:space-x-reverse pl-1 pb-1">
-            <span class="text-xs font-semibold text-gray-900 ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-indigo-500 hover:underline"> AI Agent</span></span>
+            <span class="text-xs font-semibold text-gray-900 ">SAGE<span class="mt-1 text-xs leading-tight font-strong text-blue-700 hover:underline"> AI Agent</span></span>
           </div>
           <div class="text-sm leading-6 font-normal py-2 text-gray-900  message-bubble bot-bubble">
              ${formatMessage(message)}
@@ -522,7 +522,7 @@ HTML_TEMPLATE = """
           sourceTitle = escapeHtml(sourceTitle);
           
           // Make the source title clickable with the same functionality as inline citations
-          sourcesHtml += `<li>${index + 1}. <a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
+          sourcesHtml += `<li><a href="#source-${index + 1}" class="citation-link text-blue-600 hover:underline cursor-pointer" data-source-id="${index + 1}">${sourceTitle}</a></li>`;
         });
         
         sourcesHtml += '</ol>';

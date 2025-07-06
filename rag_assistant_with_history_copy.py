@@ -1,3 +1,4 @@
+from rag_improvement_logging import log_interaction
 """
 Flask-compatible version of the RAG assistant with in-memory conversation history
 """
@@ -82,7 +83,6 @@ class FlaskRAGAssistantWithHistory:
     - If uncertain, ask the user for clarification.
     - Respond in the same language as the user's query.
     - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
-    - If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
     - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**
     - Do not cite if the <source> tag does not contain an id attribute.
     - Do not use XML tags in your response.
@@ -614,21 +614,56 @@ class FlaskRAGAssistantWithHistory:
         logger.info(f"Found {len(cited_sources)} cited sources (explicit and implicit)")
         return cited_sources
 
+    def _get_enhanced_query(self, query: str) -> str:
+        """
+        Enhance the user query with conversation history.
+        """
+        
+        # Get the last few messages from the history
+        history = self.conversation_manager.get_history()[-5:]
+        
+        # Create a prompt for the enhancement
+        prompt = "Based on the following conversation history, please generate a concise and informative search query that captures the user's intent. The query should be self-contained and not require the conversation history to be understood. Focus on the most recent user query and the key entities and topics discussed.\n\n"
+        
+        for msg in history:
+            prompt += f"{msg['role']}: {msg['content']}\n"
+            
+        prompt += f"\nGenerate a search query for the last user message: '{query}'"
+        
+        try:
+            response = self.openai_client.completions.create(
+                model=self.deployment_name,
+                prompt=prompt,
+                max_tokens=100,
+                temperature=0.2,
+            )
+            enhanced_query = response.choices[0].text.strip()
+            logger.info(f"Enhanced query: {enhanced_query}")
+            return enhanced_query
+        except Exception as e:
+            logger.error(f"Error enhancing query: {e}")
+            return query
+
     # ─────────── public API ───────────────
     def generate_rag_response(
-        self, query: str
+        self, query: str, is_enhanced: bool = False
     ) -> Tuple[str, List[Dict], List[Dict], Dict[str, Any], str]:
         """
         Generate a response using RAG with conversation history.
         
         Args:
             query: The user query
+            is_enhanced: A flag to indicate if the query is already enhanced
             
         Returns:
             answer, cited_sources, [], evaluation, context
         """
         try:
-            kb_results = self.search_knowledge_base(query)
+            if not is_enhanced:
+                enhanced_query = self._get_enhanced_query(query)
+            else:
+                enhanced_query = query
+            kb_results = self.search_knowledge_base(enhanced_query)
             if not kb_results:
                 return (
                     "No relevant information found in the knowledge base.",
@@ -784,6 +819,8 @@ class FlaskRAGAssistantWithHistory:
                     content = chunk.choices[0].delta.content
                     collected_chunks.append(content)
                     collected_answer += content
+                    # Yield the raw content - the client-side will handle markdown rendering
+                    # This ensures consistent rendering across all response types
                     yield content
             
             logger.info("DEBUG - Collected answer: %s", collected_answer[:100])

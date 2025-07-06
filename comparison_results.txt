@@ -1,0 +1,1070 @@
+
+=== TESTING PROCEDURAL QUERIES ===
+
+INFO - [rag_improvement.compare] - Comparing responses for query: how to add a new calendar?
+INFO - [rag_improvement.compare] - Comparing responses for query: how to add a new calendar?
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: how to add a new calendar?
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 5 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 5 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 5 results
+INFO - [rag_improvement.phase3] - Found 0 procedural and 5 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 contains procedural content
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 contains procedural content
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 contains procedural content
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 5 valid chunks and 5 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'how to add a new calendar?' detected as procedural based on pattern matching
+INFO - [rag_improvement.phase3] - Using procedural system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+    
+    Respond to the user query about procedural content using the provided contex...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1">emails can be
+
+set for core staff to see when one milestone has been comple...
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n    \n    Respond to the user query about procedural content using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines for Procedural Content:\n    \n    - Structure your response with clear hierarchical organization:\n      * Use markdown headings (## for main sections, ### for subsections)\n      * Group related steps under appropriate headings\n      * Maintain a logical flow from prerequisites to completion\n    \n    - For step-by-step instructions:\n      * Preserve the original sequence and numbering from the source material\n      * Present steps in a clear, logical order from start to finish\n      * Number each step explicitly (1, 2, 3, etc.)\n      * Include all necessary details for each step\n      * Use bullet points for sub-steps or additional details within a step\n    \n    - Ensure completeness:\n      * Include all necessary prerequisites before listing steps\n      * Specify where to start the procedure (e.g., which menu, screen, or interface)\n      * Include any required materials, permissions, or preconditions\n      * Conclude with verification steps or expected outcomes\n      * Mention any common issues or troubleshooting tips if available\n    \n    - Always include inline citations using [id] format when referencing information from sources\n      * Citations should appear at the end of the relevant step or section\n      * Every factual claim should have a citation\n      * **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses**\n    \n    ### Example Format for Procedures:\n    \n    ## How to [Accomplish Task]\n    \n    ### Prerequisites\n    - [Required materials or permissions] [1]\n    - [System requirements or conditions] [1]\n    \n    ### [First Major Section]\n    1. **[Step Name]**: [Detailed instructions for step 1] [1]\n       - [Additional details or tips]\n       - [Alternative approaches if applicable]\n    \n    2. **[Step Name]**: [Detailed instructions for step 2] [2]\n       - [Additional details or tips]\n    \n    ### [Second Major Section]\n    3. **[Step Name]**: [Detailed instructions for step 3] [2]\n       - [Additional details or tips]\n    \n    4. **[Step Name]**: [Detailed instructions for step 4] [3]\n       - [Additional details or tips]\n    \n    ### Verification\n    - [How to confirm successful completion] [3]\n    - [Expected outcome or result] [3]\n    \n    ### General Guidelines:\n    \n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Output:\n    \n    Provide a clear, structured response that follows these guidelines while incorporating information from the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\">emails can be\n\nset for core staff to see when one milestone has been completed and another needs to start.\n\nTo\n\nlearn more about how to create and manage milestones, please refer to Using Milestones .\n\nManage Events When enabled, core staff have the ability to add events to a resource calendar,\n\ndirectly from the View All Requests tab.\n\nThis is helpful if the core staff will assume responsibility\n\nfor scheduling time on behalf of the user, and has received a request to do so.\n\n**To see the add**\n\nevent interface, click on the 'add event' link.\n\nThis will open the 'Add event' interface and allow the\n\ncore to schedule on one or multiple instruments.\n\nSearch for the resources you want to schedule.\n\nAdjust the search time to the time frame needed to schedule Individual resources can also be\n\nadjusted Click 'Book' for each resource or 'Book all' for multiple resources to save the events.\n\nThe\n\ncalendar will show all instruments selected above, availability on each instrument and the\n\nreservations that were just made.\n\nClosing out of this interface will show the reservation on the\n\nsingle service request.\n\nChange Row Order There are times when the order of forms, milestones,\n\nservices, and charges, and events need to be reordered.\n\n**You can change the order by clicking on**\n\n'change order'.\n\nNext, click on the icon to the left of the item you wish to move, and drag it up or\n\ndown to adjust the order.\n\n**Click 'Finish'.**\n\n**You will now see the revised order.**\n\nPage 3</source>\n\n<source id=\"2\">of editing sections will display on the left. Click on the setting, or use the search engine, to\n\nfind specific editing sections. Helpful tips - Each editing panel within a page will need to be saved\n\nindividually. Most settings have help text to explain the functionality of the setting. Hover the 'i'\n\nicon beside the field to review available help text. General Settings Basic Information Schedule\n\nName: Enter a name for the calendar. \n**Scheduled Resource Description:**\n This text is displayed to\n\nthe customer on the calendar interface. You can utilize this text section by providing an\n\nexplanation of the resource, an image of the resource, billing information, or directions on\n\nscheduling. \n**Category:**\n Allows you to group calendars into categories. To create a new category,\n\nclick in the category drop down and select Add new category, this will create a free text text below\n\nwhere you can type in the name of the new category. NOTE: If you would like your calendars\n\ndisplayed in categories, please contact iLab, as an additional setting needs to be enabled. Time\n\nZone : Enter the time zone to be used for scheduling purposes. By default, this will be set to your\n\ninstitution's time zone. This setting will override the user's personal time zone setting when\n\nscheduling on the calendar. \n**Classification :**\n Assign a classification to the schedule that can be\n\nused to more effectively search for it. Available classification terms are derived from the Eagle I\n\nPage 1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for</source>\n\n<source id=\"3\">1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for\n\nresources within a single calendar interface. Users can then view all calendars at one time to\n\nschedule on the available resource. NOTE: The same calendar pricing and restrictions will apply\n\nto each instance. For example, if you have multiple PCR machines, you could enter each PCR\n\nmachine as a separate row within the 'Configure Multiple Instances' section with the names \"PCR\n\n1\", \"PCR 2\", \"PCR3\". Custom Forms Custom forms can be included when creating a reservation\n\nto capture preliminary information from the customer. Cores can create multiple custom forms and\n\nlink them to individual schedules. When the user creates a reservation, the form will display in the\n\n'Required Forms' section on the Reservation Details page. Form fields can be required or not to\n\ncomplete prior to submitting the reservation. To manage the forms available to the core, refer to\n\nCustom Forms . Include custom form on reservations detail page? (Y/N): Indicate whether any\n\ncustom forms associated with this resource will be displayed on the reservations details page.\n\nDisplay a custom form when scheduling maintenance on this resource? (Y/N): Indicate whether a\n\ncustom form should display when a maintenance reservation is created. Notifications Send\n\nreminder emails for reservations?: Select from the drop down the amount of time prior to a\n\nreservation when the user should receive a reminder email about their reservation. Subscribed</source>\n\n<source id=\"4\">(edit) icon\n\nfor existing equipment to access the schedule settings. NOTE: Advanced attributes must be\n\nturned on by an iLab associate in order to utilize configurable reservations. If Advanced Attributes\n\nis turned on in the calendar, the calendar page updates with additional buttons. Click the\n\n\"Advanced Attributes\" button to set up the requirements. The first page allows the user to set up a\n\nattributes and arrange them into groupings. The top section is for general attribute(s) (i.e.\n\nattributes without a grouping). If you do not have one, start with your first grouping by typing a\n\nname and pressing the \"Add grouping\" button. If you want to require at least one grouping to be\n\nselected by users, click the \"Require at least one group\" check box. To create attributes under\n\neach grouping, press the \"Add attribute\" button. For each attribute, you must have a name, a\n\ndescription and at least one item to be selected. You can make selecting the attribute mandatory\n\nby toggling the \"Required\" switch to on. You can also make the attribute visible only to core staff\n\nby toggling on the \"Administrative only\" switch. Different attributes can be color coded. Press the\n\n\"Plus\" button to add more options to be configured. Press the Add attributes button to add another\n\nattribute and follow the steps above to add the selections under the attributes. Once you have all\n\nyour groupings and attributes built for your calendar, you can begin assigning requirements on\n\nPage 1\n\nHelpJuice Articles\n\nthe calendar. Click the \"Back to core\" button in the upper-right to return to the Schedule\n\nEquipment tab. Assign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button. On the calendar page, click the \"Manage\n\nconfigurations\" button. On the configuration view, click the day you wish to configure. Check the\n\ntimes of day that must be configured by clicking the check boxes. Then, select the attribute(s) that</source>\n\n<source id=\"5\">1\n\n\n\n**HelpJuice Articles**\n\nthe calendar.\n\nClick the \"Back to core\" button in the upper-right to return to the Schedule\n\n**Equipment tab.**\n\nAssign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button.\n\n**On the calendar page, click the \"Manage**\n\nconfigurations\" button.\n\nOn the configuration view, click the day you wish to configure.\n\n**Check the**\n\ntimes of day that must be configured by clicking the check boxes.\n\n**Then, select the attribute(s) that**\n\nmust be configured for that time.\n\nFinally, press the \"Configure\" button once the attributes and\n\ntimes are selected.\n\nYou will see the attributes that have been assigned to the specific time of the\n\nday display on the configuration table below.\n\nClick the View Calendar button to go back to the\n\ncalendar.\n\nOn this page, to view when an attribute is configured, select an option from the drop\n\ndown and then press \"Search\".\n\nYou will see where your attribute matches, does not match, and\n\nwhere the calendar is open.\n\nFrom this screen, you can schedule on the times where you have a\n\nmatch or where no configuration is set.\n\nTo configure the calendar based on a reservation, press\n\nthe Manage Configuration button on the calendar page.\n\n**Then click on the day of the reservation**\n\non the calendar.\n\nGo to the reservation to which you would like to match the day s attributes.\n\nPress\n\nthe \"Copy config\" button on the right.\n\n**Go to the top.**\n\nThe configuration of the reservation displays\n\nat the top section.\n\nCheck the boxes for the times that you wish to have that configuration.\n\nPress\n\nthe \"Configure\" button.\n\nThe appropriate times then reflect the attributes of the user s reservation.\n\nOnce the configuration is set for that day, any reservations that do not match the core set\n\nconfiguration will be canceled.\n\nPage 2</source>\n</context>\n<user_query>\nhow to add a new calendar?\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Found 2 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 1519,
+  "improved_length": 2957,
+  "original_sources_count": 1,
+  "improved_sources_count": 2,
+  "original_context_length": 8215,
+  "improved_context_length": 9376,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 1519,
+  "improved_length": 2957,
+  "original_sources_count": 1,
+  "improved_sources_count": 2,
+  "original_context_length": 8215,
+  "improved_context_length": 9376,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+To add a new calendar, follow these steps:
+
+1. **Enter Basic Information**: 
+   - Provide a name for the calendar in the "Schedule Name" field.
+   - Add a description for the scheduled resource, which will be displayed to customers on the calendar interface. This can include explanations, images, billing information, or scheduling directions.
+
+2. **Set Up Categories**: 
+   - Use the "Category" dropdown to group calendars into categories. If you need a new category, select "Add new category" and type the name of the category. Note that additional settings may need to be enabled by contacting iLab for displaying calendars in categories.
+
+3. **Configure Time Zone**: 
+   - Enter the time zone for scheduling purposes. By default, this will be set to your institution's time zone, overriding the user's personal time zone setting.
+
+4. **Assign Classification**: 
+   - Assign a classification to the schedule for easier searching. Available classification terms are derived from the Resource Ontology Set [1].
+
+5. **Add Notes and Instructions**: 
+   - Include notes that will display above the calendar on the "View Schedule" page.
+   - Provide customer instructions for reservation details, which will appear at the top of the Reservation Details page [1].
+
+6. **Create Multiple Instances (Optional)**: 
+   - If needed, you can create multiple calendars for different resources or purposes [1].
+
+Once these steps are completed, your new calendar will be ready for use. Let me know if you need further clarification!
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+## How to Add a New Calendar
+
+### Prerequisites
+- Ensure you have access to the calendar management interface.
+- Confirm that you have the necessary permissions to create and edit calendars.
+
+### Steps to Add a New Calendar
+1. **Access the Calendar Settings**:
+   - Navigate to the section where calendar settings are managed. This may involve clicking on the relevant menu or tab within your system interface.
+
+2. **Enter Basic Information**:
+   - **Schedule Name**: Provide a name for the calendar. This will help users identify it easily [1].
+   - **Scheduled Resource Description**: Add a description for the resource. This text will be displayed to customers on the calendar interface and can include explanations, images, billing information, or scheduling directions [1].
+   - **Category**: Group the calendar into a category if needed. To create a new category:
+     - Click on the category dropdown.
+     - Select "Add new category."
+     - Type the name of the new category in the free text field below. Note: If you want calendars displayed in categories, you may need to contact iLab to enable an additional setting [1].
+   - **Time Zone**: Specify the time zone for scheduling purposes. By default, this will be set to your institution's time zone, but it can override the user's personal time zone setting [1].
+   - **Classification**: Assign a classification to the schedule to make it easier to search. Available classification terms are derived from the Eagle I Resource Ontology Set [1].
+
+3. **Add Calendar Notes**:
+   - Include any notes that should appear above the calendar on the "View Schedule" page. These notes can provide additional context or instructions for users [1].
+
+4. **Set Customer Instructions for Reservation Details**:
+   - Enter instructions that will be displayed to customers at the top of the Reservation Details page. These instructions can guide users on how to complete their reservations [1].
+
+5. **Configure Multiple Instances (Optional)**:
+   - If you need to create multiple calendars within a single interface (e.g., for multiple resources like PCR machines), use the "Configure Multiple Instances" section. Enter each resource as a separate row with distinct names (e.g., "PCR 1," "PCR 2," etc.) [2].
+
+6. **Save the Calendar**:
+   - Save each editing panel individually to ensure all settings are applied correctly. Hover over the "i" icon beside fields to review help text if needed [1].
+
+### Verification
+- Check the calendar interface to ensure the new calendar appears with the correct settings and information.
+- Verify that the calendar is accessible and displays properly to users.
+
+### Troubleshooting
+- If the calendar does not display correctly, ensure all required fields were completed during setup.
+- Contact iLab support if additional settings (e.g., categories or advanced attributes) need to be enabled [1].
+
+By following these steps, you can successfully add a new calendar to your system.
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 1519
+improved_length: 2957
+original_sources_count: 1
+improved_sources_count: 2
+original_context_length: 8215
+improved_context_length: 9376
+has_numbered_steps: False
+has_section_headers: True
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 1438 characters longer (+94.7%)
+The improved response cites 1 more sources
+The improved response does NOT include numbered steps
+The improved response includes section headers
+INFO - [rag_improvement.compare] - Comparing responses for query: what are the steps to configure calendar permissions?
+INFO - [rag_improvement.compare] - Comparing responses for query: what are the steps to configure calendar permissions?
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: what are the steps to configure calendar permissions?
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 8 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 8 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 8 results
+INFO - [rag_improvement.phase3] - Found 0 procedural and 8 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 contains procedural content
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 contains procedural content
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 contains procedural content
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 5 contains procedural content
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 5 valid chunks and 5 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'what are the steps to configure calendar permissions?' detected as procedural based on pattern matching
+INFO - [rag_improvement.phase3] - Using procedural system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+    
+    Respond to the user query about procedural content using the provided contex...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1">HelpJuice Articles
+
+**Article 36:**
+ Creating Permission Groups
+
+ID: 337955...
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n    \n    Respond to the user query about procedural content using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines for Procedural Content:\n    \n    - Structure your response with clear hierarchical organization:\n      * Use markdown headings (## for main sections, ### for subsections)\n      * Group related steps under appropriate headings\n      * Maintain a logical flow from prerequisites to completion\n    \n    - For step-by-step instructions:\n      * Preserve the original sequence and numbering from the source material\n      * Present steps in a clear, logical order from start to finish\n      * Number each step explicitly (1, 2, 3, etc.)\n      * Include all necessary details for each step\n      * Use bullet points for sub-steps or additional details within a step\n    \n    - Ensure completeness:\n      * Include all necessary prerequisites before listing steps\n      * Specify where to start the procedure (e.g., which menu, screen, or interface)\n      * Include any required materials, permissions, or preconditions\n      * Conclude with verification steps or expected outcomes\n      * Mention any common issues or troubleshooting tips if available\n    \n    - Always include inline citations using [id] format when referencing information from sources\n      * Citations should appear at the end of the relevant step or section\n      * Every factual claim should have a citation\n      * **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses**\n    \n    ### Example Format for Procedures:\n    \n    ## How to [Accomplish Task]\n    \n    ### Prerequisites\n    - [Required materials or permissions] [1]\n    - [System requirements or conditions] [1]\n    \n    ### [First Major Section]\n    1. **[Step Name]**: [Detailed instructions for step 1] [1]\n       - [Additional details or tips]\n       - [Alternative approaches if applicable]\n    \n    2. **[Step Name]**: [Detailed instructions for step 2] [2]\n       - [Additional details or tips]\n    \n    ### [Second Major Section]\n    3. **[Step Name]**: [Detailed instructions for step 3] [2]\n       - [Additional details or tips]\n    \n    4. **[Step Name]**: [Detailed instructions for step 4] [3]\n       - [Additional details or tips]\n    \n    ### Verification\n    - [How to confirm successful completion] [3]\n    - [Expected outcome or result] [3]\n    \n    ### General Guidelines:\n    \n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Output:\n    \n    Provide a clear, structured response that follows these guidelines while incorporating information from the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\">HelpJuice Articles\n\n**Article 36:**\n Creating Permission Groups\n\nID: 337955\n\nURL: https://help.ilab.agilent.com/37446-managing-sched ule-equipment/337955-creating- permissions\n\n**Published:**\n True\n\nViews: 9425\n\n**Description:**\n\nRole: Core Administrator\n\n**Content:**\n\nPermission groups have replaced what was formerly trained user levels. Permission groups allow\n\nthe core to assign users to different groups and then add those groups to usage types that will\n\nenable or limit access to a calendar. Permission groups are not hierarchical and can be assigned\n\nto multiple usage types. Permission groups are assigned at a core level but users/research\n\ngroups may be added per resource. For more information on specific calendar settings that have\n\nbeen updated, please see Schedule Settings. The first step in setting up resource calendars is to\n\ncreate permission groups. T hese permission groups will apply across all calendars and will be\n\ntied to usage types within each individual calendar. No more than 10 permission groups may be\n\nadded. To create a permission, navigate to the More button on the Schedule Equipment tab. Click\n\non Manage Permission Levels . A new interface will open. This new page will allow up to 10\n\npermissions to be created, edited, and deleted. All cores will have a Trained permission that can\n\nbe renamed, and each core is required to retain at least one permission level. The system will still\n\nutilize a level of Untrained which is not visible on this page. To add a new permission, click on\n\n'New Permission Level'. Add the name of the permission group and click 'Save'. Validations will\n\nensure permission names are not duplicated. The system will also ensure a permission is not\n\ndeleted if actively assigned to a group/ person or resource setting. The system will inform the user\n\nwhen this occurs, and the action button will be disabled. Once all permission levels have been\n\nadded, you can manage the permissions groups on the following interface. \n**Go to People Tab:**</source>\n\n<source id=\"2\">click on\n\n'New Permission Level'. Add the name of the permission group and click 'Save'. Validations will\n\nensure permission names are not duplicated. The system will also ensure a permission is not\n\ndeleted if actively assigned to a group/ person or resource setting. The system will inform the user\n\nwhen this occurs, and the action button will be disabled. Once all permission levels have been\n\nadded, you can manage the permissions groups on the following interface. \n**Go to People Tab:**\n\nNavigate to the People tab to bulk manage permissions. \n**Go to Equipment Trainings:**\n Choose and\n\nnavigate to a specific calendar to manage permissions. \n**New Permission Level:**\n Add a new\n\npermission name up to 10 different permissions. This button will be grayed out if 10 permiss i ons\n\nare present. \n**Three dots:**\n Click and drag on the dots to sort the order of the permissions. Although\n\nthe permissions are not hierarchical, t his will affect the order the permissions appear in selection\n\nlists ( i.e - reservation details for the calendar) . \n**Edit Pencil:**\n Click the blue edit pencil to edit the\n\nname of the permission level. \n**Delete X:**\n Click the X to delete the permission. The system will not\n\nallow you to delete a permission that has users assigned to it.\n\nPage 1</source>\n\n<source id=\"3\">1\n\n\n\n**HelpJuice Articles**\n\nthe calendar.\n\nClick the \"Back to core\" button in the upper-right to return to the Schedule\n\n**Equipment tab.**\n\nAssign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button.\n\n**On the calendar page, click the \"Manage**\n\nconfigurations\" button.\n\nOn the configuration view, click the day you wish to configure.\n\n**Check the**\n\ntimes of day that must be configured by clicking the check boxes.\n\n**Then, select the attribute(s) that**\n\nmust be configured for that time.\n\nFinally, press the \"Configure\" button once the attributes and\n\ntimes are selected.\n\nYou will see the attributes that have been assigned to the specific time of the\n\nday display on the configuration table below.\n\nClick the View Calendar button to go back to the\n\ncalendar.\n\nOn this page, to view when an attribute is configured, select an option from the drop\n\ndown and then press \"Search\".\n\nYou will see where your attribute matches, does not match, and\n\nwhere the calendar is open.\n\nFrom this screen, you can schedule on the times where you have a\n\nmatch or where no configuration is set.\n\nTo configure the calendar based on a reservation, press\n\nthe Manage Configuration button on the calendar page.\n\n**Then click on the day of the reservation**\n\non the calendar.\n\nGo to the reservation to which you would like to match the day s attributes.\n\nPress\n\nthe \"Copy config\" button on the right.\n\n**Go to the top.**\n\nThe configuration of the reservation displays\n\nat the top section.\n\nCheck the boxes for the times that you wish to have that configuration.\n\nPress\n\nthe \"Configure\" button.\n\nThe appropriate times then reflect the attributes of the user s reservation.\n\nOnce the configuration is set for that day, any reservations that do not match the core set\n\nconfiguration will be canceled.\n\nPage 2</source>\n\n<source id=\"4\">(edit) icon\n\nfor existing equipment to access the schedule settings. NOTE: Advanced attributes must be\n\nturned on by an iLab associate in order to utilize configurable reservations. If Advanced Attributes\n\nis turned on in the calendar, the calendar page updates with additional buttons. Click the\n\n\"Advanced Attributes\" button to set up the requirements. The first page allows the user to set up a\n\nattributes and arrange them into groupings. The top section is for general attribute(s) (i.e.\n\nattributes without a grouping). If you do not have one, start with your first grouping by typing a\n\nname and pressing the \"Add grouping\" button. If you want to require at least one grouping to be\n\nselected by users, click the \"Require at least one group\" check box. To create attributes under\n\neach grouping, press the \"Add attribute\" button. For each attribute, you must have a name, a\n\ndescription and at least one item to be selected. You can make selecting the attribute mandatory\n\nby toggling the \"Required\" switch to on. You can also make the attribute visible only to core staff\n\nby toggling on the \"Administrative only\" switch. Different attributes can be color coded. Press the\n\n\"Plus\" button to add more options to be configured. Press the Add attributes button to add another\n\nattribute and follow the steps above to add the selections under the attributes. Once you have all\n\nyour groupings and attributes built for your calendar, you can begin assigning requirements on\n\nPage 1\n\nHelpJuice Articles\n\nthe calendar. Click the \"Back to core\" button in the upper-right to return to the Schedule\n\nEquipment tab. Assign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button. On the calendar page, click the \"Manage\n\nconfigurations\" button. On the configuration view, click the day you wish to configure. Check the\n\ntimes of day that must be configured by clicking the check boxes. Then, select the attribute(s) that</source>\n\n<source id=\"5\">Articles\n\nstart step and set a smaller start time step. This will allow users to continue to make reservation\n\nby the time step for example 60 minutes but not require that each reservation start on the hour.\n\nAvailability Settings An availability is a predefined set of circumstances that is defined under the\n\nusage type and pricing section. This section allows for you to set limitations and defaults around\n\nthose usage types to be applied to the calendar. Default usage type for users with no\n\npermissions: Select the default usage types that should display when users are not in any\n\npermission groups. Default usage type (for \n**Trained users, etc.):**\n Select the default usage types\n\nthat should display when each permission is shown. This section will populate a number of rows\n\ndepending on how many permissions have been added (up to 10). \n**Allow spanning availabilities?:**\n\nThis setting controls whether or not customers can schedule events that cross from one\n\navailability into another availability (i.e.- peak to non peak hours) . If this setting is turned off, the\n\ncustomer would need to schedule one event for each availability. Instructions for event availability\n\n: These instructions can be viewed in the reservations details screen when users are selecting an\n\navailability. \n**Use custom availabilities :**\n Turning this setting on allows for core staff and users to be\n\nable to schedules ad-hoc reservation at any open time on the calendar. This setting overrides\n\nother restrictions placed upon the calendar. Usage Types &amp; Pricing A usage type is a\n\npredefined reservation type created with specific scheduling and rate parameters. For example,\n\nyou may allow the usage type \"Independent User\" to schedule from 8am - 5pm, M-F and set the\n\ncost of usage during that time frame to a specific amount. Within each usage type, rates can be\n\nset differently for each price types (i.e.- external, internal, corporate) and can differ among\n\ndifferent usage types.</source>\n</context>\n<user_query>\nwhat are the steps to configure calendar permissions?\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Found 2 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 1656,
+  "improved_length": 2466,
+  "original_sources_count": 3,
+  "improved_sources_count": 2,
+  "original_context_length": 9362,
+  "improved_context_length": 9243,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 1656,
+  "improved_length": 2466,
+  "original_sources_count": 3,
+  "improved_sources_count": 2,
+  "original_context_length": 9362,
+  "improved_context_length": 9243,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+To configure calendar permissions, follow these steps:
+
+1. **Create Permission Groups**:
+   - Navigate to the "Schedule Equipment" tab and click on the "More" button.
+   - Select "Manage Permission Levels" to open the interface for creating, editing, and deleting permissions.
+   - Click "New Permission Level" to add a new permission group. Enter the name of the permission group and click "Save". Ensure the names are unique as validations will prevent duplicates [1].
+   - Note that you can create up to 10 permission groups. The system will not allow deletion of permissions actively assigned to users or resources [1][2].
+
+2. **Manage Permissions**:
+   - Navigate to the "People" tab to bulk manage permissions for users and research groups [2].
+   - Use the "Equipment Trainings" section to manage permissions for specific calendars [2].
+
+3. **Edit and Organize Permissions**:
+   - Use the blue edit pencil to modify permission names.
+   - Click the "X" to delete permissions, but ensure they are not actively assigned to users or resources [2].
+   - Drag and sort permissions using the three dots to adjust their order in selection lists (e.g., reservation details) [2].
+
+4. **Assign Permissions to Usage Types**:
+   - Permission groups are tied to usage types within individual calendars. This enables or limits access to the calendar based on the assigned group [1].
+
+5. **Set Default Usage Types**:
+   - Configure default usage types for users without permissions or for specific trained user groups in the availability settings section [3].
+
+These steps will allow you to effectively configure and manage calendar permissions for your resources.
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+## Steps to Configure Calendar Permissions
+
+### Prerequisites
+- You must have Core Administrator access to manage permissions [2].
+- Ensure that no more than 10 permission groups are created, as the system limits the number of permissions to 10 [2].
+
+### Steps to Configure Calendar Permissions
+
+#### 1. **Create Permission Groups**
+   - Navigate to the **Schedule Equipment** tab and click on the **More** button [2].
+   - Select **Manage Permission Levels**. This opens a new interface where permissions can be created, edited, or deleted [2].
+   - Click on **New Permission Level** to add a new permission group [2].
+     - Enter the name of the permission group and click **Save**.
+     - Ensure the permission names are unique, as the system validates against duplicate names [2].
+   - Note: If a permission group is actively assigned to a user, group, or resource setting, it cannot be deleted. The system will disable the delete action and notify the user [2].
+
+#### 2. **Bulk Manage Permissions**
+   - Navigate to the **People** tab to bulk manage permissions [2].
+
+#### 3. **Assign Permissions to Calendars**
+   - Go to the **Equipment Trainings** section and select a specific calendar [2].
+   - Add permissions to the calendar by choosing the appropriate usage types and assigning them to the permission groups [2].
+
+#### 4. **Organize Permission Groups**
+   - Use the **Three Dots** icon to drag and sort the order of permissions. While permissions are not hierarchical, this affects how they appear in selection lists (e.g., reservation details for the calendar) [2].
+
+#### 5. **Edit or Delete Permissions**
+   - To edit a permission group, click the blue **Edit Pencil** icon and update the name [2].
+   - To delete a permission group, click the **Delete X** icon. Note that permissions assigned to users or resources cannot be deleted [2].
+
+### Verification
+- Check the calendar settings to ensure the permissions are correctly applied to the intended usage types [2].
+- Verify that the permissions appear in the correct order in selection lists [2].
+
+### Troubleshooting
+- If the **New Permission Level** button is grayed out, it indicates that the maximum limit of 10 permissions has been reached [2].
+- If a permission group cannot be deleted, ensure it is not actively assigned to any user, group, or resource setting [2].
+
+By following these steps, you can successfully configure calendar permissions to manage access and usage types effectively.
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 1656
+improved_length: 2466
+original_sources_count: 3
+improved_sources_count: 2
+original_context_length: 9362
+improved_context_length: 9243
+has_numbered_steps: False
+has_section_headers: True
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 810 characters longer (+48.9%)
+The improved response cites 1 fewer sources
+The improved response does NOT include numbered steps
+The improved response includes section headers
+INFO - [rag_improvement.compare] - Comparing responses for query: guide to setting up a calendar
+INFO - [rag_improvement.compare] - Comparing responses for query: guide to setting up a calendar
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: guide to setting up a calendar
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 7 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 7 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 7 results
+INFO - [rag_improvement.phase3] - Found 0 procedural and 7 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 contains procedural content
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 contains procedural content
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 5 contains procedural content
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 5 valid chunks and 5 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'guide to setting up a calendar' detected as procedural based on pattern matching
+INFO - [rag_improvement.phase3] - Using procedural system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+    
+    Respond to the user query about procedural content using the provided contex...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1">of editing sections will display on the left. Click on the setting, or use ...
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n    \n    Respond to the user query about procedural content using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines for Procedural Content:\n    \n    - Structure your response with clear hierarchical organization:\n      * Use markdown headings (## for main sections, ### for subsections)\n      * Group related steps under appropriate headings\n      * Maintain a logical flow from prerequisites to completion\n    \n    - For step-by-step instructions:\n      * Preserve the original sequence and numbering from the source material\n      * Present steps in a clear, logical order from start to finish\n      * Number each step explicitly (1, 2, 3, etc.)\n      * Include all necessary details for each step\n      * Use bullet points for sub-steps or additional details within a step\n    \n    - Ensure completeness:\n      * Include all necessary prerequisites before listing steps\n      * Specify where to start the procedure (e.g., which menu, screen, or interface)\n      * Include any required materials, permissions, or preconditions\n      * Conclude with verification steps or expected outcomes\n      * Mention any common issues or troubleshooting tips if available\n    \n    - Always include inline citations using [id] format when referencing information from sources\n      * Citations should appear at the end of the relevant step or section\n      * Every factual claim should have a citation\n      * **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses**\n    \n    ### Example Format for Procedures:\n    \n    ## How to [Accomplish Task]\n    \n    ### Prerequisites\n    - [Required materials or permissions] [1]\n    - [System requirements or conditions] [1]\n    \n    ### [First Major Section]\n    1. **[Step Name]**: [Detailed instructions for step 1] [1]\n       - [Additional details or tips]\n       - [Alternative approaches if applicable]\n    \n    2. **[Step Name]**: [Detailed instructions for step 2] [2]\n       - [Additional details or tips]\n    \n    ### [Second Major Section]\n    3. **[Step Name]**: [Detailed instructions for step 3] [2]\n       - [Additional details or tips]\n    \n    4. **[Step Name]**: [Detailed instructions for step 4] [3]\n       - [Additional details or tips]\n    \n    ### Verification\n    - [How to confirm successful completion] [3]\n    - [Expected outcome or result] [3]\n    \n    ### General Guidelines:\n    \n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Output:\n    \n    Provide a clear, structured response that follows these guidelines while incorporating information from the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\">of editing sections will display on the left. Click on the setting, or use the search engine, to\n\nfind specific editing sections. Helpful tips - Each editing panel within a page will need to be saved\n\nindividually. Most settings have help text to explain the functionality of the setting. Hover the 'i'\n\nicon beside the field to review available help text. General Settings Basic Information Schedule\n\nName: Enter a name for the calendar. \n**Scheduled Resource Description:**\n This text is displayed to\n\nthe customer on the calendar interface. You can utilize this text section by providing an\n\nexplanation of the resource, an image of the resource, billing information, or directions on\n\nscheduling. \n**Category:**\n Allows you to group calendars into categories. To create a new category,\n\nclick in the category drop down and select Add new category, this will create a free text text below\n\nwhere you can type in the name of the new category. NOTE: If you would like your calendars\n\ndisplayed in categories, please contact iLab, as an additional setting needs to be enabled. Time\n\nZone : Enter the time zone to be used for scheduling purposes. By default, this will be set to your\n\ninstitution's time zone. This setting will override the user's personal time zone setting when\n\nscheduling on the calendar. \n**Classification :**\n Assign a classification to the schedule that can be\n\nused to more effectively search for it. Available classification terms are derived from the Eagle I\n\nPage 1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for</source>\n\n<source id=\"2\">current service name\n\n(i.e.\n\ninstance name).\n\nPlease note: this action cannot be undone.\n\n**Remove Schedule Click this**\n\nbutton if you would like to delete the calendar/schedule completely.\n\n**You will be prompted a**\n\nsecond time to confirm you want to permanently delete the calendar.\n\n**If current reservations exist**\n\non the calendar, you will need to type in the name of the resource to confirm deletion.\n\n**Please**\n\nnote: this action cannot be undone.\n\nCalendar Display Scale hour on schedule?: Check this box if\n\nyou would like the hour on the schedule (y-axis) to scale to the minimum time step allowed on the\n\ncalendar.\n\nDisplay usage type names in the background of the calendar: Turn this setting off to\n\ndisable the written display of usage types as small text in the background of your calendar.\n\nThis\n\nmay limit the information immediately available to your customers, especially if they have a color\n\nvision deficiency or other sight impairment.\n\nDefault to multi-view?: Indicate whether you would like\n\n**Page 2**\n\n\n\n**HelpJuice Articles**\n\nthe default calendar view to display all calendars when you have multiple instances.\n\n**Let users see**\n\nreservation owners: This allows users of the core to see the name and email of the person who\n\ncreated the reservation and is beneficial if cores encourage collaboration among customers.\n\nPublic Visibility Display this schedule to the public on your external landing page?: Choose\n\nwhether to have this schedule, its description, and availabilities be displayed on the core's\n\nexternal landing page.\n\nLet public users see the reservation owners?: Choose whether you would\n\nlike the public to be able to view the owner of reservations.\n\n**Restrictions Time Settings Minimum**\n\nreservation time : The minimum amount of time the customer can schedule in one session.\n\nMaximum reservation time : The maximum amount of time the customer can schedule in one\n\nsession.\n\nTime Step : The increment of time by which the event can be increased or decreased.</source>\n\n<source id=\"3\">HelpJuice Articles\n\nArticle 147: Schedule Settings\n\nID: 266098\n\nURL: https://help.ilab.agilent.com/37446-managing-sched ule-equipment/266098-editing-e quipment\n\nPublished: True\n\nViews: 24844\n\nDescription:\n\nRole: Core Administrator\n\nContent:\n\nEach iLab calendar is built independently and configured with its own set of rules and restrictions.\n\nAs a core administrator, you can maintain and edit settings for the calendar(s) within your core at\n\nany time, or contact support for help.\n\nBelow is a list of each section within the calendar template.\n\nNote: This is a long article.\n\nTo return to the top of the page use CTRL + Home (PC) or + (Mac).\n\nAccess Schedule Settings General Settings Calendar Display Public Visibility Restrictions\n\nCancellation and Edit Policy Availability Settings Usage Types &amp; Pricing Permissions\n\nRecurrent Events Linked Resources Add-On Charges Billing Scans/Sessions Usage Tracking\n\nAdvanced Attributes Reservation Verification Settings Access Schedule Settings From the\n\nSchedule Equipment tab, calendars can be edited by clicking the blue pencil icon located to the\n\nright of the View Schedule button.\n\niLab Usage Tracker Some cores might still see the old iLab\n\nUsage Tracker button in the Schedule Equipment tab or in the core settings page within the\n\n**Admin tab of the Core page.**\n\nHowever, this feature has been discontinued, and the R&amp;D\n\nteam is working on removing it completely from the interface.\n\n**Within the schedule settings, each**\n\npanel of editing sections will display on the left.\n\nClick on the setting, or use the search engine, to\n\nfind specific editing sections.\n\nHelpful tips - Each editing panel within a page will need to be saved\n\nindividually.\n\nMost settings have help text to explain the functionality of the setting.\n\n**Hover the 'i'**\n\nicon beside the field to review available help text.\n\nGeneral Settings Basic Information Schedule\n\nName: Enter a name for the calendar.\n\nScheduled Resource Description: This text is displayed to</source>\n\n<source id=\"4\">1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for\n\nresources within a single calendar interface. Users can then view all calendars at one time to\n\nschedule on the available resource. NOTE: The same calendar pricing and restrictions will apply\n\nto each instance. For example, if you have multiple PCR machines, you could enter each PCR\n\nmachine as a separate row within the 'Configure Multiple Instances' section with the names \"PCR\n\n1\", \"PCR 2\", \"PCR3\". Custom Forms Custom forms can be included when creating a reservation\n\nto capture preliminary information from the customer. Cores can create multiple custom forms and\n\nlink them to individual schedules. When the user creates a reservation, the form will display in the\n\n'Required Forms' section on the Reservation Details page. Form fields can be required or not to\n\ncomplete prior to submitting the reservation. To manage the forms available to the core, refer to\n\nCustom Forms . Include custom form on reservations detail page? (Y/N): Indicate whether any\n\ncustom forms associated with this resource will be displayed on the reservations details page.\n\nDisplay a custom form when scheduling maintenance on this resource? (Y/N): Indicate whether a\n\ncustom form should display when a maintenance reservation is created. Notifications Send\n\nreminder emails for reservations?: Select from the drop down the amount of time prior to a\n\nreservation when the user should receive a reminder email about their reservation. Subscribed</source>\n\n<source id=\"5\">(edit) icon\n\nfor existing equipment to access the schedule settings. NOTE: Advanced attributes must be\n\nturned on by an iLab associate in order to utilize configurable reservations. If Advanced Attributes\n\nis turned on in the calendar, the calendar page updates with additional buttons. Click the\n\n\"Advanced Attributes\" button to set up the requirements. The first page allows the user to set up a\n\nattributes and arrange them into groupings. The top section is for general attribute(s) (i.e.\n\nattributes without a grouping). If you do not have one, start with your first grouping by typing a\n\nname and pressing the \"Add grouping\" button. If you want to require at least one grouping to be\n\nselected by users, click the \"Require at least one group\" check box. To create attributes under\n\neach grouping, press the \"Add attribute\" button. For each attribute, you must have a name, a\n\ndescription and at least one item to be selected. You can make selecting the attribute mandatory\n\nby toggling the \"Required\" switch to on. You can also make the attribute visible only to core staff\n\nby toggling on the \"Administrative only\" switch. Different attributes can be color coded. Press the\n\n\"Plus\" button to add more options to be configured. Press the Add attributes button to add another\n\nattribute and follow the steps above to add the selections under the attributes. Once you have all\n\nyour groupings and attributes built for your calendar, you can begin assigning requirements on\n\nPage 1\n\nHelpJuice Articles\n\nthe calendar. Click the \"Back to core\" button in the upper-right to return to the Schedule\n\nEquipment tab. Assign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button. On the calendar page, click the \"Manage\n\nconfigurations\" button. On the configuration view, click the day you wish to configure. Check the\n\ntimes of day that must be configured by clicking the check boxes. Then, select the attribute(s) that</source>\n</context>\n<user_query>\nguide to setting up a calendar\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 4 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 4 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 4 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Found 5 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 2381,
+  "improved_length": 4298,
+  "original_sources_count": 4,
+  "improved_sources_count": 5,
+  "original_context_length": 9680,
+  "improved_context_length": 10044,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 2381,
+  "improved_length": 4298,
+  "original_sources_count": 4,
+  "improved_sources_count": 5,
+  "original_context_length": 9680,
+  "improved_context_length": 10044,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+To set up a calendar, follow these steps:
+
+1. **Access General Settings**:
+   - Enter a name for the calendar.
+   - Provide a description for the scheduled resource. This text will be displayed to customers on the calendar interface and can include explanations, images, billing information, or directions for scheduling [1].
+
+2. **Categorize the Calendar**:
+   - Use the "Category" dropdown to group calendars into categories. If needed, create a new category by selecting "Add new category" and typing the name. Note that additional settings may need to be enabled for category display [1].
+
+3. **Set the Time Zone**:
+   - Specify the time zone for scheduling purposes. By default, this will align with your institution's time zone, overriding the user's personal time zone settings [1].
+
+4. **Add Notes and Instructions**:
+   - Include calendar notes that will appear above the calendar on the View Schedule page.
+   - Provide customer instructions for reservation details, which will be displayed at the top of the Reservation Details page [1].
+
+5. **Configure Display Settings**:
+   - Decide whether to scale the hour on the schedule to the minimum time step allowed.
+   - Choose whether to display usage type names in the background of the calendar.
+   - Set the default view to multi-view if multiple instances exist.
+   - Allow users to see reservation owners if collaboration is encouraged [2].
+
+6. **Set Public Visibility**:
+   - Determine whether the schedule and its description should be visible to the public on your external landing page.
+   - Decide if public users can view reservation owners [2].
+
+7. **Define Restrictions**:
+   - Set minimum and maximum reservation times.
+   - Specify the time step increments for scheduling events [2].
+
+8. **Advanced Attributes (Optional)**:
+   - Enable advanced attributes if required. This allows you to create groupings and attributes for the calendar, such as mandatory selections or administrative-only visibility [3].
+
+9. **Manage Events**:
+   - Core staff can add events directly to the calendar, scheduling time on behalf of users if needed [4].
+
+10. **Save Settings**:
+    - Remember to save each editing panel individually after making changes [1].
+
+This guide provides a comprehensive overview of setting up and configuring a calendar based on the provided context. If you need further assistance, feel free to ask!
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+## Guide to Setting Up a Calendar
+
+### Prerequisites
+- Ensure you have access to the **Schedule Equipment tab** in iLab as a core administrator [4].
+- Verify that any required advanced attributes are enabled by an iLab associate if needed [5].
+- Familiarize yourself with the calendar settings and their functionalities, such as general settings, restrictions, and advanced attributes [5][4].
+
+---
+
+### General Settings
+1. **Access Schedule Settings**: Navigate to the **Schedule Equipment tab** and click the blue pencil icon next to the **View Schedule** button to edit the calendar [4].
+   
+2. **Enter Basic Information**:
+   - **Schedule Name**: Provide a name for the calendar [5].
+   - **Scheduled Resource Description**: Add text that will be displayed to customers on the calendar interface. This can include explanations, images, billing details, or scheduling directions [5].
+   - **Category**: Assign a category to group calendars. To create a new category, select "Add new category" from the dropdown menu and type the name of the category. Note: Contact iLab if you want categories displayed [5].
+   - **Time Zone**: Set the time zone for scheduling purposes. This will override the user's personal time zone settings [5].
+   - **Classification**: Assign a classification to the schedule for easier searching. Classification terms are derived from the Resource Ontology Set [5].
+
+3. **Add Calendar Notes**: Include notes that will appear above the calendar on the **View Schedule** page [4].
+
+4. **Customer Instructions**: Provide instructions for reservation details. These will be displayed at the top of the **Reservation Details** page [4].
+
+---
+
+### Calendar Display Settings
+5. **Adjust Display Options**:
+   - **Scale Hour on Schedule**: Check this box to scale the hour (y-axis) to the minimum time step allowed on the calendar [4].
+   - **Display Usage Type Names**: Enable or disable the display of usage types as text in the background of the calendar [4].
+   - **Default to Multi-View**: Indicate whether the default calendar view should display all calendars when multiple instances exist [4].
+   - **Let Users See Reservation Owners**: Allow users to view the name and email of the person who created the reservation [4].
+
+6. **Public Visibility**:
+   - Choose whether to display the schedule, description, and availabilities on the core's external landing page [4].
+   - Decide if public users can view reservation owners [4].
+
+---
+
+### Restrictions and Time Settings
+7. **Set Time Restrictions**:
+   - **Minimum Reservation Time**: Define the minimum time a customer can schedule in one session [4].
+   - **Maximum Reservation Time**: Define the maximum time a customer can schedule in one session [4].
+   - **Time Step**: Set the increment by which events can be increased or decreased [4].
+
+---
+
+### Advanced Attributes (Optional)
+8. **Enable Advanced Attributes**:
+   - If advanced attributes are turned on, click the **Advanced Attributes** button to configure requirements [5].
+   - Set up attributes and groupings:
+     - Add a grouping by typing a name and clicking "Add grouping."
+     - Create attributes under each grouping by clicking "Add attribute." Provide a name, description, and selection options [5].
+     - Toggle "Required" to make attributes mandatory or "Administrative only" to restrict visibility to core staff [5].
+
+9. **Assign Attributes to a Resource Schedule**:
+   - Use the **Advanced Scheduler** button to manage configurations.
+   - Select the day and time slots to configure attributes [5].
+
+---
+
+### Verification
+- Save each editing panel individually to ensure changes are applied [5][4].
+- Confirm that the calendar displays correctly and that all settings, restrictions, and attributes are functioning as intended [4].
+- Test the calendar interface to verify customer usability, including reservation creation and visibility settings [4][4].
+
+---
+
+### Common Issues and Troubleshooting
+- If categories are not displaying, contact iLab to enable the necessary settings [5].
+- Ensure advanced attributes are activated by an iLab associate if they are not visible [5].
+- Double-check time zone settings to prevent scheduling conflicts [5].
+
+By following these steps, you can successfully set up a calendar tailored to your core's needs.
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 2381
+improved_length: 4298
+original_sources_count: 4
+improved_sources_count: 5
+original_context_length: 9680
+improved_context_length: 10044
+has_numbered_steps: False
+has_section_headers: True
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 1917 characters longer (+80.5%)
+The improved response cites 1 more sources
+The improved response does NOT include numbered steps
+The improved response includes section headers
+
+=== TESTING INFORMATIONAL QUERIES ===
+
+INFO - [rag_improvement.compare] - Comparing responses for query: what is a calendar?
+INFO - [rag_improvement.compare] - Comparing responses for query: what is a calendar?
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: what is a calendar?
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 3 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 3 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 3 results
+INFO - [rag_improvement.phase3] - Found 0 procedural and 3 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 contains procedural content
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 3 valid chunks and 3 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'what is a calendar?' detected as informational
+INFO - [rag_improvement.phase3] - Using default system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+
+    Respond to the user query using the provided context, incorporating inline citat...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1">print reservations for the day across resources by using the "print reserva...
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n\n    Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines:\n\n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Ensure citations are concise and directly related to the information provided.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses.**\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Example of Citation:\n\n    If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:\n\n    * \"According to the study, the proposed method increases efficiency by 20% [1].\"\n    \n    ### Follow-up Questions:\n    \n    For follow-up questions, you must continue to cite sources. For example:\n    \n    User: \"What are the key features of Product X?\"\n    Assistant: \"Product X has three main features: cloud integration [1], advanced analytics [2], and mobile support [3].\"\n    \n    User: \"Tell me more about the mobile support.\"\n    Assistant: \"The mobile support feature of Product X includes cross-platform compatibility, offline mode, and push notifications [3].\"\n    \n    ### Output:\n\n    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\">print reservations for the day across resources by using the \"print reservations\" link.\n\n**First,**\n\nyou must select the \"one day\" view and navigate to the day you wish the print.\n\n**Then click on \"print**\n\nreservations\".\n\n**The printer window will display.**\n\n**Select your printer and click \"OK\".**\n\n**Your selected**\n\nday will print the details of each reservation for the selected day.\n\n**The \"Print Schedules\" link allows**\n\nyou to print the entire day's schedule for a single resource.\n\n**First, you must select the \"one day\"**\n\nview and navigate to the day you wish to print.\n\n**Then click on \"Print Schedule\".**\n\n**The schedule**\n\nprints with both a calendar view of the reservations, and a chart print of the reservations.\n\n**Set View**\n\nOptions There are various options available related to the Reservations view: Legend: If you click\n\non the question mark icon, a key will display that details what each color on the calendar means.\n\nRefresh: The circular arrow icon will refresh the reservation view and any recent changes Full\n\nscreen: Click on the diagonal arrow icon to switch the screen to full screen view.\n\n**In full screen**\n\nview, click this icon again to return to the windowed view.\n\n**Select Resources On the right side of**\n\nthe calendar, you will see the Select Resources panel.\n\nThis panel provides several different ways\n\nto search for and select resources to display.\n\nSearch: If you would like to search for a specific\n\nresource, enter the name of the resource here.\n\nAs you type, your results will automatically filter\n\n**Page 1**\n\n\n\n**HelpJuice Articles**\n\nbelow (in panel 4) Select: In the Select section, you may select any one of the pre-defined filter\n\nparameters to view.\n\n\"My subscriptions\" displays calendars of resources to which you have\n\nsubscribed.\n\n\"My favorites\" displays calendars of resources you have designated as a favorite.\n\n\"Schedules with events\" will display only calendars that have future reservations.\n\n\"All\" displays all\n\nresource calendars.\n\n\"Clear\" clears all previous calendar selections.</source>\n\n<source id=\"2\">1\n\n\n\n**HelpJuice Articles**\n\nthe calendar.\n\nClick the \"Back to core\" button in the upper-right to return to the Schedule\n\n**Equipment tab.**\n\nAssign Attributes to a Resource Schedule To schedule attributes on the calendar,\n\nclick on the \"Advanced Scheduler\" button.\n\n**On the calendar page, click the \"Manage**\n\nconfigurations\" button.\n\nOn the configuration view, click the day you wish to configure.\n\n**Check the**\n\ntimes of day that must be configured by clicking the check boxes.\n\n**Then, select the attribute(s) that**\n\nmust be configured for that time.\n\nFinally, press the \"Configure\" button once the attributes and\n\ntimes are selected.\n\nYou will see the attributes that have been assigned to the specific time of the\n\nday display on the configuration table below.\n\nClick the View Calendar button to go back to the\n\ncalendar.\n\nOn this page, to view when an attribute is configured, select an option from the drop\n\ndown and then press \"Search\".\n\nYou will see where your attribute matches, does not match, and\n\nwhere the calendar is open.\n\nFrom this screen, you can schedule on the times where you have a\n\nmatch or where no configuration is set.\n\nTo configure the calendar based on a reservation, press\n\nthe Manage Configuration button on the calendar page.\n\n**Then click on the day of the reservation**\n\non the calendar.\n\nGo to the reservation to which you would like to match the day s attributes.\n\nPress\n\nthe \"Copy config\" button on the right.\n\n**Go to the top.**\n\nThe configuration of the reservation displays\n\nat the top section.\n\nCheck the boxes for the times that you wish to have that configuration.\n\nPress\n\nthe \"Configure\" button.\n\nThe appropriate times then reflect the attributes of the user s reservation.\n\nOnce the configuration is set for that day, any reservations that do not match the core set\n\nconfiguration will be canceled.\n\nPage 2</source>\n\n<source id=\"3\">**Equipment Settings:**\n\nClick the gear icon to navigate to the \n**Schedule Settings. Confirm Usage:**\n The Confirm Usage\n\nbutton will direct you to the confirm usage page pre-filtered for the schedule you are currently\n\nviewing. The yellow circle on the Confirm Usage button indicates there are unconfirmed events.\n\n**Calendar Notes:**\n You may add a note to this header section in the schedule settings Calendar\n\nNotes, to display special instructions or notes you want visible to the user. \n**Time Frame:**\n Select\n\nthe time frame or view in which you would like the schedule to be shown in (Day, Week, Month, or\n\nMulti View). Multi View shows a single-day view that lists all the separate instances of a resource\n\n(e.g. if a core has multiple physical instance of the same equipment, they may show them all on a\n\nsingle schedule and allow the user to pick a specific instance when they make a reservation)\n\n**Calendar:**\n Click the calendar to navigate to a specific date. \n**Export to PDF:**\n Click the printer icon to\n\nexport the schedule to a \n**PDF. Forward/Backward:**\n move forward (\"&gt;\") or backward (\"&lt;\") in\n\ntime, in steps equal to the chosen time frame on the calendar. \n**Linked Calendar:**\n Click the button\n\nto show other relevant schedules. \n**Calendar Details:**\n The Calendar Details button opens a popup\n\nwith additional information on availabilities, pricing and event color codes. \n**Green Events:**\n Your\n\nfuture reservations. \n**Purple Events:**\n \n**Your past reservations. Red Events:**\n If the equipment is\n\nPage 1\n\nHelpJuice Articles\n\nunavailable for a selected amount of time. \n**Orange Events:**\n In some cases, cores require core\n\napproval for reservations. If you have reserved time on the calendar that requires core approval,\n\nthat event will be in orange. When the reservation has been approved you may receive an email\n\nand you will see the event turn to purple. Grey: \n**Reservations made by others. White:**\n\nReservations that have been canceled or are no shows. \n**Schedule:**\n Shows all reservations on the</source>\n</context>\n<user_query>\nwhat is a calendar?\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Found 1 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 481,
+  "improved_length": 519,
+  "original_sources_count": 5,
+  "improved_sources_count": 1,
+  "original_context_length": 10062,
+  "improved_context_length": 6030,
+  "has_numbered_steps": false,
+  "has_section_headers": false
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 481,
+  "improved_length": 519,
+  "original_sources_count": 5,
+  "improved_sources_count": 1,
+  "original_context_length": 10062,
+  "improved_context_length": 6030,
+  "has_numbered_steps": false,
+  "has_section_headers": false
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+A calendar is a tool or system used to organize and display dates, times, and events. It typically provides a visual representation of days, weeks, months, and years, allowing users to schedule, manage, and track activities or reservations. In the context provided, calendars are used to manage resources, reservations, and schedules, offering features such as viewing availability, configuring attributes, printing schedules, and navigating specific dates [1], [2], [3], [4], [5].
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+A calendar, in the context provided, is a tool used to navigate, view, and manage reservations or schedules for resources. It allows users to select specific dates, view resource availability, and interact with various scheduling features such as adding notes, exporting schedules to PDF, and confirming usage. The calendar also uses color codes to indicate the status of events, such as future reservations (green), past reservations (purple), unavailable times (red), and reservations requiring approval (orange) [1].
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 481
+improved_length: 519
+original_sources_count: 5
+improved_sources_count: 1
+original_context_length: 10062
+improved_context_length: 6030
+has_numbered_steps: False
+has_section_headers: False
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 38 characters longer (+7.9%)
+The improved response cites 4 fewer sources
+The improved response does NOT include numbered steps
+The improved response does NOT include section headers
+INFO - [rag_improvement.compare] - Comparing responses for query: tell me about calendar features
+INFO - [rag_improvement.compare] - Comparing responses for query: tell me about calendar features
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: tell me about calendar features
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 7 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 7 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 7 results
+INFO - [rag_improvement.phase3] - Found 0 procedural and 7 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 contains procedural content
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 contains procedural content
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 5 contains procedural content
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 5 valid chunks and 5 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'tell me about calendar features' detected as informational
+INFO - [rag_improvement.phase3] - Using default system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+
+    Respond to the user query using the provided context, incorporating inline citat...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1">of editing sections will display on the left. Click on the setting, or use ...
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n\n    Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines:\n\n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Ensure citations are concise and directly related to the information provided.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses.**\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Example of Citation:\n\n    If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:\n\n    * \"According to the study, the proposed method increases efficiency by 20% [1].\"\n    \n    ### Follow-up Questions:\n    \n    For follow-up questions, you must continue to cite sources. For example:\n    \n    User: \"What are the key features of Product X?\"\n    Assistant: \"Product X has three main features: cloud integration [1], advanced analytics [2], and mobile support [3].\"\n    \n    User: \"Tell me more about the mobile support.\"\n    Assistant: \"The mobile support feature of Product X includes cross-platform compatibility, offline mode, and push notifications [3].\"\n    \n    ### Output:\n\n    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\">of editing sections will display on the left. Click on the setting, or use the search engine, to\n\nfind specific editing sections. Helpful tips - Each editing panel within a page will need to be saved\n\nindividually. Most settings have help text to explain the functionality of the setting. Hover the 'i'\n\nicon beside the field to review available help text. General Settings Basic Information Schedule\n\nName: Enter a name for the calendar. \n**Scheduled Resource Description:**\n This text is displayed to\n\nthe customer on the calendar interface. You can utilize this text section by providing an\n\nexplanation of the resource, an image of the resource, billing information, or directions on\n\nscheduling. \n**Category:**\n Allows you to group calendars into categories. To create a new category,\n\nclick in the category drop down and select Add new category, this will create a free text text below\n\nwhere you can type in the name of the new category. NOTE: If you would like your calendars\n\ndisplayed in categories, please contact iLab, as an additional setting needs to be enabled. Time\n\nZone : Enter the time zone to be used for scheduling purposes. By default, this will be set to your\n\ninstitution's time zone. This setting will override the user's personal time zone setting when\n\nscheduling on the calendar. \n**Classification :**\n Assign a classification to the schedule that can be\n\nused to more effectively search for it. Available classification terms are derived from the Eagle I\n\nPage 1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for</source>\n\n<source id=\"2\">1\n\nHelpJuice Articles\n\n**Resource Ontology Set. Calendar Notes:**\n You can add a note here that will display above the\n\ncalendar on the View Schedule page. Customer \n**Instructions for Reservation Details:**\n Instructions\n\nentered here will be displayed to the customer at the top of the Reservation Details page. For\n\nmore information about the Reservation Details page, please refer to the Schedule Equipment\n\narticle. Multiple Instances Multiple instances allows cores to create multiple calendars for\n\nresources within a single calendar interface. Users can then view all calendars at one time to\n\nschedule on the available resource. NOTE: The same calendar pricing and restrictions will apply\n\nto each instance. For example, if you have multiple PCR machines, you could enter each PCR\n\nmachine as a separate row within the 'Configure Multiple Instances' section with the names \"PCR\n\n1\", \"PCR 2\", \"PCR3\". Custom Forms Custom forms can be included when creating a reservation\n\nto capture preliminary information from the customer. Cores can create multiple custom forms and\n\nlink them to individual schedules. When the user creates a reservation, the form will display in the\n\n'Required Forms' section on the Reservation Details page. Form fields can be required or not to\n\ncomplete prior to submitting the reservation. To manage the forms available to the core, refer to\n\nCustom Forms . Include custom form on reservations detail page? (Y/N): Indicate whether any\n\ncustom forms associated with this resource will be displayed on the reservations details page.\n\nDisplay a custom form when scheduling maintenance on this resource? (Y/N): Indicate whether a\n\ncustom form should display when a maintenance reservation is created. Notifications Send\n\nreminder emails for reservations?: Select from the drop down the amount of time prior to a\n\nreservation when the user should receive a reminder email about their reservation. Subscribed</source>\n\n<source id=\"3\">current service name\n\n(i.e.\n\ninstance name).\n\nPlease note: this action cannot be undone.\n\n**Remove Schedule Click this**\n\nbutton if you would like to delete the calendar/schedule completely.\n\n**You will be prompted a**\n\nsecond time to confirm you want to permanently delete the calendar.\n\n**If current reservations exist**\n\non the calendar, you will need to type in the name of the resource to confirm deletion.\n\n**Please**\n\nnote: this action cannot be undone.\n\nCalendar Display Scale hour on schedule?: Check this box if\n\nyou would like the hour on the schedule (y-axis) to scale to the minimum time step allowed on the\n\ncalendar.\n\nDisplay usage type names in the background of the calendar: Turn this setting off to\n\ndisable the written display of usage types as small text in the background of your calendar.\n\nThis\n\nmay limit the information immediately available to your customers, especially if they have a color\n\nvision deficiency or other sight impairment.\n\nDefault to multi-view?: Indicate whether you would like\n\n**Page 2**\n\n\n\n**HelpJuice Articles**\n\nthe default calendar view to display all calendars when you have multiple instances.\n\n**Let users see**\n\nreservation owners: This allows users of the core to see the name and email of the person who\n\ncreated the reservation and is beneficial if cores encourage collaboration among customers.\n\nPublic Visibility Display this schedule to the public on your external landing page?: Choose\n\nwhether to have this schedule, its description, and availabilities be displayed on the core's\n\nexternal landing page.\n\nLet public users see the reservation owners?: Choose whether you would\n\nlike the public to be able to view the owner of reservations.\n\n**Restrictions Time Settings Minimum**\n\nreservation time : The minimum amount of time the customer can schedule in one session.\n\nMaximum reservation time : The maximum amount of time the customer can schedule in one\n\nsession.\n\nTime Step : The increment of time by which the event can be increased or decreased.</source>\n\n<source id=\"4\">other restrictions placed upon the calendar.\n\nUsage Types &amp; Pricing A usage type is a\n\npredefined reservation type created with specific scheduling and rate parameters.\n\n**For example,**\n\nyou may allow the usage type \"Independent User\" to schedule from 8am - 5pm, M-F and set the\n\ncost of usage during that time frame to a specific amount.\n\n**Within each usage type, rates can be**\n\nset differently for each price types (i.e.- external, internal, corporate) and can differ among\n\ndifferent usage types.\n\nCore admins can also designate if this availability requires a certain\n\nPermission level or approval for users within each usage type.\n\nName of usage type: Name your\n\nusage type.\n\nExample of frequently used usage types are Independent, Assisted, Peak, After\n\n**Hours, etc.**\n\nThis is a free text field that can be configured to your site.\n\nBackground color: Define\n\nwhich color should display on the calendar for this usage type.\n\nHINT: Lighter colors are easier to\n\nview.\n\nEvery usage type has a color to help define that particular time frame when viewing the\n\ncalendar.\n\nNew usage schedule button: Under the Actions column, use the Edit button to define\n\nthe days and times for this usage type.\n\nDepending on the restriction settings, you can also select\n\nwhether training or approval is required for this usage type.\n\nCustom Fields: If set on the institution\n\nlevel, cores will have the option to set custom billing fields per calendar.\n\nType: Select the price\n\nclass(es) utilizing this usage type.\n\nPrice classes are defined at the institution level.\n\nPrice: Define\n\nthe per price class for the usage types.\n\nDuration price: If enabled by an iLab Associate, you can\n\nset the Duration Price field to apply a discounted rate after a specified number of minutes.\n\nSee\n\n**Duration Pricing for more information.**\n\nEffective Date Starting: Enter a start date for this current\n\nrate, if applicable.\n\nEffective Date Ending: Enter an end date for this current rate, if applicable.</source>\n\n<source id=\"5\">**Equipment Settings:**\n\nClick the gear icon to navigate to the \n**Schedule Settings. Confirm Usage:**\n The Confirm Usage\n\nbutton will direct you to the confirm usage page pre-filtered for the schedule you are currently\n\nviewing. The yellow circle on the Confirm Usage button indicates there are unconfirmed events.\n\n**Calendar Notes:**\n You may add a note to this header section in the schedule settings Calendar\n\nNotes, to display special instructions or notes you want visible to the user. \n**Time Frame:**\n Select\n\nthe time frame or view in which you would like the schedule to be shown in (Day, Week, Month, or\n\nMulti View). Multi View shows a single-day view that lists all the separate instances of a resource\n\n(e.g. if a core has multiple physical instance of the same equipment, they may show them all on a\n\nsingle schedule and allow the user to pick a specific instance when they make a reservation)\n\n**Calendar:**\n Click the calendar to navigate to a specific date. \n**Export to PDF:**\n Click the printer icon to\n\nexport the schedule to a \n**PDF. Forward/Backward:**\n move forward (\"&gt;\") or backward (\"&lt;\") in\n\ntime, in steps equal to the chosen time frame on the calendar. \n**Linked Calendar:**\n Click the button\n\nto show other relevant schedules. \n**Calendar Details:**\n The Calendar Details button opens a popup\n\nwith additional information on availabilities, pricing and event color codes. \n**Green Events:**\n Your\n\nfuture reservations. \n**Purple Events:**\n \n**Your past reservations. Red Events:**\n If the equipment is\n\nPage 1\n\nHelpJuice Articles\n\nunavailable for a selected amount of time. \n**Orange Events:**\n In some cases, cores require core\n\napproval for reservations. If you have reserved time on the calendar that requires core approval,\n\nthat event will be in orange. When the reservation has been approved you may receive an email\n\nand you will see the event turn to purple. Grey: \n**Reservations made by others. White:**\n\nReservations that have been canceled or are no shows. \n**Schedule:**\n Shows all reservations on the</source>\n</context>\n<user_query>\ntell me about calendar features\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 1 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 2 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 3 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 4 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 is explicitly cited in the answer
+INFO - [rag_improvement.phase3] - Source 5 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Found 5 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 2818,
+  "improved_length": 2532,
+  "original_sources_count": 5,
+  "improved_sources_count": 5,
+  "original_context_length": 10132,
+  "improved_context_length": 10104,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 2818,
+  "improved_length": 2532,
+  "original_sources_count": 5,
+  "improved_sources_count": 5,
+  "original_context_length": 10132,
+  "improved_context_length": 10104,
+  "has_numbered_steps": false,
+  "has_section_headers": true
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+The calendar system described in the context offers a variety of features for managing schedules and reservations effectively. Here are the key features:
+
+1. **General Settings**:
+   - You can name the calendar and provide a description for the scheduled resource, which is displayed to customers. This description can include explanations, images, billing information, or directions for scheduling [1].
+   - Calendars can be grouped into categories, and new categories can be created. However, displaying calendars in categories requires additional settings enabled by iLab [1].
+   - Time zones can be set for scheduling purposes, overriding users' personal time zone settings [1].
+   - Classifications can be assigned to schedules to improve searchability [1].
+
+2. **Calendar Notes and Instructions**:
+   - Notes can be added to display above the calendar or on the Reservation Details page, providing instructions or special information for customers [1][2].
+
+3. **Multiple Instances**:
+   - Multiple calendars can be created for resources within a single interface, allowing users to view and schedule across all instances simultaneously. For example, separate rows can be created for different equipment like "PCR 1," "PCR 2," etc. [2].
+
+4. **Custom Forms**:
+   - Custom forms can be linked to schedules to capture preliminary information from customers. These forms can be required or optional and can be displayed during reservations or maintenance scheduling [2].
+
+5. **Notifications**:
+   - Reminder emails can be sent to users prior to their reservations, with customizable timing [2].
+
+6. **Calendar Display Options**:
+   - Features like scaling hours, displaying usage type names, and defaulting to multi-view are available to customize the calendar display [4].
+   - Public visibility settings allow schedules to be displayed on external landing pages, and users can choose whether reservation owners' details are visible to the public [4].
+
+7. **Time Settings and Restrictions**:
+   - Minimum and maximum reservation times can be set, along with time step increments for scheduling [4].
+
+8. **Navigation and Export Options**:
+   - Users can navigate the calendar by date, export schedules to PDF, move forward/backward in time, and view linked calendars [3][5].
+
+9. **Event Color Codes**:
+   - Events are color-coded for clarity:
+     - Green: Future reservations.
+     - Purple/Blue: Past reservations.
+     - Red: Equipment unavailable.
+     - Orange: Reservations requiring core approval.
+     - Grey: Reservations made by others [3][5].
+
+10. **Favorites**:
+    - Calendars can be added to a favorites list for easier access [5].
+
+These features provide robust functionality for managing resources, scheduling, and customer interactions. Let me know if you'd like more details on any specific feature!
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+The calendar features include various functionalities to manage and customize scheduling effectively:
+
+1. **General Settings**:
+   - **Name**: You can assign a name to the calendar.
+   - **Scheduled Resource Description**: This section can be used to provide explanations, images, billing information, or directions related to the resource [5].
+   - **Category**: Calendars can be grouped into categories. New categories can be created, but additional settings may need to be enabled by contacting iLab [5].
+   - **Time Zone**: The calendar's time zone can be set to override users' personal time zones [5].
+   - **Classification**: Assign classifications to schedules for easier searching [5].
+   - **Calendar Notes**: Notes can be added to display above the calendar on the View Schedule page [5].
+
+2. **Multiple Instances**:
+   - Allows creating multiple calendars within a single interface for resources like equipment. For example, separate rows for "PCR 1", "PCR 2", etc., can be configured [4].
+
+3. **Custom Forms**:
+   - Custom forms can be linked to schedules to capture preliminary information from users during reservations. These forms can be required or optional [4].
+
+4. **Notifications**:
+   - Reminder emails can be sent to users before their reservations, with customizable timing [4].
+
+5. **Display Options**:
+   - You can scale the hour on the schedule, display usage type names in the background, and set the default view to multi-view for multiple instances [4].
+   - Public visibility settings allow the schedule and its details to be displayed on external landing pages [4].
+
+6. **Restrictions**:
+   - Minimum and maximum reservation times can be set, along with time step increments for scheduling [4].
+
+7. **Usage Types & Pricing**:
+   - Usage types define specific scheduling and rate parameters, such as "Independent User" or "Peak Hours." Rates can vary based on price classes (e.g., external, internal) and can include discounted rates for longer durations [4].
+
+8. **Equipment Settings**:
+   - Features like Confirm Usage, Calendar Notes, and Time Frame views (Day, Week, Month, Multi View) are available. Multi View allows users to see all instances of a resource on a single schedule [5].
+   - Events are color-coded for easier identification (e.g., green for future reservations, purple for past reservations, red for unavailable equipment) [5].
+
+These features provide flexibility and customization for managing calendars effectively. Let me know if you'd like more details on any specific feature!
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 2818
+improved_length: 2532
+original_sources_count: 5
+improved_sources_count: 5
+original_context_length: 10132
+improved_context_length: 10104
+has_numbered_steps: False
+has_section_headers: True
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 286 characters shorter (-10.1%)
+Both responses cite the same number of sources
+The improved response does NOT include numbered steps
+The improved response includes section headers
+INFO - [rag_improvement.compare] - Comparing responses for query: when was the calendar system released?
+INFO - [rag_improvement.compare] - Comparing responses for query: when was the calendar system released?
+INFO - [rag_improvement.phase3] - FlaskRAGAssistantWithHistory initialized with conversation history
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from original RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.compare] - Getting response from improved RAG implementation...
+INFO - [rag_improvement.phase3] - Searching knowledge base for query: when was the calendar system released?
+INFO - [rag_improvement.phase3] - Executing vector search with fields: text_vector
+INFO - [rag_improvement.phase3] - Search parameters: index=vector-1751292361997-pool10, vector_field=text_vector, top=10
+INFO - [rag_improvement.phase3] - Search returned 10 results
+INFO - [rag_improvement.phase3] - Reorganizing 10 results to preserve hierarchy
+INFO - [rag_improvement.phase3] - Reorganized into 4 ordered results
+INFO - [rag_improvement.phase3] - Preparing context from 4 search results
+INFO - [rag_improvement.phase3] - Prioritizing procedural content in 4 results
+INFO - [rag_improvement.phase3] - Found 1 procedural and 3 informational results
+INFO - [rag_improvement.phase3] - Results prioritized with procedural content first
+INFO - [rag_improvement.phase3] - Source 1 contains procedural content
+INFO - [rag_improvement.phase3] - Source 1 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 2 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 3 contains procedural content
+INFO - [rag_improvement.phase3] - Source 3 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Source 4 contains procedural content
+INFO - [rag_improvement.phase3] - Source 4 has parent_id: aHR0cHM6Ly9jYXBvenpvbDAyc3Rvcm...
+INFO - [rag_improvement.phase3] - Prepared context with 4 valid chunks and 4 sources
+INFO - [rag_improvement.phase3] - Context contains procedural content: True
+INFO - [rag_improvement.phase3] - Generating response with conversation history
+INFO - [rag_improvement.phase3] - Query 'when was the calendar system released?' detected as informational
+INFO - [rag_improvement.phase3] - Using default system prompt
+INFO - [rag_improvement.phase3] - Conversation history has 2 messages
+INFO - [rag_improvement.phase3] - Message 0 - Role: system
+INFO - [rag_improvement.phase3] - Content: 
+    ### Task:
+
+    Respond to the user query using the provided context, incorporating inline citat...
+INFO - [rag_improvement.phase3] - Message 1 - Role: user
+INFO - [rag_improvement.phase3] - Content: <context>
+<source id="1" data-procedural="true" data-steps="2-2000">revision number, and
+
+many more....
+INFO - [rag_improvement.phase3] - ========== OPENAI RAW PAYLOAD ==========
+INFO - [rag_improvement.phase3] - {
+  "model": "deployment02",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n    ### Task:\n\n    Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id=\"1\">).\n    \n    ### Guidelines:\n\n    - If you don't know the answer, clearly state that.\n    - If uncertain, ask the user for clarification.\n    - Respond in the same language as the user's query.\n    - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.\n    - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**\n    - Do not cite if the <source> tag does not contain an id attribute.\n    - Do not use XML tags in your response.\n    - Ensure citations are concise and directly related to the information provided.\n    - Maintain continuity with previous conversation by referencing earlier exchanges when appropriate.\n    - **IMPORTANT: For follow-up questions, continue to use citations [id] when referencing information from the provided context, even if you've mentioned this information in previous responses.**\n    - **Always cite your sources in every response, including follow-up questions.**\n    \n    ### Example of Citation:\n\n    If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:\n\n    * \"According to the study, the proposed method increases efficiency by 20% [1].\"\n    \n    ### Follow-up Questions:\n    \n    For follow-up questions, you must continue to cite sources. For example:\n    \n    User: \"What are the key features of Product X?\"\n    Assistant: \"Product X has three main features: cloud integration [1], advanced analytics [2], and mobile support [3].\"\n    \n    User: \"Tell me more about the mobile support.\"\n    Assistant: \"The mobile support feature of Product X includes cross-platform compatibility, offline mode, and push notifications [3].\"\n    \n    ### Output:\n\n    Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context. Remember to include citations in ALL responses, including follow-up questions.\n    \n    <context>\n\n    {{CONTEXT}}\n    </context>\n    \n    <user_query>\n\n    {{QUERY}}\n    </user_query>\n    "
+    },
+    {
+      "role": "user",
+      "content": "<context>\n<source id=\"1\" data-procedural=\"true\" data-steps=\"2-2000\">revision number, and\n\nmany more. \n\uf097 Users may now login to ECM using their Windows NT domain logon. \n\uf097 The Scheduler program may now be run as a service under Windows NT or \n2000. \n\uf097 The Scheduler program can store files in a protected local folder in case of a\n\nnetwork disruption with transfer to ECM as soon as the network connection is \nrestored.\n\n\uf097 Access to the Scheduler program settings is now controlled for each installed \nagent so users cannot interfere with other scheduled tasks.\n\n\uf097 All administration of the Scheduler program is now done through the Scheduler \npage in ECM.\n\n\uf097 The Scheduler program now supports Scheduler Agent programs for data \nsystems that have complex file structures. Scheduler Agent programs are now \navailable for Waters Millennium and Waters Micromass MassLynx data.\n\n\uf097 Oracle databases are now connected to the Web server using OLE DB rather than \nODBC.\n\n\uf097 Microsoft SQL Server 2000 is now supported. SQL Server 7.0 is no longer \nsupported.\n\n\uf097 ECM now supports load balancing with multiple Web servers so additional servers \ncan be added as the system load increases. We recommend using F5 BIGIP as the \nload balancer.\n\n\uf097 Added movement of cabinets, drawers, folders, and files. \n\uf097 The keyword search at the top of the ECM home page now searches all metadata\n\nand full text indexes so you find what you need quickly. \n\uf097 Advanced search has been expanded to include more metadata. \n\uf097 A new archive agent designed to work with a Storage Array Network (SAN) has\n\nbeen added. \n\uf097 Filter packs have been added for HTML, JCAMP IR, JCAMP MS, JCAMP NMR,\n\nSciex Analyst, and Waters Millennium data.\n\n2.  Version History\n\nOpenLab Enterprise Content Manager Release Notes 17\n\nVersion 1.1 (January 2001)\n\nThe following enhancements were made in \n**Version 1.1:**\n \n\uf097 Added the Filter Pack for Waters Micromass MassLynx. \n\uf097 Added the Filter Pack for Varian SaturnMS. \n\uf097 The CD/DVD Jukebox Archive is now completely functional.</source>\n\n<source id=\"2\">(July 2011)\n\tVersion 3.4.1 (October 2010)\n\tVersion 3.3.2 SP1 (June 2009)\n\tVersion 3.3.2 (April 2008)\n\tVersion 3.3.1 (May 2006)\n\tVersion 3.3 (November 2005)\n\tVersion 3.2 (January 2005)\n\tVersion 3.1 (October 2004)\n\tVersion 3.0.1 (March 2004)\n\tVersion 3.0 (March 2004)\n\tVersion 2.2 (April 2003)\n\tVersion 2.1.2 (August 2003)\n\tVersion 2.1.1 (November 2002)\n\tVersion 2.1.0 J (August 2002)\n\tVersion 2.1 (July 2002)\n\tVersion 2.0.2 (March 2002)\n\tVersion 2.0.1 (December 2001)\n\tVersion 2.0 (November 2001)\n\tVersion 1.1 (January 2001)\n\n\t3 Product Feature Issues and Resolutions\n\tAll Areas of the ECM System\n\tECM FT Service\n\tECM Server Base Software\n\tECM Print Services\n\tECM Scheduler Agent\n\tE-Mail Notification\n\tEnterprise Node\n\tGeneral</source>\n\n<source id=\"3\">Agilent Knowledge Base Article\n\nWhen was the system pressure test limit changed from 3ul/min to\n\n5ul/min?\n\n**Author:**\n yizhan | \n**Created:**\n 2022-09-26\n\n**Source URL:**\n https://community.agilent.com/ikb/online-technical-support-knowledge-base-lc/w/wiki/16740/when-was-the-system-pressure-test-limit-changed-from-3ul-min-to-5ul-min\n\nNote: This is a text-only fallback PDF. See HTML file for complete content with images.\n\nAgilent Internal\nThis Information \n**Applies To the Following Product(s):**\n?All pumps\n\n**Content or Issue Description:**\n\nIn the past years the test limits for the System Pressure Test and the Leak Tests for the pumps were both 3\n?L. Problems occurred when the pump was passing the test barely but well within the limits but the System\nPressure Test for the complete system failed because the Sampler or the?TCC were adding?tiny leaks to the\noverall?result\n\n**Steps to Follow:**\n\nSystem Pressure Test for 1200/1260/1290 Infinity?and 1290 Infinity II Pumps?With the release of LabAdvisor\nB.02.06 the limits for the System Pressure Test were raised depending on the pressure tested. For systems\ntested between 1 bar and 1000 bar the limit is set to 5 ?L. For systems tested >1000 bar the limit is set to 15\n?L accounting for increased stress on fittings, seals and valves.\nSee also service note 1290-015\n\n**Potential risks:**\n\nNA\n\n**Keywords:**\n?System pressure test, test limit\n\n**Article Author:**\n?Steve Zhang\n\nPage 1/1</source>\n\n<source id=\"4\">Service Note\n\nService Note\n\n**Document Information:**\n \nProduct Identifier G6917 RapID Raman\n\nProduct Revision N/A\n\nDocument Number D0025189\n\n**Document Change Log:**\n\nDate Reason for Update\n\nInitial release\n\nService Note Details\n\nTitle: Protocols Released to the Field Portal\n\n**Summary:**\n RapID Service Protocol and Calibration Work Instructions have been\n\nreleased onto the Field Portal\n\n**Parts required:**\n N/A\n\n**Situation/Problem:**\n RapID Service Protocol, Calibration, Test Piece Certification Work\n\nInstructions have been released onto the Field Portal.\n\nThe Service Protocol and Test Piece Certification hasn\u2019t changed beyond\n\ngetting a new document number and some colours updated.\n\nThe calibration work instructions has gone through a re-work into a new\n\nstyle and is released along side a new tool referenced in a secondary\n\nService Note D0025190\n\n**Solution/Action:**\n \n**Released as:**\n\n**D0025048 :**\n RapID System Test Piece Certification\n\n**D0025083 :**\n RapID Service Protocol\n\n**D0025085 :**\n RapID Calibration\n\n**Additional Information:**\n No additional training is required to implement the changes described in\n\nthis Service Note\n\n**Attachments:**\n (optional) N/A\n\n**Template Effective Date:**\n 23-\n**Dec-2020   Printed Date:**\n 4-Jun-2021\n\nPage 1 of 1 Agilent Technologies Restricted\n\nPLC Service Note BQ07.T19 (Rev. A.02)\n\nSep-2022\n\n*** Agilent Attributes List ***\n\n**AEM ID :**\n 09dfdc4f-f469-46e3-a76d-923b88f0134f\n\n**AEM Version :**\n 1.0\n\n**Service Note Classification :**\n Information Only\n\n**Content Description :**\n\n**Content Revision :**\n A.00 MCO000036796\n\n**Source Content ID :**\n\n**Source Content ID :**\n D0025189\n\n**Content Release Date :**\n 2023-05-22 13:20:46 GMT\n\n**Content Entitlement Level :**\n Service Entitled Partner\n\n**Acknowledgement Required :**\n No\n\n**Country Entitlement List :**\n\n**Training Required :**\n No\n\n**Training Details :**\n\n**Performed By :**\n Authorized Service Personnel\n\n**Serial Number Range :**\n\n**Service Note Implementation :**\n\n**Manage Parts :**\n\n**Billable :**\n\n**Billing Period End Date :**</source>\n</context>\n<user_query>\nwhen was the calendar system released?\n</user_query>"
+    }
+  ],
+  "max_tokens": 1000,
+  "temperature": 0.3,
+  "top_p": 1.0,
+  "presence_penalty": 0.6,
+  "frequency_penalty": 0.6
+}
+INFO - [rag_improvement.phase3] - Filtering cited sources from answer
+INFO - [rag_improvement.phase3] - No explicit citations found, checking for content similarity
+INFO - [rag_improvement.phase3] - Found 0 cited sources (explicit and implicit)
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 196,
+  "improved_length": 187,
+  "original_sources_count": 0,
+  "improved_sources_count": 0,
+  "original_context_length": 8197,
+  "improved_context_length": 6330,
+  "has_numbered_steps": false,
+  "has_section_headers": false
+}
+INFO - [rag_improvement.compare] - Comparison metrics: {
+  "original_length": 196,
+  "improved_length": 187,
+  "original_sources_count": 0,
+  "improved_sources_count": 0,
+  "original_context_length": 8197,
+  "improved_context_length": 6330,
+  "has_numbered_steps": false,
+  "has_section_headers": false
+}
+
+================================================================================
+ORIGINAL RESPONSE:
+================================================================================
+The context does not provide specific information about the release date of a "calendar system." If you are referring to a particular system or software, please clarify so I can assist you better.
+
+================================================================================
+IMPROVED RESPONSE:
+================================================================================
+The provided context does not mention the release date of a calendar system. If you are referring to a specific product or feature, please provide more details so I can assist you better.
+
+================================================================================
+COMPARISON METRICS:
+================================================================================
+original_length: 196
+improved_length: 187
+original_sources_count: 0
+improved_sources_count: 0
+original_context_length: 8197
+improved_context_length: 6330
+has_numbered_steps: False
+has_section_headers: False
+
+================================================================================
+ANALYSIS:
+================================================================================
+The improved response is 9 characters shorter (-4.6%)
+Both responses cite the same number of sources
+The improved response does NOT include numbered steps
+The improved response does NOT include section headers

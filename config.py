@@ -38,16 +38,29 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD"))     
 
 POSTGRES_SSL_MODE = os.getenv("POSTGRES_SSL_MODE", os.getenv("PGSSLMODE", "require")) # Default to 'require' for Render
 def get_cost_rates(model: str) -> dict:
-    """
-    Retrieve prompt and completion cost rates per 1,000 tokens for a given model
-    from environment variables named {MODEL}_PROMPT_COST_PER_1K and {MODEL}_COMPLETION_COST_PER_1K.
-    """
+    model_upper = model.upper()
+
     try:
-        prompt_rate = float(os.getenv(f"{model}_PROMPT_COST_PER_1K", "0"))
-    except ValueError:
-        prompt_rate = 0.0
+        prompt_rate = float(os.getenv(f"{model_upper}_PROMPT_COST_PER_1M"))
+    except (ValueError, TypeError):
+        prompt_rate = None
+
+    if prompt_rate is None:
+        try:
+            prompt_rate = float(os.getenv(f"{model_upper}_PROMPT_COST_PER_1K"))
+        except (ValueError, TypeError):
+            prompt_rate = 0.0
+
     try:
-        completion_rate = float(os.getenv(f"{model}_COMPLETION_COST_PER_1K", "0"))
-    except ValueError:
-        completion_rate = 0.0
+        completion_rate = float(os.getenv(f"{model_upper}_COMPLETION_COST_PER_1M"))
+    except (ValueError, TypeError):
+        completion_rate = None
+
+    if completion_rate is None:
+        try:
+            completion_rate = float(os.getenv(f"{model_upper}_COMPLETION_COST_PER_1K"))
+        except (ValueError, TypeError):
+            completion_rate = 0.0
+
     return {"prompt": prompt_rate, "completion": completion_rate}
+
