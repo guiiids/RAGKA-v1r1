@@ -738,7 +738,6 @@ HTML_TEMPLATE = """
         </button>
       </div>
     </div>
-    <span>SAGE may occasionally be wrong. Verify critical info.</span>
     </div>
     <div class="flex items-center justify-center ml-4 overflow-visible">
       <button id="toggle-console-btn" class="group hidden px-3 py-1 w-full bg-white dark:bg-black text-white hover:bg-gray-300 text-gray-800 rounded relative inline-flex items-center justify-center">

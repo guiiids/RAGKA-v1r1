@@ -933,8 +933,7 @@ HTML_TEMPLATE = """
     // Add user message to chat
       function addUserMessage(message) {
         // Hide center logo if visible
-        const centerLogo = document.getElementById('center-logo');
-        if (centerLogo && !centerLogo.classList.contains('hidden')) {
+p        if (centerLogo && !centerLogo.classList.contains('hidden')) {
           centerLogo.classList.add('hidden');
         }
         
