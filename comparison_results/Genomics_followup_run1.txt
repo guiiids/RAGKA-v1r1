@@ -1,0 +1,53 @@
+DOMAIN: Genomics
+QUERY TYPE: followup
+RUN: 1
+================================================================================
+
+QUERY:
+No sample preparation issues were discovered. What could be the next steps?
+
+================================================================================
+
+ACTUAL RESPONSE:
+If no sample preparation issues were identified, the next steps should focus on other potential factors that could affect the outcome. Here are the recommended actions:
+
+1. **Instrument Setup and Calibration**  
+   - Verify that the instrument is properly calibrated and functioning as expected. Perform an auto-teach to ensure the alignment of the pipette module and tip boxes. If auto-teach fails, an on-site visit by a field service engineer (FSE) may be required to re-align the Z gantry and pipette, adjust teach points, and conduct post-repair testing [4].  
+
+2. **Deck Configuration and Consumables Placement**  
+   - Check the placement of labware on the deck, including tip boxes, reagent plates, and Beads & Buffer plates. Misplacement of these items can lead to errors during the run [2][3].  
+   - Inspect the deck for any signs of deformation or improper alignment, particularly the pipette module barrels. If deformation is observed, replacement may be necessary [4].  
+
+3. **Reagent and Consumable Quality**  
+   - Confirm that all reagents and consumables used during the run were in optimal condition and not expired or damaged [2][3].  
+   - Check for any discrepancies in residual reagent volumes or signs of leakage in the Beads & Buffer plate, which could indicate sealing issues [2].  
+
+4. **Run Data Analysis**  
+   - Request the post-run data folder to analyze consumables lot numbers and identify any patterns or anomalies during the run [4].  
+   - Assess sequencing metrics such as on-target percentage and read depth to determine if there are issues with library preparation downstream [3].  
+
+5. **Hardware Diagnostics**  
+   - Run hardware tests to check for intermittent failures, such as incorrect Z belt tension or tip pickup issues. Replace components as needed [2].  
+
+6. **Repeat the Run with Controls**  
+   - Perform a repeat run using a reference sample to eliminate variables and confirm reproducibility. This can help identify whether the issue is related to the instrument or specific samples [2].  
+
+By systematically addressing these areas, you can narrow down the root cause of the issue and ensure successful library preparation in subsequent runs.
+
+================================================================================
+
+EXPECTED RESPONSE:
+If no sample preparation issues were discovered and an engineer is required to go on-site, the following instructions should be provided to ensure a thorough investigation and resolution:---### 1. Review Site Preparation- Action: Verify that the site meets all preparation requirements, including:- Adequate laboratory space with proper clearances around the instrument.- Correct electrical outlets and power supply.- Environmental conditions (e.g., temperature, humidity) within the specified range [4].- Follow-up: Ensure the instrument is placed in its permanent location and confirm all consumables and supplies are available [4].---### 2. Inspect Instrument Setup- Action: Check the physical setup of the Magnis instrument, including:- Alignment of the Z gantry and pipette module.- Placement of consumables such as tip boxes, reagent plates, and Beads & Buffer plates.- Proper latching of plates into the spring-loaded mechanism [1], [3].- Follow-up: Perform an auto-teach to verify alignment. If auto-teach fails, manually adjust teach points and run post-repair tests [1].---### 3. Check Instrument Components- Action: Inspect critical components for damage or misalignment:- Pipette module barrels for deformation.- Magnets within the HSM for proper positioning [2].- Follow-up: Replace any damaged components and test their functionality.
+
+================================================================================
+
+VALIDATION RESULTS:
+Response time: 7.16 seconds
+Response length: 2194 characters
+Sources cited: 4
+
+MISSING REQUIRED PHRASES:
+  - If no sample preparation issues were discovered and an engineer is required to go on-site
+  - ### 1. Review Site Preparation
+  - ### 2. Inspect Instrument Setup
+  - ### 3. Check Instrument Components

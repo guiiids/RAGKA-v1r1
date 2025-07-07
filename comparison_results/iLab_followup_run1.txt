@@ -1,0 +1,37 @@
+DOMAIN: iLab
+QUERY TYPE: followup
+RUN: 1
+================================================================================
+
+QUERY:
+How can I undo this and reattach an invoice?
+
+================================================================================
+
+ACTUAL RESPONSE:
+To reattach a detached invoice in iLab, follow these steps:
+
+1. Navigate to the **Billing tab** in the core facility and locate the section called **View Detached Invoices**. Detached invoices can also be found within the "Invoices" link in the left-hand navigation menu [1].
+2. Use the filter tools within the Invoices filter panel to search for detached invoices, which are easily identifiable by their red-lettered "Detached" status [1].
+3. Select the checkbox next to the detached invoice you want to reattach.
+4. The detached invoice will automatically be moved into the next **Billing Event** created for inclusion. Selecting the checkbox ensures the invoice is inserted into the new billing event [1].
+
+This process allows you to include the previously detached invoice in a new billing event for further processing.
+
+================================================================================
+
+EXPECTED RESPONSE:
+To reattach a detached invoice in iLab, follow these steps:### Steps to Reattach a Detached Invoice1. Locate the Detached Invoice:- Navigate to the Billing Tab of the core facility.- Go to the section labeled View Detached Invoices. Detached invoices are identified by their red-lettered "Detached" status [1].2. Select the Invoice:- Use the filter tools within the Invoices filter panel to search for the specific detached invoice, if needed [1].- Click the checkbox next to the invoice you wish to reattach [1].3. Include in a New Billing Event:- Detached invoices are automatically moved into the next billing event created.- Select the checkbox labeled Include at the top of the list to automatically mark all detached invoices as ready for inclusion in the new billing event [1].4. Finalize the Billing Event:- Proceed with the creation or management of the new billing event, ensuring the selected invoice is included [1].---### Important Notes- Detached invoices can only be reattached to new billing events, not to the original event they were removed from [1].- Ensure all necessary corrections or updates to the invoice are made before reattaching it to avoid further issues during processing.
+
+================================================================================
+
+VALIDATION RESULTS:
+Response time: 5.28 seconds
+Response length: 823 characters
+Sources cited: 1
+
+MISSING REQUIRED PHRASES:
+  - Locate the Detached Invoice
+  - Select the Invoice
+  - Include in a New Billing Event
+  - Finalize the Billing Event

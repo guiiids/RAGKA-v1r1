@@ -1,0 +1,59 @@
+DOMAIN: Genomics
+QUERY TYPE: initial
+RUN: 1
+================================================================================
+
+QUERY:
+A user complains that they get no final libraries on their Magnis instrument despite following the manual precisely. Which questions should I, an Agilent remote engineer, ask to probe how they prepared the samples?
+
+================================================================================
+
+ACTUAL RESPONSE:
+To investigate why no final libraries are being generated on the Magnis instrument, you can ask the user the following questions to probe their sample preparation process:
+
+1. **Reagent Storage and Preparation**  
+   - Were the reagents stored under the appropriate conditions as specified in the SureSelect on Magnis User Guides and reagent labels? [2]  
+   - Were the reagents properly thawed, vortexed, and centrifuged using the correct equipment? [2]  
+   - Did you visually inspect the reagents before loading them onto the deck to ensure all liquid was at the bottom of the wells and that there was no observable damage to the consumables? [2]  
+
+2. **Quantification of Input Samples**  
+   - Was the quantification of the input DNA/RNA reproducible? Did you re-run the quantification to confirm the dropout or low yield was not due to pipetting errors? [2]  
+   - Were the reagents and consumables used for quantification in optimal condition? [2][2]  
+
+3. **Input DNA/RNA Quality and Volume**  
+   - Did the input DNA/RNA sample meet the guidelines in the SureSelect on Magnis User Guides? [2]  
+   - Was the correct sample volume added to the sample input strip? [2]  
+   - Was the DNA diluted and sheared in 1x Low TE buffer? If enzymatic shearing was performed, was the DNA input volume 14 µL? [2]  
+
+4. **Probe and Hybridization Accuracy**  
+   - Were the correct probes used for the region of interest? [2]  
+   - Were the probes added accurately to the probe strip using an appropriate pipette to ensure precise volume dispensing? [2]  
+
+5. **Deck Setup and Consumables Placement**  
+   - Did you check photos of the deck to confirm proper placement of labware, including tip boxes, HSM plates, and Beads & Buffer plates? [2][3]  
+   - Were the tip boxes placed correctly within their platforms? [4]  
+
+6. **Run Setup and Instrument Checks**  
+   - Did you confirm the DNA/RNA concentration and quality settings on the Run Setup tab of the touchscreen? [2]  
+   - If enzymatic shearing was performed, did you adjust the fragmentation time on the "Confirm Setup" screen if fragment sizes were inconsistent? [2]  
+   - Have you performed an auto-teach to verify the alignment of the pipette module and tip boxes? [4]  
+
+By systematically addressing these points, you can identify potential issues in sample preparation or instrument setup that may be causing the lack of final libraries.
+
+================================================================================
+
+EXPECTED RESPONSE:
+To troubleshoot why no final libraries are being generated on the Magnis instrument, you should ask the following questions to probe the user's sample preparation process:---### 1. Input DNA/RNA Preparation- How was the input DNA/RNA quantified?- Confirm if the user used a Qubit BR dsDNA assay or Agilent NGS FFPE QC kit to assess DNA quality and concentration [5].- What was the input DNA volume and buffer?- Verify if the DNA was diluted in 1x Low TE buffer to the correct volume (e.g., 50 µL total) [5].- Was enzymatic shearing performed correctly?- If enzymatic shearing was used, ask if the input volume was 14 µL and if the fragmentation time was set appropriately on the touchscreen [4].- Was QC performed after off-deck shearing?- Ensure the user performed quality control on the sheared DNA before loading it onto the Magnis [4].---### 2. Reagent Handling- Were the reagents thawed, vortexed, and spun down?- Confirm if reagents were thawed to room temperature, vortexed horizontally and vertically, and centrifuged to ensure all liquid was at the bottom of the wells [2][3].- Were the reagents free from air bubbles or damage?- Ask if the user visually inspected the reagents for air bubbles or abnormalities before loading them onto the deck [3].- Were the probes dispensed accurately?- Verify if the probes were added to the probe input strip using an appropriate pipette, ensuring precise volumes (e.g., 5 µL or 2 µL for EPIS protocols) [4].---### 3. Deck Setup- Were consumables placed correctly on the deck?- Ask if the user ensured proper placement of tip boxes, HSM plates, and Beads & Buffer plates, ensuring they were latched into the spring-loaded mechanisms [2][3].- Was the Beads & Buffer plate seal inspected?- Confirm if the user checked for warping, bulging, or abnormalities in the Beads & Buffer plate seal [3].- Were tip boxes aligned properly?- Misaligned tip boxes can cause pipetting errors. Ask if the user checked their placement before starting the run [1][2].
+
+================================================================================
+
+VALIDATION RESULTS:
+Response time: 11.04 seconds
+Response length: 2399 characters
+Sources cited: 4
+
+MISSING REQUIRED PHRASES:
+  - investigate why the user is getting no final libraries
+  - ### 1. Input DNA/RNA Preparation
+  - ### 2. Reagent Handling
+  - ### 3. Deck Setup

@@ -1,0 +1,39 @@
+DOMAIN: iLab
+QUERY TYPE: initial
+RUN: 1
+================================================================================
+
+QUERY:
+How do I detach an invoice from a billing file in iLab?
+
+================================================================================
+
+ACTUAL RESPONSE:
+To detach an invoice from a billing file in iLab, follow these steps:
+
+1. Navigate to the **Billing tab** in the core facility to view your list of existing billing events. Ensure the billing event has a status of either "Billing Initialized" or "Draft."
+2. Locate the billing event that contains the invoice(s) you want to detach and click on the appropriate invoice link to display a list of all invoices within that billing event.
+3. Open the specific invoice you wish to detach by selecting the magnifying glass icon to the far right.
+4. Once the invoice is open, select the **"Detach Invoice" icon** at the top of the invoice.
+5. The **Detach Invoice window** will open. You may enter a note in the provided field (optional).
+6. Click **"Detach Invoice"** to remove the invoice from the billing event. A note indicating that the invoice has been detached will display at the top of the invoice [1].
+
+After detachment, the invoice will move to a new section called **View Detached Invoices**, found under the core facility's Billing tab. Detached invoices can also be filtered and aggregated using the filter panel for easy management [1].
+
+================================================================================
+
+EXPECTED RESPONSE:
+To detach an invoice from a billing file in iLab, follow these steps:### Steps to Detach an Invoice1. Access the Billing Tab:Navigate to the core's Billing Tab to view the list of existing billing events. Ensure the billing event has a status of either "Billing Initialized" or "Draft" [1].2. Locate the Billing Event:Find the billing event that contains the invoice(s) you want to detach [1].3. Open the Invoice:- Click on the appropriate invoice link to display all invoices within the billing event.- Select the magnifying glass icon to the far right of the invoice you wish to detach [1].4. Detach the Invoice:- Once the invoice is open, click the "Detach Invoice" icon at the top of the invoice.- The Detach Invoice window will open. You may enter a note in the provided field, but this is optional.- Click "Detach Invoice" to remove the invoice from the billing event.- A note indicating the invoice has been detached will display at the top of the invoice [1].---### Important Notes- Restrictions:An invoice cannot be detached if:- It has been marked Paid or Partially Paid.- The billing event has a status of "File Sent", meaning all invoices have already been sent to an institutional ERP for final processing [1].- Institutional Settings:Not all institutions allow detached invoices. Institutional administrators determine whether core administrators have the authority to detach invoices from billing events [1].
+
+================================================================================
+
+VALIDATION RESULTS:
+Response time: 5.40 seconds
+Response length: 1143 characters
+Sources cited: 1
+
+MISSING REQUIRED PHRASES:
+  - Access the Billing Tab
+  - Locate the Billing Event
+  - Open the Invoice
+  - Detach the Invoice

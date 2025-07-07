@@ -1,0 +1,25 @@
+RAG CONSISTENCY TEST SUMMARY
+===========================
+
+Test run at: 2025-07-07 07:47:27
+
+
+DOMAIN: Genomics
+--------------------------------------------------------------------------------
+Run 1: Initial query successful. Follow-up query successful.
+
+DOMAIN: GC
+--------------------------------------------------------------------------------
+Run 1: Initial query successful. Follow-up query successful.
+
+DOMAIN: LC
+--------------------------------------------------------------------------------
+Run 1: Initial query successful. Follow-up query successful.
+
+DOMAIN: iLab
+--------------------------------------------------------------------------------
+Run 1: Initial query successful. Follow-up query successful.
+
+DOMAIN: OpenLab CDS
+--------------------------------------------------------------------------------
+Run 1: Initial query successful. Follow-up query successful.
